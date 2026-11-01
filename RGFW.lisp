@@ -1,6 +1,5 @@
 ;;;; Generated Common Lisp translation; altered source.
-;;;; Targets: linux-x86_64, linux-arm64, linux-i686, linux-armv7, windows-x86_64, windows-arm64, windows-i686, freebsd-x86_64, freebsd-arm64, freebsd-i686, freebsd-armv7
-;;;; Partial coverage: skipped missing SDK headers for macos-x86_64, macos-arm64.
+;;;; Targets: linux-x86_64, linux-arm64, linux-i686, linux-armv7, windows-x86_64, windows-arm64, windows-i686, macos-x86_64, macos-arm64, freebsd-x86_64, freebsd-arm64, freebsd-i686, freebsd-armv7
 ;;;; /*
 ;;;; *
 ;;;; *	RGFW 2.0.0-dev
@@ -179,6 +178,12 @@
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (unless (find-package :float-features)
     (asdf/operate:load-system "float-features")))
+#+(:and :darwin (:or :x86-64 :arm64))
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (unless
+      (member "cffi-libffi" (asdf/operate:already-loaded-systems) :test
+              #'equal)
+    (asdf/operate:load-system "cffi-libffi")))
 ;; Translation maintenance notes (markers below refer here):
 ;; [storage] addressable C storage is retained below.
 ;;   Consider Lisp objects only after checking aliasing and ABI use.
@@ -374,6 +379,7 @@
            #:rgfw-write-clipboard)
   (:shadow #:write
            #:length
+           #:array
            #:first
            #:count
            #:values
@@ -383,6 +389,7 @@
            #:string
            #:read
            #:time
+           #:last
            #:type
            #:class-name
            #:close
@@ -397,15 +404,15 @@
 (declaim
  (ftype function %--x11window-hints-decorations %--x11window-hints-flags
   %-devicemode-w-dm-bits-per-pel %-devicemode-w-dm-display-frequency
-  %-devicemode-w-dm-fields %-devicemode-w-dm-pels-height
-  %-devicemode-w-dm-pels-width %-devicemode-w-dm-size %-display-devicew-cb
-  %-display-devicew-state-flags %-iconinfo-f-icon %-iconinfo-hbm-color
-  %-iconinfo-hbm-mask %-iconinfo-x-hotspot %-iconinfo-y-hotspot %-pointl-x
-  %-pointl-y %-x-event-type %-x-image-bits-per-pixel %-x-image-blue-mask
-  %-x-image-data %-x-image-green-mask %-x-image-red-mask
-  %-x-priv-display-default-screen %-x-priv-display-fd %-x-priv-display-qlen
-  %-x-priv-display-screens %-xcursor-image-pixels %-xcursor-image-xhot
-  %-xcursor-image-yhot %-xkb-component-names-keycodes %-xkb-desc-max-key-code
+  %-devicemode-w-dm-pels-height %-devicemode-w-dm-pels-width
+  %-devicemode-w-dm-size %-display-devicew-cb %-display-devicew-state-flags
+  %-iconinfo-f-icon %-iconinfo-hbm-color %-iconinfo-hbm-mask
+  %-iconinfo-x-hotspot %-iconinfo-y-hotspot %-pointl-x %-pointl-y
+  %-x-event-type %-x-image-bits-per-pixel %-x-image-blue-mask %-x-image-data
+  %-x-image-green-mask %-x-image-red-mask %-x-priv-display-default-screen
+  %-x-priv-display-fd %-x-priv-display-qlen %-x-priv-display-screens
+  %-xcursor-image-pixels %-xcursor-image-xhot %-xcursor-image-yhot
+  %-xkb-component-names-keycodes %-xkb-desc-max-key-code
   %-xkb-desc-min-key-code %-xkb-desc-names %-xkb-names-rec-keys
   %-xkb-state-rec-locked-mods %-xrr-crtc-gamma-blue %-xrr-crtc-gamma-green
   %-xrr-crtc-gamma-red %-xrr-crtc-info-height %-xrr-crtc-info-mode
@@ -426,20 +433,21 @@
   %address--x-event-xexpose %address--x-event-xkey %address--x-event-xmotion
   %address--x-event-xproperty %address--x-event-xreparent
   %address--x-event-xselection %address--x-event-xselectionrequest
-  %address--x-image-f %address--xkb-key-name-rec-name
-  %address-rgfw-event-scale %address-rgfw-info-api-keycodes
-  %address-rgfw-info-callbacks %address-rgfw-info-event-wait-force-stop
-  %address-rgfw-info-events %address-rgfw-info-keyboard
-  %address-rgfw-info-keycodes %address-rgfw-info-monitors
-  %address-rgfw-info-mouse-buttons %address-rgfw-info-standard-mice
-  %address-rgfw-info-wide-class-name %address-rgfw-info-window-state
-  %address-rgfw-info-wm-delete-window %address-rgfw-info-wnd-class
-  %address-rgfw-info-xrandr-event-base %address-rgfw-monitor-mode
-  %address-rgfw-monitor-node-adapter-name
+  %address--x-image-f %address--xkb-key-name-rec-name %address-cg-rect-origin
+  %address-cg-rect-size %address-rgfw-event-scale
+  %address-rgfw-info-api-keycodes %address-rgfw-info-callbacks
+  %address-rgfw-info-custom-view-classes
+  %address-rgfw-info-event-wait-force-stop %address-rgfw-info-events
+  %address-rgfw-info-keyboard %address-rgfw-info-keycodes
+  %address-rgfw-info-monitors %address-rgfw-info-mouse-buttons
+  %address-rgfw-info-standard-mice %address-rgfw-info-wide-class-name
+  %address-rgfw-info-window-state %address-rgfw-info-wm-delete-window
+  %address-rgfw-info-wnd-class %address-rgfw-info-xrandr-event-base
+  %address-rgfw-monitor-mode %address-rgfw-monitor-node-adapter-name
   %address-rgfw-monitor-node-device-name %address-rgfw-monitors-data
   %address-rgfw-monitors-free-list %address-rgfw-native-image-bitmap-bits
-  %address-rgfw-surface-native %address-rgfw-window-internal
-  %address-rgfw-window-internal-new-mode
+  %address-rgfw-native-image-buffer %address-rgfw-surface-native
+  %address-rgfw-window-internal %address-rgfw-window-internal-new-mode
   %address-rgfw-window-internal-old-mode
   %address-tag-minmaxinfo-pt-max-track-size
   %address-tag-minmaxinfo-pt-min-track-size
@@ -451,27 +459,36 @@
   %address-x-button-event-x %address-x-button-event-x-root
   %address-x-button-event-y %address-x-button-event-y-root
   %address-x-client-message-event-data %address-x-size-hints-max-aspect
-  %address-x-size-hints-min-aspect %address-xi-raw-event-valuators %atof
-  %bitmapv5header-b-v5bit-count %bitmapv5header-b-v5compression
-  %bitmapv5header-b-v5height %bitmapv5header-b-v5planes
-  %bitmapv5header-b-v5size %bitmapv5header-b-v5width %byte-string
-  %c---syscall-slong-t-to-u64 %c---time-t-to-u64 %c-atom-to-i32
-  %c-atom-to-int %c-atom-to-long %c-char-to-u8 %c-cursor-to-pointer
-  %c-double-to-i32 %c-double-to-u32 %c-dword-ptr-to-word %c-dword-to-i32
-  %c-dword-to-long %c-expression-to-atom %c-expression-to-colormap
-  %c-expression-to-dword %c-expression-to-dword-ptr %c-expression-to-key-sym
+  %address-x-size-hints-min-aspect %address-xi-raw-event-valuators
+  %aggregate-callback %atof %bitmapv5header-b-v5bit-count
+  %bitmapv5header-b-v5compression %bitmapv5header-b-v5height
+  %bitmapv5header-b-v5planes %bitmapv5header-b-v5size
+  %bitmapv5header-b-v5width %byte-string %c---syscall-slong-t-to-u64
+  %c---time-t-to-u64 %c-atom-to-i32 %c-atom-to-int %c-atom-to-long
+  %c-bool-to-rgfw-bool %c-builtin-bool-to-bool %c-cf-index-to-pointer
+  %c-cf-index-to-size-t %c-cg-float-to-i32 %c-cg-gamma-value-to-u16
+  %c-char-to-u8 %c-cursor-to-pointer %c-double-to-i32 %c-double-to-u32
+  %c-dword-ptr-to-word %c-dword-to-i32 %c-dword-to-long %c-expression-to-atom
+  %c-expression-to-bool %c-expression-to-boolean-t %c-expression-to-colormap
+  %c-expression-to-dword %c-expression-to-dword-ptr
+  %c-expression-to-io-service-t %c-expression-to-key-sym
+  %c-expression-to-ns-window-style-mask %c-expression-to-nsu-integer
   %c-expression-to-rgfw-format %c-expression-to-rgfw-key
   %c-expression-to-rgfw-mouse-button %c-expression-to-time
-  %c-expression-to-u64 %c-expression-to-uint %c-expression-to-word
-  %c-expression-to-xrr-mode-flags %c-float-to-dword %c-handle-to-int
-  %c-hbitmap-to-int %c-hicon-to-int %c-hicon-to-lparam %c-hmodule-to-int
-  %c-i32-to-atom %c-i32-to-dword %c-i32-to-unsigned-long %c-i64-to-long
-  %c-int-to-dword %c-int-to-hwnd %c-int-to-size-t %c-int-to-u64
-  %c-int-to-uint %c-key-sym-to-rgfw-key %c-key-sym-to-u32 %c-key-sym-to-u8
-  %c-long-to-char %c-long-to-dword %c-long-to-i32 %c-long-to-int
-  %c-long-to-time %c-long-to-u32 %c-long-to-u64 %c-long-to-unsigned-int
+  %c-expression-to-u64 %c-expression-to-uint %c-expression-to-uint8-t
+  %c-expression-to-word %c-expression-to-xrr-mode-flags %c-float-to-dword
+  %c-handle-to-int %c-hbitmap-to-int %c-hicon-to-int %c-hicon-to-lparam
+  %c-hmodule-to-int %c-i32-to-atom %c-i32-to-dword %c-i32-to-unsigned-long
+  %c-i64-to-long %c-int-to-cg-open-gl-display-mask %c-int-to-dword
+  %c-int-to-hwnd %c-int-to-ns-bitmap-format %c-int-to-ns-window-style-mask
+  %c-int-to-nsu-integer %c-int-to-rgfw-bool %c-int-to-rgfw-key
+  %c-int-to-rgfw-mouse-button %c-int-to-size-t %c-int-to-u64 %c-int-to-uint
+  %c-key-sym-to-rgfw-key %c-key-sym-to-u32 %c-key-sym-to-u8 %c-long-to-char
+  %c-long-to-dword %c-long-to-i32 %c-long-to-int %c-long-to-time
+  %c-long-to-u32 %c-long-to-u64 %c-long-to-unsigned-int
   %c-long-to-unsigned-long %c-long-to-window %c-long-to-xim-style
   %c-lparam-to-dword-ptr %c-lparam-to-hrawinput %c-lparam-to-pointer
+  %c-nsu-integer-to-cg-direct-display-id %c-nsu-integer-to-int
   %c-pfn-dwm-enable-blur-behind-window-to-int
   %c-pfn-dwm-set-window-attribute-to-int %c-pfn-get-dpi-for-monitor-to-int
   %c-pfn-time-begin-period-to-int %c-pfn-x-shape-combine-mask-to-int
@@ -479,26 +496,30 @@
   %c-pfn-x-sync-int-to-value-to-int %c-pfn-x-sync-set-counter-to-int
   %c-pfn-xcursor-image-create-to-int %c-pfn-xcursor-image-destroy-to-int
   %c-pfn-xcursor-image-load-cursor-to-int %c-pfn-xi-select-events-to-int
-  %c-pointer-to-cursor %c-pointer-to-int %c-pointer-to-long
-  %c-pointer-to-lparam %c-pointer-to-rr-mode
-  %c-rgfw-convert-image-data-func-to-int %c-rr-mode-to-pointer
-  %c-size-t-to-int %c-time-t-to-u64 %c-u32-to-i32 %c-u32-to-key-code
-  %c-u32-to-lparam %c-u32-to-size-t %c-u32-to-unsigned-long %c-u32-to-word
+  %c-pointer-to-cf-index %c-pointer-to-cursor %c-pointer-to-int
+  %c-pointer-to-long %c-pointer-to-lparam %c-pointer-to-rr-mode
+  %c-rgfw-bool-to-bool %c-rgfw-convert-image-data-func-to-int
+  %c-rr-mode-to-pointer %c-size-t-to-cf-index %c-size-t-to-int
+  %c-size-t-to-u32 %c-time-t-to-u64 %c-u16-to-u32 %c-u32-to-i32 %c-u32-to-int
+  %c-u32-to-key-code %c-u32-to-lparam %c-u32-to-ns-window-style-mask
+  %c-u32-to-size-t %c-u32-to-u16 %c-u32-to-unsigned-long %c-u32-to-word
   %c-u64-to-i32 %c-u8-to-u32 %c-uint-to-i32 %c-uint-to-size-t
-  %c-ulong-ptr-to-lpstr %c-unsigned-int-to-i32 %c-unsigned-int-to-key-code
-  %c-unsigned-int-to-u8 %c-unsigned-long-to-i32 %c-unsigned-long-to-long
-  %c-unsigned-long-to-u32 %c-unsigned-long-to-u64
-  %c-unsigned-signed-char-to-atom %c-wchar-t-to-rgfw-key %c-wchar-to-u32
-  %c-window-to-long %c-window-to-u64 %c-word-to-i16 %c-word-to-short
-  %c-word-to-ulong-ptr %c-wparam-to-hdrop %c-wparam-to-i32 %c-wparam-to-u32
-  %c-wparam-to-uint %c-wparam-to-wchar %c-xim-to-int %c-xkb-desc-ptr-to-int
-  %c-xrm-database-to-int %compare %dwm-blurbehind-dw-flags
-  %dwm-blurbehind-f-enable %dwm-blurbehind-f-transition-on-maximized
-  %dwm-blurbehind-h-rgn-blur %file-call %fill %flashwinfo-cb-size
-  %flashwinfo-dw-flags %flashwinfo-hwnd %flashwinfo-u-count %fputc
-  %funcs-destroy-image %host-slot-empty-p %host-slot-index %integer
-  %load-host %offset %pollfd-events %pollfd-fd %pollfd-revents %printf
-  %rgfw-common-event-win %rgfw-data-drag-event-action
+  %c-ulong-ptr-to-lpstr %c-uni-char-to-rgfw-key %c-unsigned-int-to-i32
+  %c-unsigned-int-to-key-code %c-unsigned-int-to-u8 %c-unsigned-long-to-i32
+  %c-unsigned-long-to-int %c-unsigned-long-to-long %c-unsigned-long-to-u32
+  %c-unsigned-long-to-u64 %c-unsigned-signed-char-to-atom
+  %c-wchar-t-to-rgfw-key %c-wchar-to-u32 %c-window-to-long %c-window-to-u64
+  %c-word-to-i16 %c-word-to-short %c-word-to-ulong-ptr %c-wparam-to-hdrop
+  %c-wparam-to-i32 %c-wparam-to-u32 %c-wparam-to-uint %c-wparam-to-wchar
+  %c-xim-to-int %c-xkb-desc-ptr-to-int %c-xrm-database-to-int %cg-point-x
+  %cg-point-y %cg-size-height %cg-size-width %compare
+  %dwm-blurbehind-dw-flags %dwm-blurbehind-f-enable
+  %dwm-blurbehind-f-transition-on-maximized %dwm-blurbehind-h-rgn-blur
+  %file-call %fill %flashwinfo-cb-size %flashwinfo-dw-flags %flashwinfo-hwnd
+  %flashwinfo-u-count %fputc %funcs-destroy-image %host-slot-empty-p
+  %host-slot-index %integer %load-host %objc-super-receiver
+  %objc-super-super-class %offset %pollfd-events %pollfd-fd %pollfd-revents
+  %printf %rgfw-common-event-win %rgfw-data-drag-event-action
   %rgfw-data-drag-event-data-type %rgfw-data-drag-event-x
   %rgfw-data-drag-event-y %rgfw-data-drop-event-value
   %rgfw-data-drop-event-win %rgfw-data-drop-node-length
@@ -514,14 +535,17 @@
   %rgfw-info--net-wm-sync-request-counter %rgfw-info--net-workarea
   %rgfw-info-atom-pair %rgfw-info-class-name %rgfw-info-clipboard
   %rgfw-info-clipboard-1 %rgfw-info-clipboard-manager %rgfw-info-context
-  %rgfw-info-cur %rgfw-info-debug-callback-src %rgfw-info-display
-  %rgfw-info-dnd-build %rgfw-info-dnd-cur %rgfw-info-dnd-root
-  %rgfw-info-event-bottom %rgfw-info-event-len %rgfw-info-helper-window
-  %rgfw-info-hidden-mouse %rgfw-info-im %rgfw-info-instance
-  %rgfw-info-multiple %rgfw-info-net-wm-window-opacity
-  %rgfw-info-polled-events %rgfw-info-queue-events %rgfw-info-raw-mouse
-  %rgfw-info-save-targets %rgfw-info-scroll-x %rgfw-info-scroll-y
-  %rgfw-info-targets %rgfw-info-unix-clipboard %rgfw-info-utf8-string
+  %rgfw-info-cur %rgfw-info-custom-ns-app-delegate
+  %rgfw-info-custom-ns-app-delegate-class %rgfw-info-custom-window-class
+  %rgfw-info-custom-window-delegate-class %rgfw-info-debug-callback-src
+  %rgfw-info-display %rgfw-info-dnd-build %rgfw-info-dnd-cur
+  %rgfw-info-dnd-root %rgfw-info-event-bottom %rgfw-info-event-len
+  %rgfw-info-flash %rgfw-info-helper-window %rgfw-info-hidden-mouse
+  %rgfw-info-im %rgfw-info-instance %rgfw-info-multiple
+  %rgfw-info-net-wm-window-opacity %rgfw-info-ns-app %rgfw-info-polled-events
+  %rgfw-info-queue-events %rgfw-info-raw-mouse %rgfw-info-save-targets
+  %rgfw-info-scroll-x %rgfw-info-scroll-y %rgfw-info-targets
+  %rgfw-info-tis-bundle %rgfw-info-unix-clipboard %rgfw-info-utf8-string
   %rgfw-info-vector-x %rgfw-info-vector-y %rgfw-info-window-count
   %rgfw-info-wm-delete-window %rgfw-info-wm-protocols %rgfw-info-wm-state
   %rgfw-info-x11error %rgfw-info-x11format %rgfw-info-x11source
@@ -534,42 +558,46 @@
   %rgfw-key-event-mod %rgfw-key-event-repeat %rgfw-key-event-state
   %rgfw-key-event-value %rgfw-monitor-event-monitor %rgfw-monitor-event-state
   %rgfw-monitor-list-cur %rgfw-monitor-mode-src %rgfw-monitor-node
-  %rgfw-monitor-node-crtc %rgfw-monitor-node-disconnected
+  %rgfw-monitor-node-all-modes %rgfw-monitor-node-crtc
+  %rgfw-monitor-node-disconnected %rgfw-monitor-node-display
   %rgfw-monitor-node-h-monitor %rgfw-monitor-node-next
-  %rgfw-monitor-node-rr-output %rgfw-monitor-user-ptr %rgfw-monitors-count
+  %rgfw-monitor-node-rr-output %rgfw-monitor-node-screen
+  %rgfw-monitor-node-uint-num %rgfw-monitor-user-ptr %rgfw-monitors-count
   %rgfw-monitors-primary %rgfw-mouse-button-event-state
   %rgfw-mouse-button-event-value %rgfw-mouse-delta-event-x
   %rgfw-mouse-delta-event-y %rgfw-mouse-motion-event-in-window
   %rgfw-mouse-motion-event-x %rgfw-mouse-motion-event-y
-  %rgfw-native-image-bitmap-bits %rgfw-native-image-buffer
-  %rgfw-native-image-format %rgfw-native-image-hdc-mem
+  %rgfw-native-image-bitmap %rgfw-native-image-bitmap-bits
+  %rgfw-native-image-buffer %rgfw-native-image-format
+  %rgfw-native-image-hdc-mem %rgfw-native-image-rep
   %rgfw-scale-updated-event-x %rgfw-scale-updated-event-y
   %rgfw-surface-convert-func %rgfw-surface-format %rgfw-surface-h
   %rgfw-surface-w %rgfw-window-focus-event-state %rgfw-window-h
   %rgfw-window-internal-mouse %rgfw-window-next %rgfw-window-src-action-frame
   %rgfw-window-src-aspect-ratio-h %rgfw-window-src-aspect-ratio-w
-  %rgfw-window-src-flash-end %rgfw-window-src-gc %rgfw-window-src-h
-  %rgfw-window-src-h-icon-big %rgfw-window-src-h-icon-small
-  %rgfw-window-src-hdc %rgfw-window-src-high-surrogate %rgfw-window-src-ic
+  %rgfw-window-src-delegate %rgfw-window-src-flash-end %rgfw-window-src-gc
+  %rgfw-window-src-h %rgfw-window-src-h-icon-big
+  %rgfw-window-src-h-icon-small %rgfw-window-src-hdc
+  %rgfw-window-src-high-surrogate %rgfw-window-src-ic
   %rgfw-window-src-max-size-h %rgfw-window-src-max-size-w
   %rgfw-window-src-min-size-h %rgfw-window-src-min-size-w
-  %rgfw-window-src-parent %rgfw-window-src-w %rgfw-window-src-window
-  %rgfw-window-src-x %rgfw-window-src-y %rgfw-window-state-data-length
-  %rgfw-window-state-drop-x %rgfw-window-state-drop-y
-  %rgfw-window-state-mouse-leave %rgfw-window-state-win
-  %rgfw-window-state-win-leave %rgfw-window-update-event-h
-  %rgfw-window-update-event-w %rgfw-window-update-event-x
-  %rgfw-window-update-event-y %rgfw-window-user-ptr %rgfw-window-w
-  %rgfw-window-x %rgfw-window-y %screen-default-gc %screen-root
-  %screen-root-depth %screen-root-visual %snprintf %standard-stream %store
-  %string-result %strncpy %strtof %strtol %tag-monitorinfoexa-cb-size
-  %tag-monitorinfoexw-cb-size %tag-monitorinfoexw-dw-flags %tag-msg-message
-  %tag-point-x %tag-point-y %tag-rawinputdevice-dw-flags
-  %tag-rawinputdevice-hwnd-target %tag-rawinputdevice-us-usage
-  %tag-rawinputdevice-us-usage-page %tag-rawinputheader-dw-type
-  %tag-rawmouse-l-last-x %tag-rawmouse-l-last-y %tag-rawmouse-us-flags
-  %tag-rect-bottom %tag-rect-left %tag-rect-right %tag-rect-top
-  %tag-windowplacement-show-cmd %tag-wndclassw-cb-cls-extra
+  %rgfw-window-src-mouse %rgfw-window-src-parent %rgfw-window-src-view
+  %rgfw-window-src-w %rgfw-window-src-window %rgfw-window-src-x
+  %rgfw-window-src-y %rgfw-window-state-data-length %rgfw-window-state-drop-x
+  %rgfw-window-state-drop-y %rgfw-window-state-mouse-leave
+  %rgfw-window-state-win %rgfw-window-state-win-leave
+  %rgfw-window-update-event-h %rgfw-window-update-event-w
+  %rgfw-window-update-event-x %rgfw-window-update-event-y
+  %rgfw-window-user-ptr %rgfw-window-w %rgfw-window-x %rgfw-window-y
+  %screen-default-gc %screen-root %screen-root-depth %screen-root-visual
+  %snprintf %standard-stream %store %strncpy %strtof %strtol
+  %tag-monitorinfoexa-cb-size %tag-monitorinfoexw-cb-size
+  %tag-monitorinfoexw-dw-flags %tag-msg-message %tag-point-x %tag-point-y
+  %tag-rawinputdevice-dw-flags %tag-rawinputdevice-hwnd-target
+  %tag-rawinputdevice-us-usage %tag-rawinputdevice-us-usage-page
+  %tag-rawinputheader-dw-type %tag-rawmouse-l-last-x %tag-rawmouse-l-last-y
+  %tag-rawmouse-us-flags %tag-rect-bottom %tag-rect-left %tag-rect-right
+  %tag-rect-top %tag-windowplacement-show-cmd %tag-wndclassw-cb-cls-extra
   %tag-wndclassw-h-cursor %tag-wndclassw-h-icon %tag-wndclassw-h-instance
   %tag-wndclassw-hbr-background %tag-wndclassw-lpfn-wnd-proc
   %tag-wndclassw-lpsz-class-name %timespec-tv-nsec %timespec-tv-sec
@@ -605,22 +633,23 @@
   %xi-valuator-state-mask %xi-valuator-state-mask-len %xim-callback-callback
   %xim-callback-client-data %xim-styles-count-styles
   %xim-styles-supported-styles %xrm-value-addr %xwm-hints-flags
-  %xwm-hints-icon-pixmap %xwm-hints-initial-state %zero-p))
-#+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
+  %xwm-hints-icon-pixmap %xwm-hints-initial-state %zero-p cg-display-bounds
+  cg-display-screen-size cg-event-get-location cg-warp-mouse-cursor-position))
+#+(:and (:or :linux :darwin :freebsd) (:or :arm64 :x86-64))
 (defconstant +c-long-max+ 9223372036854775807)
 #+(:or
    (:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
     (:or :freebsd :linux))
    (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (defconstant +c-long-max+ 2147483647)
-#+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
+#+(:and (:or :linux :darwin :freebsd) (:or :arm64 :x86-64))
 (defconstant +c-unsigned-long-max+ 18446744073709551615)
 #+(:or
    (:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
     (:or :freebsd :linux))
    (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (defconstant +c-unsigned-long-max+ 4294967295)
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defconstant +c-pointer-max+ 18446744073709551615)
 #+(:or (:and :arm (:not :arm64) (:or :linux :freebsd))
    (:and :x86 (:not :x86-64) (:or :linux :windows :freebsd)))
@@ -647,6 +676,25 @@
 #+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
 (eval-when (:load-toplevel :execute)
   (cffi:load-foreign-library '"shell32.dll"))
+#+(:and :darwin (:or :x86-64 :arm64))
+(eval-when (:load-toplevel :execute)
+  (cffi:load-foreign-library
+   '(:framework #A((14) base-char . "CoreFoundation"))))
+#+(:and :darwin (:or :x86-64 :arm64))
+(eval-when (:load-toplevel :execute)
+  (cffi:load-foreign-library
+   '(:framework #A((12) base-char . "CoreGraphics"))))
+#+(:and :darwin (:or :x86-64 :arm64))
+(eval-when (:load-toplevel :execute)
+  (cffi:load-foreign-library '(:framework #A((5) base-char . "IOKit"))))
+#+(:and :darwin (:or :x86-64 :arm64))
+(eval-when (:load-toplevel :execute)
+  (cffi:load-foreign-library '(:framework #A((10) base-char . "CarbonCore"))))
+#+(:and :darwin (:or :x86-64 :arm64))
+(eval-when (:load-toplevel :execute)
+  (cffi:load-foreign-library
+   '(:or "libobjc.A.dylib" "/usr/lib/libobjc.A.dylib" "libobjc.so.4"
+     "libobjc.so")))
 #+(:and :sbcl (:not :sb-thread))
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (setf (macro-function '%with-storage-lock)
@@ -689,6 +737,57 @@
                                                   (cons 'progn body)
                                                   '(%release-frame
                                                     *frame*)))))))
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (setf (macro-function '%call-pointer)
+          (lambda (%form %environment)
+            (declare (ignorable %environment))
+            (declare (ignore %environment))
+            (destructuring-bind
+                (%operator pointer options &rest arguments)
+                %form
+              (declare (ignore %operator))
+              (let* ((address (gensym "POINTER"))
+                     (function (gensym "FUNCTION"))
+                     (result (car (common-lisp:last arguments)))
+                     (inputs (butlast arguments))
+                     (call
+                      (list* 'cffi:foreign-funcall-pointer
+                             (common-lisp:list '%native-argument-pointer
+                                               address)
+                             options
+                             (append
+                              (loop :for (common-lisp:type
+                                          value) :on inputs :by #'cddr
+                                    :append (common-lisp:list
+                                             common-lisp:type
+                                             (if (eq common-lisp:type
+                                                     :pointer)
+                                                 (common-lisp:list
+                                                  '%native-argument-pointer
+                                                  value)
+                                                 value)))
+                              (common-lisp:list result)))))
+                (common-lisp:list 'let*
+                                  (common-lisp:list
+                                   (common-lisp:list '*string-arguments*
+                                                     '*string-arguments*)
+                                   (common-lisp:list address pointer)
+                                   (common-lisp:list function
+                                                     (common-lisp:list
+                                                      '%translated-function
+                                                      address)))
+                                  (common-lisp:list 'if function
+                                                    (list* 'funcall function
+                                                           (loop :for pair :on inputs :by #'cddr
+                                                                 :collect (common-lisp:second
+                                                                           pair)))
+                                                    (if (eq result :pointer)
+                                                        (common-lisp:list
+                                                         '%string-result
+                                                         (common-lisp:list
+                                                          'cffi:pointer-address
+                                                          call))
+                                                        call))))))))
 (declaim
  (inline %integer %zero-p %host-slot-index %host-slot-empty-p
   %pointer-address %native-pointer %native-argument-pointer %offset
@@ -749,6 +848,8 @@
 (defvar *frame* nil)
 (defvar *caller-frame* nil)
 (defvar *function-frame* nil)
+#+(:and :darwin (:or :x86-64 :arm64))
+(defvar *aggregate-callbacks* (make-hash-table :test #'eq))
 (defvar *string-arguments* nil)
 (defvar *string-input-cache*
   (trivial-garbage:make-weak-hash-table :test #'eq :weakness :key))
@@ -756,7 +857,8 @@
    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
    (:or :freebsd :linux))
 (defun %atof (pointer) (%strtof pointer 0 nil))
-#+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (progn
  (defun %host-slot-index (address) (logand (ash address -3) 4095))
  (defun %host-slot-empty-p (address)
@@ -1316,7 +1418,8 @@
                                                    #\Space))
                                      (emit prefix) (emit body))))))))
       common-lisp:count)))
-#+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (defun %offset (pointer bytes)
   (if (%string-pointer-p pointer)
       (make-%string-pointer (+ (%string-pointer-address pointer) bytes)
@@ -1567,7 +1670,8 @@
   (if (functionp pointer)
       pointer
       (gethash (%pointer-address pointer) *translated-functions*)))
-#+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (defun %zero-p (value) (eql value 0))
 (cffi:define-foreign-type %native-address nil nil (:actual-type :pointer)
  (:simple-parser %native-address))
@@ -1605,6 +1709,44 @@
   (defmethod cffi:expand-from-foreign
              (value (common-lisp:type %native-address))
     (common-lisp:list 'cffi:pointer-address value)))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun %aggregate-callback
+       (name trampoline result arguments &optional (abi :default-abi))
+  (%with-storage-lock
+   (or (third (gethash name *aggregate-callbacks*))
+       (let ((cif (cffi::make-libffi-cif name result arguments abi))
+             (closure nil)
+             (complete nil))
+         (unwind-protect
+             (cffi:with-foreign-object (code :pointer)
+              (setf closure
+                      (cffi:foreign-funcall "ffi_closure_alloc"
+                         :size 4096
+                         :pointer code
+                         :pointer))
+              (when (cffi:null-pointer-p closure)
+                (error "Unable to allocate native callback"))
+              (let ((entry (cffi:mem-ref code :pointer)))
+                (unless
+                    (zerop
+                     (cffi:foreign-funcall "ffi_prep_closure_loc"
+                        :pointer closure
+                        :pointer cif
+                        :pointer trampoline
+                        :pointer (cffi:null-pointer)
+                        :pointer entry
+                        :int))
+                  (error "Unable to prepare native callback"))
+                (setf (gethash name *aggregate-callbacks*)
+                        (common-lisp:list closure cif entry)
+                      complete t)
+                entry))
+           (unless complete
+             (when (and closure (not (cffi:null-pointer-p closure)))
+               (cffi:foreign-funcall "ffi_closure_free"
+                  :pointer closure
+                  :void))
+             (cffi::free-libffi-cif cif)))))))
 (define-condition %foreign-callback-unavailable
     (error)
     nil
@@ -1782,9 +1924,6 @@
   (when (%string-pointer-p value)
     (pushnew value *string-arguments* :test #'eq))
   value)
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
 (defun %string-result (address)
   (or
    (loop :for view :in *string-arguments*
@@ -1798,7 +1937,7 @@
 ;; C source (RGFW.h:3558):
 ;; end of global private API defs
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defparameter -rgfw (%allocate 8))
 #+(:or (:and :arm (:not :arm64) (:or :linux :freebsd))
    (:and :x86 (:not :x86-64) (:or :linux :windows :freebsd)))
@@ -2022,8 +2161,24 @@
 (defparameter time-end-period-src (%allocate 8))
 #+(:and :windows :x86 (:not :x86-64))
 (defparameter time-end-period-src (%allocate 4))
-#+(:or (:and (:or :x86-64 (:and :x86 (:not :x86-64))) (:or :freebsd :linux))
-   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ ;; C2LISP [storage]
+
+ (defparameter tis-copy-current-keyboard-layout-input-source-src
+   (%allocate 8))
+ ;; C2LISP [storage]
+
+ (defparameter tis-get-input-source-property-src (%allocate 8))
+ ;; C2LISP [storage]
+
+ (defparameter lm-get-kbd-type-src (%allocate 8))
+ ;; C2LISP [storage]
+
+ (defparameter k-tis-property-unicode-key-layout-data-src (%allocate 8)))
+#+(:or (:and :arm64 (:or :windows :darwin))
+   (:and :x86 (:not :x86-64) (:or :linux :windows :freebsd))
+   (:and :x86-64 (:or :linux :windows :darwin :freebsd)))
 (defconstant +c-code-char+ -1)
 #+(:and (:or :arm64 (:and :arm (:not :arm64))) (:or :freebsd :linux))
 (defconstant +c-code-char+ 1)
@@ -2059,7 +2214,7 @@
 #+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
    (:or :freebsd :linux))
 (defconstant +c-code-rr-output+ 4)
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defconstant +c-code-size-t+ 8)
 #+(:or (:and :arm (:not :arm64) (:or :linux :freebsd))
    (:and :x86 (:not :x86-64) (:or :linux :windows :freebsd)))
@@ -2195,37 +2350,37 @@
 (defconstant +c-size-flashwinfo+ 32)
 #+(:and :windows :x86 (:not :x86-64))
 (defconstant +c-size-flashwinfo+ 20)
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defconstant +c-size-pointer+ 8)
 #+(:or (:and :arm (:not :arm64) (:or :linux :freebsd))
    (:and :x86 (:not :x86-64) (:or :linux :windows :freebsd)))
 (defconstant +c-size-pointer+ 4)
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defconstant +c-size-rgfw-data-drop-node+ 32)
 #+(:or (:and :arm (:not :arm64) (:or :linux :freebsd))
    (:and :x86 (:not :x86-64) (:or :linux :windows :freebsd)))
 (defconstant +c-size-rgfw-data-drop-node+ 16)
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defconstant +c-size-rgfw-data-transfer+ 24)
 #+(:or (:and :arm (:not :arm64) (:or :linux :freebsd))
    (:and :x86 (:not :x86-64) (:or :linux :windows :freebsd)))
 (defconstant +c-size-rgfw-data-transfer+ 12)
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defconstant +c-size-rgfw-debug-info+ 16)
 #+(:or (:and :arm (:not :arm64) (:or :linux :freebsd))
    (:and :x86 (:not :x86-64) (:or :linux :windows :freebsd)))
 (defconstant +c-size-rgfw-debug-info+ 8)
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defconstant +c-size-rgfw-event+ 32)
 #+(:or (:and :arm (:not :arm64) (:or :linux :freebsd))
    (:and :x86 (:not :x86-64) (:or :linux :windows :freebsd)))
 (defconstant +c-size-rgfw-event+ 24)
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defconstant +c-size-rgfw-gamma-ramp+ 32)
 #+(:or (:and :arm (:not :arm64) (:or :linux :freebsd))
    (:and :x86 (:not :x86-64) (:or :linux :windows :freebsd)))
 (defconstant +c-size-rgfw-gamma-ramp+ 16)
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defconstant +c-size-rgfw-generic-func+ 8)
 #+(:or (:and :arm (:not :arm64) (:or :linux :freebsd))
    (:and :x86 (:not :x86-64) (:or :linux :windows :freebsd)))
@@ -2240,12 +2395,14 @@
 (defconstant +c-size-rgfw-info+ 6384)
 #+(:and :windows :x86 (:not :x86-64))
 (defconstant +c-size-rgfw-info+ 5656)
-#+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defconstant +c-size-rgfw-info+ 4800)
+#+(:and (:or :linux :darwin :freebsd) (:or :arm64 :x86-64))
 (defconstant +c-size-rgfw-monitor+ 200)
 #+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
    (:or :freebsd :linux))
 (defconstant +c-size-rgfw-monitor+ 184)
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defconstant +c-size-rgfw-monitor-mode+ 24)
 #+(:or (:and :arm (:not :arm64) (:or :linux :freebsd))
    (:and :x86 (:not :x86-64) (:or :linux :windows :freebsd)))
@@ -2259,7 +2416,9 @@
 (defconstant +c-size-rgfw-monitor-node+ 352)
 #+(:and :windows :x86 (:not :x86-64))
 (defconstant +c-size-rgfw-monitor-node+ 324)
-#+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defconstant +c-size-rgfw-monitor-node+ 240)
+#+(:and (:or :linux :darwin :freebsd) (:or :arm64 :x86-64))
 (defconstant +c-size-rgfw-native-image+ 24)
 #+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
    (:or :freebsd :linux))
@@ -2268,7 +2427,7 @@
 (defconstant +c-size-rgfw-native-image+ 32)
 #+(:and :windows :x86 (:not :x86-64))
 (defconstant +c-size-rgfw-native-image+ 16)
-#+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
+#+(:and (:or :linux :darwin :freebsd) (:or :arm64 :x86-64))
 (defconstant +c-size-rgfw-surface+ 56)
 #+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
    (:or :freebsd :linux))
@@ -2286,6 +2445,8 @@
 (defconstant +c-size-rgfw-window+ 208)
 #+(:and :windows :x86 (:not :x86-64))
 (defconstant +c-size-rgfw-window+ 164)
+#+(:and :darwin (:or :x86-64 :arm64))
+(defconstant +c-size-rgfw-window+ 176)
 #+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
 (defconstant +c-size-rgfw-window-src+ 56)
 #+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
@@ -2295,7 +2456,9 @@
 (defconstant +c-size-rgfw-window-src+ 64)
 #+(:and :windows :x86 (:not :x86-64))
 (defconstant +c-size-rgfw-window-src+ 44)
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defconstant +c-size-rgfw-window-src+ 32)
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defconstant +c-size-rgfw-window-state+ 48)
 #+(:or (:and :arm (:not :arm64) (:or :linux :freebsd))
    (:and :x86 (:not :x86-64) (:or :linux :windows :freebsd)))
@@ -2315,7 +2478,7 @@
 #+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
    (:or :freebsd :linux))
 (defconstant +c-size-screen+ 80)
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defconstant +c-size-size-t+ 8)
 #+(:or (:and :arm (:not :arm64) (:or :linux :freebsd))
    (:and :x86 (:not :x86-64) (:or :linux :windows :freebsd)))
@@ -2443,7 +2606,7 @@
   %c-pointer-to-rr-mode %c-rgfw-convert-image-data-func-to-int
   %c-rgfw-key-to-size-t %c-rgfw-key-to-u32 %c-rr-mode-to-pointer
   %c-size-t-to-i32 %c-size-t-to-int %c-size-t-to-rgfw-key
-  %c-size-t-to-rgfw-mouse-icon %c-size-t-to-u8 %c-u32-to-i32
+  %c-size-t-to-rgfw-mouse-icon %c-size-t-to-u32 %c-size-t-to-u8 %c-u32-to-i32
   %c-u32-to-key-code %c-u32-to-size-t %c-u32-to-u8 %c-u32-to-unsigned-long
   %c-u64-to-i32 %c-u8-to-u32 %c-unsigned-int-to-i32
   %c-unsigned-int-to-key-code %c-unsigned-int-to-u8 %c-unsigned-long-to-i32
@@ -2511,13 +2674,14 @@
   %c-pointer-to-rr-mode %c-rgfw-convert-image-data-func-to-int
   %c-rgfw-key-to-size-t %c-rgfw-key-to-u32 %c-rr-mode-to-pointer
   %c-size-t-to-i32 %c-size-t-to-int %c-size-t-to-rgfw-key
-  %c-size-t-to-rgfw-mouse-icon %c-size-t-to-u8 %c-time-t-to-u64 %c-u32-to-i32
-  %c-u32-to-key-code %c-u32-to-size-t %c-u32-to-u8 %c-u32-to-unsigned-long
-  %c-u64-to-i32 %c-u8-to-u32 %c-unsigned-int-to-i32
-  %c-unsigned-int-to-key-code %c-unsigned-int-to-u8 %c-unsigned-long-to-i32
-  %c-unsigned-long-to-long %c-unsigned-long-to-u32 %c-unsigned-long-to-u64
-  %c-unsigned-signed-char-to-atom %c-window-to-long %c-window-to-u64
-  %c-xim-to-int %c-xkb-desc-ptr-to-int %c-xrm-database-to-int))
+  %c-size-t-to-rgfw-mouse-icon %c-size-t-to-u32 %c-size-t-to-u8
+  %c-time-t-to-u64 %c-u32-to-i32 %c-u32-to-key-code %c-u32-to-size-t
+  %c-u32-to-u8 %c-u32-to-unsigned-long %c-u64-to-i32 %c-u8-to-u32
+  %c-unsigned-int-to-i32 %c-unsigned-int-to-key-code %c-unsigned-int-to-u8
+  %c-unsigned-long-to-i32 %c-unsigned-long-to-long %c-unsigned-long-to-u32
+  %c-unsigned-long-to-u64 %c-unsigned-signed-char-to-atom %c-window-to-long
+  %c-window-to-u64 %c-xim-to-int %c-xkb-desc-ptr-to-int
+  %c-xrm-database-to-int))
 #+(:and
    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
    (:or :freebsd :linux))
@@ -2534,7 +2698,39 @@
    (:or :freebsd :linux))
 (defun %c-atom-to-long (value)
   (- (logand (+ value 2147483648) 4294967295) 2147483648))
-#+(:and (:or :x86-64 (:and :x86 (:not :x86-64))) (:or :freebsd :linux))
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ (declaim
+  (inline %c-bool-to-rgfw-bool %c-builtin-bool-to-bool %c-cf-index-to-pointer
+   %c-cf-index-to-size-t %c-cg-float-to-i32 %c-cg-gamma-value-to-u16
+   %c-char-to-u8 %c-expression-to-bool %c-expression-to-boolean-t
+   %c-expression-to-io-service-t %c-expression-to-ns-window-style-mask
+   %c-expression-to-nsu-integer %c-expression-to-rgfw-bool
+   %c-expression-to-rgfw-event-flag %c-expression-to-rgfw-event-type
+   %c-expression-to-rgfw-window-flags %c-expression-to-size-t
+   %c-expression-to-u32 %c-expression-to-u8 %c-expression-to-uint8-t
+   %c-expression-to-unsigned-long %c-float-to-i32 %c-float-to-u16
+   %c-float-to-u32 %c-i32-to-size-t %c-i32-to-u32
+   %c-int-to-cg-open-gl-display-mask %c-int-to-ns-bitmap-format
+   %c-int-to-ns-window-style-mask %c-int-to-nsu-integer
+   %c-int-to-rgfw-event-flag %c-int-to-rgfw-event-type %c-int-to-rgfw-key
+   %c-int-to-rgfw-keymod %c-int-to-rgfw-mouse-icon
+   %c-int-to-rgfw-window-flags %c-int-to-size-t %c-int-to-u32 %c-int-to-u8
+   %c-nsu-integer-to-cg-direct-display-id %c-nsu-integer-to-int
+   %c-pointer-to-cf-index %c-rgfw-bool-to-bool %c-rgfw-key-to-size-t
+   %c-rgfw-key-to-u32 %c-size-t-to-cf-index %c-size-t-to-i32
+   %c-size-t-to-rgfw-key %c-size-t-to-rgfw-mouse-icon %c-size-t-to-u32
+   %c-size-t-to-u8 %c-u16-to-u32 %c-u32-to-int %c-u32-to-ns-window-style-mask
+   %c-u32-to-size-t %c-u32-to-u16 %c-u32-to-u8 %c-u8-to-u32
+   %c-uni-char-to-rgfw-key %c-unsigned-long-to-int))
+ (defun %c-bool-to-rgfw-bool (value) (logand value 255))
+ (defun %c-builtin-bool-to-bool (value) (- (logand (+ value 128) 255) 128))
+ (defun %c-cf-index-to-pointer (value) (logand value 18446744073709551615))
+ (defun %c-cf-index-to-size-t (value) (logand value 18446744073709551615))
+ (defun %c-cg-float-to-i32 (value) (truncate value))
+ (defun %c-cg-gamma-value-to-u16 (value) (logand (truncate value) 65535)))
+#+(:or (:and :x86 (:not :x86-64) (:or :linux :freebsd))
+   (:and :x86-64 (:or :linux :darwin :freebsd)) (:and :darwin :arm64))
 (defun %c-char-to-u8 (value) (logand value 255))
 #+(:and (:or :arm64 (:and :arm (:not :arm64))) (:or :freebsd :linux))
 (defun %c-char-to-u8 (value) value)
@@ -2621,12 +2817,12 @@
   %c-pfn-time-begin-period-to-int %c-pointer-to-int %c-pointer-to-lparam
   %c-rgfw-convert-image-data-func-to-int %c-rgfw-key-to-size-t
   %c-rgfw-key-to-u32 %c-size-t-to-i32 %c-size-t-to-rgfw-key
-  %c-size-t-to-rgfw-mouse-icon %c-size-t-to-u8 %c-u32-to-lparam
-  %c-u32-to-size-t %c-u32-to-u8 %c-u32-to-word %c-uint-to-i32
-  %c-uint-to-size-t %c-ulong-ptr-to-lpstr %c-wchar-t-to-rgfw-key
-  %c-wchar-to-u32 %c-word-to-i16 %c-word-to-short %c-word-to-ulong-ptr
-  %c-wparam-to-hdrop %c-wparam-to-i32 %c-wparam-to-u32 %c-wparam-to-uint
-  %c-wparam-to-wchar))
+  %c-size-t-to-rgfw-mouse-icon %c-size-t-to-u32 %c-size-t-to-u8
+  %c-u32-to-lparam %c-u32-to-size-t %c-u32-to-u8 %c-u32-to-word
+  %c-uint-to-i32 %c-uint-to-size-t %c-ulong-ptr-to-lpstr
+  %c-wchar-t-to-rgfw-key %c-wchar-to-u32 %c-word-to-i16 %c-word-to-short
+  %c-word-to-ulong-ptr %c-wparam-to-hdrop %c-wparam-to-i32 %c-wparam-to-u32
+  %c-wparam-to-uint %c-wparam-to-wchar))
 #+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
 (progn
  (defun %c-double-to-i32 (value) (truncate value))
@@ -2637,6 +2833,19 @@
    (- (logand (+ value 2147483648) 4294967295) 2147483648))
  (defun %c-expression-to-dword (value) (logand value 4294967295))
  (defun %c-expression-to-dword-ptr (value) (logand value +c-pointer-max+)))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun %c-expression-to-bool (value) (- (logand (+ value 128) 255) 128))
+#+(:and :darwin :x86-64)
+(defun %c-expression-to-boolean-t (value) (logand value 4294967295))
+#+(:and :darwin :arm64)
+(defun %c-expression-to-boolean-t (value) value)
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ (defun %c-expression-to-io-service-t (value) (logand value 4294967295))
+ (defun %c-expression-to-ns-window-style-mask (value)
+   (logand value 18446744073709551615))
+ (defun %c-expression-to-nsu-integer (value)
+   (logand value 18446744073709551615)))
 (defun %c-expression-to-rgfw-bool (value) (logand value 255))
 (defun %c-expression-to-rgfw-event-flag (value) (logand value 4294967295))
 (defun %c-expression-to-rgfw-event-type (value) (logand value 255))
@@ -2659,6 +2868,8 @@
 (defun %c-expression-to-u8 (value) (logand value 255))
 #+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
 (defun %c-expression-to-uint (value) (logand value 4294967295))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun %c-expression-to-uint8-t (value) (logand value 255))
 (defun %c-expression-to-unsigned-long (value)
   (logand value +c-unsigned-long-max+))
 #+(:and
@@ -2704,16 +2915,37 @@
 (progn
  (defun %c-int-to-dword (value) (logand value 4294967295))
  (defun %c-int-to-hwnd (value) (logand value +c-pointer-max+)))
+#+(:or
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (defun %c-int-to-rgfw-bool (value) (logand value 255))
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ (defun %c-int-to-cg-open-gl-display-mask (value) (logand value 4294967295))
+ (defun %c-int-to-ns-bitmap-format (value)
+   (logand value 18446744073709551615))
+ (defun %c-int-to-ns-window-style-mask (value)
+   (logand value 18446744073709551615))
+ (defun %c-int-to-nsu-integer (value) (logand value 18446744073709551615)))
 (defun %c-int-to-rgfw-event-flag (value) (logand value 4294967295))
 (defun %c-int-to-rgfw-event-type (value) (logand value 255))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun %c-int-to-rgfw-key (value) (logand value 255))
 (defun %c-int-to-rgfw-keymod (value) (logand value 255))
+#+(:or
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (defun %c-int-to-rgfw-mouse-button (value) (logand value 255))
 (defun %c-int-to-rgfw-mouse-icon (value) (logand value 255))
 (defun %c-int-to-rgfw-window-flags (value) (logand value 4294967295))
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux)))
 (defun %c-int-to-size-t (value) (logand value +c-unsigned-long-max+))
 (defun %c-int-to-u32 (value) (logand value 4294967295))
 #+(:and
@@ -2827,12 +3059,24 @@
    (:and :freebsd :arm (:not :arm64)))
 (defun %c-rgfw-convert-image-data-func-to-int (value)
   (%pointer-address value))
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ (defun %c-nsu-integer-to-cg-direct-display-id (value)
+   (logand value 4294967295))
+ (defun %c-nsu-integer-to-int (value)
+   (- (logand (+ value 2147483648) 4294967295) 2147483648))
+ (defun %c-pointer-to-cf-index (value) (%pointer-address value))
+ (defun %c-rgfw-bool-to-bool (value) (- (logand (+ value 128) 255) 128)))
 (defun %c-rgfw-key-to-size-t (value) (logand value +c-pointer-max+))
 (defun %c-rgfw-key-to-u32 (value) (logand value 4294967295))
 #+(:and
    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
    (:or :freebsd :linux))
 (defun %c-rr-mode-to-pointer (value) (logand value +c-unsigned-long-max+))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun %c-size-t-to-cf-index (value)
+  (- (logand (+ value 9223372036854775808) 18446744073709551615)
+     9223372036854775808))
 (defun %c-size-t-to-i32 (value)
   (- (logand (+ value 2147483648) 4294967295) 2147483648))
 #+(:and
@@ -2842,6 +3086,11 @@
   (- (logand (+ value 2147483648) 4294967295) 2147483648))
 (defun %c-size-t-to-rgfw-key (value) (logand value 255))
 (defun %c-size-t-to-rgfw-mouse-icon (value) (logand value 255))
+#+(:or (:and :arm (:not :arm64) (:or :linux :freebsd))
+   (:and :x86 (:not :x86-64) (:or :linux :windows :freebsd)))
+(defun %c-size-t-to-u32 (value) value)
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun %c-size-t-to-u32 (value) (logand value 4294967295))
 (defun %c-size-t-to-u8 (value) (logand value 255))
 #+(:and :freebsd
    (:or :x86-64 :arm64 (:and (:not :x86-64) :x86) (:and (:not :arm64) :arm)))
@@ -2858,11 +3107,20 @@
 #+(:and :windows :x86 (:not :x86-64))
 (defun %c-u32-to-lparam (value)
   (- (logand (+ value 2147483648) 4294967295) 2147483648))
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ (defun %c-u16-to-u32 (value) (logand value 4294967295))
+ (defun %c-u32-to-int (value)
+   (- (logand (+ value 2147483648) 4294967295) 2147483648))
+ (defun %c-u32-to-ns-window-style-mask (value)
+   (logand value 18446744073709551615)))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun %c-u32-to-size-t (value) (logand value 18446744073709551615))
 #+(:or (:and :arm (:not :arm64) (:or :linux :freebsd))
    (:and :x86 (:not :x86-64) (:or :linux :windows :freebsd)))
 (defun %c-u32-to-size-t (value) value)
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun %c-u32-to-u16 (value) (logand value 65535))
 (defun %c-u32-to-u8 (value) (logand value 255))
 #+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
 (defun %c-u32-to-unsigned-long (value) (logand value 18446744073709551615))
@@ -2872,10 +3130,17 @@
 #+(:and
    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
    (:or :freebsd :linux))
+(defun %c-u64-to-i32 (value)
+  (- (logand (+ value 2147483648) 4294967295) 2147483648))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux)))
+(defun %c-u8-to-u32 (value) (logand value 4294967295))
+#+(:and
+   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+   (:or :freebsd :linux))
 (progn
- (defun %c-u64-to-i32 (value)
-   (- (logand (+ value 2147483648) 4294967295) 2147483648))
- (defun %c-u8-to-u32 (value) (logand value 4294967295))
  (defun %c-unsigned-int-to-i32 (value)
    (- (logand (+ value 2147483648) 4294967295) 2147483648))
  (defun %c-unsigned-int-to-key-code (value) (logand value 255))
@@ -2952,6 +3217,11 @@
 (defun %c-wparam-to-uint (value) value)
 #+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
 (defun %c-wparam-to-wchar (value) (logand value 65535))
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ (defun %c-uni-char-to-rgfw-key (value) (logand value 255))
+ (defun %c-unsigned-long-to-int (value)
+   (- (logand (+ value 2147483648) 4294967295) 2147483648)))
 (defparameter %static-0 nil)
 (defparameter %static-1 nil)
 #+(:and
@@ -3421,9 +3691,11 @@
  (defun %address--x-event-xselection (object) (%offset object 0))
  (defun %address--x-event-xselectionrequest (object) (%offset object 0))
  (defun %address--xkb-key-name-rec-name (object) (%offset object 0)))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
+(defparameter %static-2 nil)
 #+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
 (progn
- (defparameter %static-2 nil)
  (declaim
   (inline %-devicemode-w-dm-bits-per-pel
    (setf %-devicemode-w-dm-bits-per-pel) %-devicemode-w-dm-display-frequency
@@ -3694,53 +3966,185 @@
  (defun %-pointl-y (object) (%load (%offset object 4) +c-code-long+))
  (defun %address--devicemode-w-dm-position (object) (%offset object 76))
  (defun %address--display-devicew-device-name (object) (%offset object 4))
- (defun %address--display-devicew-device-string (object) (%offset object 68))
- (defun %address-rgfw-event-scale (object) (%offset object 0))
- (defun %address-tag-minmaxinfo-pt-max-track-size (object)
-   (%offset object 32))
- (defun %address-tag-minmaxinfo-pt-min-track-size (object)
-   (%offset object 24))
- (defun %address-tag-monitorinfoexa-rc-work (object) (%offset object 20))
- (defun %address-tag-monitorinfoexw-rc-monitor (object) (%offset object 4))
- (defun %address-tag-monitorinfoexw-sz-device (object) (%offset object 40))
- (defun %address-tag-rawinput-data-mouse (object) (%offset object 0))
- (defun %address-tag-rawinput-header (object) (%offset object 0))
- (defun %address-tag-rect-left (object) (%offset object 0))
- (defun %address-tag-rect-right (object) (%offset object 8))
- (defun %bitmapv5header-b-v5bit-count (object) (%load (%offset object 14) 2))
- (defun (setf %bitmapv5header-b-v5bit-count) (value object)
-   (%store-native (%offset object 14) 2 value))
- (defun %bitmapv5header-b-v5compression (object)
-   (%load (%offset object 16) 4))
- (defun (setf %bitmapv5header-b-v5compression) (value object)
-   (%store-native (%offset object 16) 4 value))
- (defun %bitmapv5header-b-v5height (object)
-   (%load (%offset object 8) +c-code-long+))
- (defun (setf %bitmapv5header-b-v5height) (value object)
-   (%store-native (%offset object 8) +c-code-long+ value))
- (defun %bitmapv5header-b-v5planes (object) (%load (%offset object 12) 2))
- (defun (setf %bitmapv5header-b-v5planes) (value object)
-   (%store-native (%offset object 12) 2 value))
- (defun %bitmapv5header-b-v5size (object) (%load (%offset object 0) 4))
- (defun (setf %bitmapv5header-b-v5size) (value object)
-   (%store-native (%offset object 0) 4 value))
- (defun %bitmapv5header-b-v5width (object)
-   (%load (%offset object 4) +c-code-long+))
- (defun (setf %bitmapv5header-b-v5width) (value object)
-   (%store-native (%offset object 4) +c-code-long+ value))
- (defun %dwm-blurbehind-dw-flags (object) (%load (%offset object 0) 4))
- (defun (setf %dwm-blurbehind-dw-flags) (value object)
-   (%store-native (%offset object 0) 4 value))
- (defun %dwm-blurbehind-f-enable (object) (%load (%offset object 4) -4))
- (defun (setf %dwm-blurbehind-f-enable) (value object)
-   (%store-native (%offset object 4) -4 value))
- (defun %dwm-blurbehind-h-rgn-blur (object)
-   (%load (%offset object 8) :pointer))
- (defun (setf %dwm-blurbehind-h-rgn-blur) (value object)
-   (%store (%offset object 8) :pointer value))
- (defun %flashwinfo-cb-size (object) (%load (%offset object 0) 4))
- (defun (setf %flashwinfo-cb-size) (value object)
-   (%store-native (%offset object 0) 4 value)))
+ (defun %address--display-devicew-device-string (object) (%offset object 68)))
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ (declaim (inline make-%value-cg-size))
+ (defstruct (%value-cg-size (:constructor make-%value-cg-size))
+   (width 0.0d0 :type double-float)
+   (height 0.0d0 :type double-float))
+ (declaim (inline make-%value-cg-point))
+ (defstruct (%value-cg-point (:constructor make-%value-cg-point))
+   (x 0.0d0 :type double-float)
+   (y 0.0d0 :type double-float))
+ (declaim
+  (inline %address-cg-rect-origin %address-cg-rect-size
+   %address-rgfw-callbacks-arr %address-rgfw-event-button
+   %address-rgfw-event-common %address-rgfw-event-delta
+   %address-rgfw-event-drag %address-rgfw-event-drop
+   %address-rgfw-event-focus %address-rgfw-event-key
+   %address-rgfw-event-key-char %address-rgfw-event-monitor
+   %address-rgfw-event-mouse %address-rgfw-event-scale
+   %address-rgfw-event-update %address-rgfw-info-api-keycodes
+   %address-rgfw-info-callbacks %address-rgfw-info-custom-view-classes
+   %address-rgfw-info-events %address-rgfw-info-keyboard
+   %address-rgfw-info-keycodes %address-rgfw-info-monitors
+   %address-rgfw-info-mouse-buttons %address-rgfw-info-standard-mice
+   %address-rgfw-info-window-state %address-rgfw-monitor-mode
+   %address-rgfw-monitor-name %address-rgfw-monitor-node-mon
+   %address-rgfw-monitors-data %address-rgfw-monitors-free-list
+   %address-rgfw-monitors-list %address-rgfw-native-image-buffer
+   %address-rgfw-surface-native %address-rgfw-window-internal
+   %address-rgfw-window-internal-enabled-events
+   %address-rgfw-window-internal-flags %address-rgfw-window-internal-new-mode
+   %address-rgfw-window-internal-old-mode %address-rgfw-window-src
+   %cg-point-x (setf %cg-point-x) %cg-point-y (setf %cg-point-y)
+   %cg-size-height (setf %cg-size-height) %cg-size-width
+   (setf %cg-size-width) %objc-super-receiver (setf %objc-super-receiver)
+   %objc-super-super-class (setf %objc-super-super-class)
+   %rgfw-color-layout-a (setf %rgfw-color-layout-a) %rgfw-color-layout-b
+   (setf %rgfw-color-layout-b) %rgfw-color-layout-channels
+   (setf %rgfw-color-layout-channels) %rgfw-color-layout-g
+   (setf %rgfw-color-layout-g) %rgfw-color-layout-r
+   (setf %rgfw-color-layout-r) %rgfw-common-event-win
+   (setf %rgfw-common-event-win) %rgfw-data-drag-event-action
+   (setf %rgfw-data-drag-event-action) %rgfw-data-drag-event-data-type
+   (setf %rgfw-data-drag-event-data-type) %rgfw-data-drag-event-x
+   (setf %rgfw-data-drag-event-x) %rgfw-data-drag-event-y
+   (setf %rgfw-data-drag-event-y) %rgfw-data-drop-event-value
+   (setf %rgfw-data-drop-event-value) %rgfw-data-drop-event-win
+   (setf %rgfw-data-drop-event-win) %rgfw-data-drop-node-data
+   (setf %rgfw-data-drop-node-data) %rgfw-data-drop-node-length
+   (setf %rgfw-data-drop-node-length) %rgfw-data-drop-node-next
+   (setf %rgfw-data-drop-node-next) %rgfw-data-drop-node-type
+   (setf %rgfw-data-drop-node-type) %rgfw-data-transfer-data
+   (setf %rgfw-data-transfer-data) %rgfw-data-transfer-length
+   (setf %rgfw-data-transfer-length) %rgfw-data-transfer-type
+   (setf %rgfw-data-transfer-type) %rgfw-debug-info-code
+   (setf %rgfw-debug-info-code) %rgfw-debug-info-msg
+   (setf %rgfw-debug-info-msg) %rgfw-debug-info-type
+   (setf %rgfw-debug-info-type) %rgfw-event-type (setf %rgfw-event-type)
+   %rgfw-gamma-ramp-blue (setf %rgfw-gamma-ramp-blue) %rgfw-gamma-ramp-count
+   (setf %rgfw-gamma-ramp-count) %rgfw-gamma-ramp-green
+   (setf %rgfw-gamma-ramp-green) %rgfw-gamma-ramp-red
+   (setf %rgfw-gamma-ramp-red) %rgfw-info-clipboard
+   (setf %rgfw-info-clipboard) %rgfw-info-cur (setf %rgfw-info-cur)
+   %rgfw-info-custom-ns-app-delegate (setf %rgfw-info-custom-ns-app-delegate)
+   %rgfw-info-custom-ns-app-delegate-class
+   (setf %rgfw-info-custom-ns-app-delegate-class)
+   %rgfw-info-custom-window-class (setf %rgfw-info-custom-window-class)
+   %rgfw-info-custom-window-delegate-class
+   (setf %rgfw-info-custom-window-delegate-class)
+   %rgfw-info-debug-callback-src (setf %rgfw-info-debug-callback-src)
+   %rgfw-info-dnd-build (setf %rgfw-info-dnd-build) %rgfw-info-dnd-cur
+   (setf %rgfw-info-dnd-cur) %rgfw-info-dnd-root (setf %rgfw-info-dnd-root)
+   %rgfw-info-event-bottom (setf %rgfw-info-event-bottom)
+   %rgfw-info-event-len (setf %rgfw-info-event-len) %rgfw-info-flash
+   (setf %rgfw-info-flash) %rgfw-info-hidden-mouse %rgfw-info-ns-app
+   (setf %rgfw-info-ns-app) %rgfw-info-polled-events
+   (setf %rgfw-info-polled-events) %rgfw-info-queue-events
+   (setf %rgfw-info-queue-events) %rgfw-info-raw-mouse
+   (setf %rgfw-info-raw-mouse) %rgfw-info-root (setf %rgfw-info-root)
+   %rgfw-info-scroll-x (setf %rgfw-info-scroll-x) %rgfw-info-scroll-y
+   (setf %rgfw-info-scroll-y) %rgfw-info-tis-bundle
+   (setf %rgfw-info-tis-bundle) %rgfw-info-vector-x
+   (setf %rgfw-info-vector-x) %rgfw-info-vector-y (setf %rgfw-info-vector-y)
+   %rgfw-info-window-count (setf %rgfw-info-window-count)
+   %rgfw-key-char-event-value (setf %rgfw-key-char-event-value)
+   %rgfw-key-event-mod (setf %rgfw-key-event-mod) %rgfw-key-event-repeat
+   (setf %rgfw-key-event-repeat) %rgfw-key-event-state
+   (setf %rgfw-key-event-state) %rgfw-key-event-value
+   (setf %rgfw-key-event-value) %rgfw-key-state-current
+   (setf %rgfw-key-state-current) %rgfw-key-state-prev
+   (setf %rgfw-key-state-prev) %rgfw-monitor-event-monitor
+   (setf %rgfw-monitor-event-monitor) %rgfw-monitor-event-state
+   (setf %rgfw-monitor-event-state) %rgfw-monitor-list-cur
+   (setf %rgfw-monitor-list-cur) %rgfw-monitor-list-head
+   (setf %rgfw-monitor-list-head) %rgfw-monitor-mode-blue
+   (setf %rgfw-monitor-mode-blue) %rgfw-monitor-mode-green
+   (setf %rgfw-monitor-mode-green) %rgfw-monitor-mode-h
+   (setf %rgfw-monitor-mode-h) %rgfw-monitor-mode-red
+   (setf %rgfw-monitor-mode-red) %rgfw-monitor-mode-refresh-rate
+   (setf %rgfw-monitor-mode-refresh-rate) %rgfw-monitor-mode-src
+   (setf %rgfw-monitor-mode-src) %rgfw-monitor-mode-w
+   (setf %rgfw-monitor-mode-w) %rgfw-monitor-node (setf %rgfw-monitor-node)
+   %rgfw-monitor-node-all-modes (setf %rgfw-monitor-node-all-modes)
+   %rgfw-monitor-node-disconnected (setf %rgfw-monitor-node-disconnected)
+   %rgfw-monitor-node-display (setf %rgfw-monitor-node-display)
+   %rgfw-monitor-node-next (setf %rgfw-monitor-node-next)
+   %rgfw-monitor-node-screen (setf %rgfw-monitor-node-screen)
+   %rgfw-monitor-node-uint-num (setf %rgfw-monitor-node-uint-num)
+   %rgfw-monitor-phys-h (setf %rgfw-monitor-phys-h) %rgfw-monitor-phys-w
+   (setf %rgfw-monitor-phys-w) %rgfw-monitor-pixel-ratio
+   (setf %rgfw-monitor-pixel-ratio) %rgfw-monitor-scale-x
+   (setf %rgfw-monitor-scale-x) %rgfw-monitor-scale-y
+   (setf %rgfw-monitor-scale-y) %rgfw-monitor-user-ptr
+   (setf %rgfw-monitor-user-ptr) %rgfw-monitor-x (setf %rgfw-monitor-x)
+   %rgfw-monitor-y (setf %rgfw-monitor-y) %rgfw-monitors-count
+   (setf %rgfw-monitors-count) %rgfw-monitors-primary
+   (setf %rgfw-monitors-primary) %rgfw-mouse-button-event-state
+   (setf %rgfw-mouse-button-event-state) %rgfw-mouse-button-event-value
+   (setf %rgfw-mouse-button-event-value) %rgfw-mouse-delta-event-x
+   (setf %rgfw-mouse-delta-event-x) %rgfw-mouse-delta-event-y
+   (setf %rgfw-mouse-delta-event-y) %rgfw-mouse-motion-event-in-window
+   (setf %rgfw-mouse-motion-event-in-window) %rgfw-mouse-motion-event-x
+   (setf %rgfw-mouse-motion-event-x) %rgfw-mouse-motion-event-y
+   (setf %rgfw-mouse-motion-event-y) %rgfw-native-image-buffer
+   (setf %rgfw-native-image-buffer) %rgfw-native-image-format
+   (setf %rgfw-native-image-format) %rgfw-native-image-rep
+   (setf %rgfw-native-image-rep) %rgfw-scale-updated-event-x
+   (setf %rgfw-scale-updated-event-x) %rgfw-scale-updated-event-y
+   (setf %rgfw-scale-updated-event-y) %rgfw-surface-convert-func
+   (setf %rgfw-surface-convert-func) %rgfw-surface-data
+   (setf %rgfw-surface-data) %rgfw-surface-format (setf %rgfw-surface-format)
+   %rgfw-surface-h (setf %rgfw-surface-h) %rgfw-surface-w
+   (setf %rgfw-surface-w) %rgfw-window-focus-event-state
+   (setf %rgfw-window-focus-event-state) %rgfw-window-h (setf %rgfw-window-h)
+   %rgfw-window-internal-capture-mouse
+   (setf %rgfw-window-internal-capture-mouse)
+   %rgfw-window-internal-enabled-events
+   (setf %rgfw-window-internal-enabled-events) %rgfw-window-internal-exit-key
+   (setf %rgfw-window-internal-exit-key) %rgfw-window-internal-flags
+   (setf %rgfw-window-internal-flags) %rgfw-window-internal-in-focus
+   (setf %rgfw-window-internal-in-focus) %rgfw-window-internal-last-mouse-x
+   (setf %rgfw-window-internal-last-mouse-x)
+   %rgfw-window-internal-last-mouse-y
+   (setf %rgfw-window-internal-last-mouse-y) %rgfw-window-internal-mod
+   (setf %rgfw-window-internal-mod) %rgfw-window-internal-monitor
+   (setf %rgfw-window-internal-monitor) %rgfw-window-internal-mouse
+   (setf %rgfw-window-internal-mouse) %rgfw-window-internal-mouse-inside
+   (setf %rgfw-window-internal-mouse-inside)
+   %rgfw-window-internal-old-borderless
+   (setf %rgfw-window-internal-old-borderless) %rgfw-window-internal-old-h
+   (setf %rgfw-window-internal-old-h) %rgfw-window-internal-old-w
+   (setf %rgfw-window-internal-old-w) %rgfw-window-internal-old-x
+   (setf %rgfw-window-internal-old-x) %rgfw-window-internal-old-y
+   (setf %rgfw-window-internal-old-y) %rgfw-window-internal-raw-mouse
+   (setf %rgfw-window-internal-raw-mouse) %rgfw-window-internal-should-close
+   (setf %rgfw-window-internal-should-close) %rgfw-window-next
+   (setf %rgfw-window-next) %rgfw-window-src-delegate
+   (setf %rgfw-window-src-delegate) %rgfw-window-src-mouse
+   (setf %rgfw-window-src-mouse) %rgfw-window-src-view
+   (setf %rgfw-window-src-view) %rgfw-window-src-window
+   (setf %rgfw-window-src-window) %rgfw-window-state-data-dragging
+   (setf %rgfw-window-state-data-dragging) %rgfw-window-state-data-drop
+   (setf %rgfw-window-state-data-drop) %rgfw-window-state-data-length
+   (setf %rgfw-window-state-data-length) %rgfw-window-state-drop-x
+   (setf %rgfw-window-state-drop-x) %rgfw-window-state-drop-y
+   (setf %rgfw-window-state-drop-y) %rgfw-window-state-mouse-enter
+   (setf %rgfw-window-state-mouse-enter) %rgfw-window-state-mouse-leave
+   (setf %rgfw-window-state-mouse-leave) %rgfw-window-state-win
+   (setf %rgfw-window-state-win) %rgfw-window-state-win-leave
+   (setf %rgfw-window-state-win-leave) %rgfw-window-update-event-h
+   (setf %rgfw-window-update-event-h) %rgfw-window-update-event-w
+   (setf %rgfw-window-update-event-w) %rgfw-window-update-event-x
+   (setf %rgfw-window-update-event-x) %rgfw-window-update-event-y
+   (setf %rgfw-window-update-event-y) %rgfw-window-user-ptr
+   (setf %rgfw-window-user-ptr) %rgfw-window-w (setf %rgfw-window-w)
+   %rgfw-window-x (setf %rgfw-window-x) %rgfw-window-y
+   (setf %rgfw-window-y)))
+ (defun %address-cg-rect-origin (object) (%offset object 0))
+ (defun %address-cg-rect-size (object) (%offset object 16)))
 (defun %address-rgfw-callbacks-arr (object) (%offset object 0))
 (defun %address-rgfw-event-button (object) (%offset object 0))
 (defun %address-rgfw-event-common (object) (%offset object 0))
@@ -3847,9 +4251,6 @@
 (defun %rgfw-monitor-y (object) (%load (%offset object 4) -4))
 (defun (setf %rgfw-monitor-y) (value object)
   (%store-native (%offset object 4) -4 value))
-(defun %rgfw-native-image-bitmap (object) (%load (%offset object 0) :pointer))
-(defun (setf %rgfw-native-image-bitmap) (value object)
-  (%store (%offset object 0) :pointer value))
 (defun %rgfw-surface-data (object) (%load (%offset object 0) :string-pointer))
 (defun (setf %rgfw-surface-data) (value object)
   (%store (%offset object 0) :string-pointer value))
@@ -3921,7 +4322,10 @@
 (defun %rgfw-window-state-mouse-enter (object) (%load (%offset object 0) 1))
 (defun (setf %rgfw-window-state-mouse-enter) (value object)
   (%store-native (%offset object 0) 1 value))
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
+(defun %address-rgfw-event-scale (object) (%offset object 0))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (progn
  (defun %address-rgfw-info-api-keycodes (object) (%offset object 1444))
  (defun %address-rgfw-info-callbacks (object) (%offset object 208))
@@ -4005,8 +4409,6 @@
    (%store-native (%offset object 1436) -4 value))
  (defun %rgfw-info-hidden-mouse (object)
    (%load (%offset object 24) :pointer))
- (defun (setf %rgfw-info-hidden-mouse) (value object)
-   (%store (%offset object 24) :pointer value))
  (defun %rgfw-info-polled-events (object) (%load (%offset object 1441) 1))
  (defun (setf %rgfw-info-polled-events) (value object)
    (%store-native (%offset object 1441) 1 value))
@@ -4089,9 +4491,6 @@
  (defun %rgfw-mouse-motion-event-y (object) (%load (%offset object 20) -4))
  (defun (setf %rgfw-mouse-motion-event-y) (value object)
    (%store (%offset object 20) -4 value))
- (defun %rgfw-native-image-format (object) (%load (%offset object 16) 1))
- (defun (setf %rgfw-native-image-format) (value object)
-   (%store-native (%offset object 16) 1 value))
  (defun %rgfw-surface-convert-func (object)
    (%load (%offset object 24) :pointer))
  (defun (setf %rgfw-surface-convert-func) (value object)
@@ -4230,144 +4629,7 @@
  (defun (setf %rgfw-info-event-len) (value object)
    (%store-native (%offset object 976) -4 value))
  (defun %rgfw-info-hidden-mouse (object)
-   (%load (%offset object 12) :pointer))
- (defun (setf %rgfw-info-hidden-mouse) (value object)
-   (%store (%offset object 12) :pointer value))
- (defun %rgfw-info-polled-events (object) (%load (%offset object 981) 1))
- (defun (setf %rgfw-info-polled-events) (value object)
-   (%store-native (%offset object 981) 1 value))
- (defun %rgfw-info-queue-events (object) (%load (%offset object 980) 1))
- (defun (setf %rgfw-info-queue-events) (value object)
-   (%store-native (%offset object 980) 1 value))
- (defun %rgfw-info-window-count (object) (%load (%offset object 8) -4))
- (defun (setf %rgfw-info-window-count) (value object)
-   (%store-native (%offset object 8) -4 value))
- (defun %rgfw-key-char-event-value (object) (%load (%offset object 8) 4))
- (defun (setf %rgfw-key-char-event-value) (value object)
-   (%store (%offset object 8) 4 value))
- (defun %rgfw-key-event-mod (object) (%load (%offset object 10) 1))
- (defun (setf %rgfw-key-event-mod) (value object)
-   (%store (%offset object 10) 1 value))
- (defun %rgfw-key-event-repeat (object) (%load (%offset object 9) 1))
- (defun (setf %rgfw-key-event-repeat) (value object)
-   (%store (%offset object 9) 1 value))
- (defun %rgfw-key-event-state (object) (%load (%offset object 11) 1))
- (defun (setf %rgfw-key-event-state) (value object)
-   (%store (%offset object 11) 1 value))
- (defun %rgfw-key-event-value (object) (%load (%offset object 8) 1))
- (defun (setf %rgfw-key-event-value) (value object)
-   (%store (%offset object 8) 1 value))
- (defun %rgfw-monitor-event-monitor (object)
-   (%load (%offset object 8) :pointer))
- (defun (setf %rgfw-monitor-event-monitor) (value object)
-   (%store (%offset object 8) :pointer value))
- (defun %rgfw-monitor-event-state (object) (%load (%offset object 12) 1))
- (defun (setf %rgfw-monitor-event-state) (value object)
-   (%store (%offset object 12) 1 value))
- (defun %rgfw-monitor-list-cur (object) (%load (%offset object 4) :pointer))
- (defun (setf %rgfw-monitor-list-cur) (value object)
-   (%store (%offset object 4) :pointer value))
- (defun %rgfw-monitor-node (object) (%load (%offset object 180) :pointer))
- (defun (setf %rgfw-monitor-node) (value object)
-   (%store (%offset object 180) :pointer value))
- (defun %rgfw-monitor-node-disconnected (object)
-   (%load (%offset object 184) 1))
- (defun (setf %rgfw-monitor-node-disconnected) (value object)
-   (%store-native (%offset object 184) 1 value))
- (defun %rgfw-monitor-node-next (object)
-   (%load (%offset object 188) :pointer))
- (defun (setf %rgfw-monitor-node-next) (value object)
-   (%store (%offset object 188) :pointer value))
- (defun %rgfw-monitor-user-ptr (object)
-   (%load (%offset object 176) :pointer))
- (defun (setf %rgfw-monitor-user-ptr) (value object)
-   (%store (%offset object 176) :pointer value))
- (defun %rgfw-monitors-count (object)
-   (%load (%offset object 8) +c-code-size-t+))
- (defun (setf %rgfw-monitors-count) (value object)
-   (%store-native (%offset object 8) +c-code-size-t+ value))
- (defun %rgfw-monitors-primary (object) (%load (%offset object 12) :pointer))
- (defun (setf %rgfw-monitors-primary) (value object)
-   (%store (%offset object 12) :pointer value))
- (defun %rgfw-mouse-button-event-state (object) (%load (%offset object 9) 1))
- (defun (setf %rgfw-mouse-button-event-state) (value object)
-   (%store (%offset object 9) 1 value))
- (defun %rgfw-mouse-button-event-value (object) (%load (%offset object 8) 1))
- (defun (setf %rgfw-mouse-button-event-value) (value object)
-   (%store (%offset object 8) 1 value))
- (defun %rgfw-mouse-delta-event-x (object) (%load (%offset object 8) :float))
- (defun (setf %rgfw-mouse-delta-event-x) (value object)
-   (%store (%offset object 8) :float value))
- (defun %rgfw-mouse-delta-event-y (object)
-   (%load (%offset object 12) :float))
- (defun (setf %rgfw-mouse-delta-event-y) (value object)
-   (%store (%offset object 12) :float value))
- (defun %rgfw-mouse-motion-event-in-window (object)
-   (%load (%offset object 16) 1))
- (defun (setf %rgfw-mouse-motion-event-in-window) (value object)
-   (%store (%offset object 16) 1 value))
- (defun %rgfw-mouse-motion-event-x (object) (%load (%offset object 8) -4))
- (defun (setf %rgfw-mouse-motion-event-x) (value object)
-   (%store (%offset object 8) -4 value))
- (defun %rgfw-mouse-motion-event-y (object) (%load (%offset object 12) -4))
- (defun (setf %rgfw-mouse-motion-event-y) (value object)
-   (%store (%offset object 12) -4 value))
- (defun %rgfw-native-image-format (object) (%load (%offset object 8) 1))
- (defun (setf %rgfw-native-image-format) (value object)
-   (%store-native (%offset object 8) 1 value))
- (defun %rgfw-surface-convert-func (object)
-   (%load (%offset object 16) :pointer))
- (defun (setf %rgfw-surface-convert-func) (value object)
-   (%store (%offset object 16) :pointer value))
- (defun %rgfw-surface-format (object) (%load (%offset object 12) 1))
- (defun (setf %rgfw-surface-format) (value object)
-   (%store-native (%offset object 12) 1 value))
- (defun %rgfw-surface-h (object) (%load (%offset object 8) -4))
- (defun (setf %rgfw-surface-h) (value object)
-   (%store-native (%offset object 8) -4 value))
- (defun %rgfw-surface-w (object) (%load (%offset object 4) -4))
- (defun (setf %rgfw-surface-w) (value object)
-   (%store-native (%offset object 4) -4 value))
- (defun %rgfw-window-focus-event-state (object) (%load (%offset object 8) 1))
- (defun (setf %rgfw-window-focus-event-state) (value object)
-   (%store (%offset object 8) 1 value))
- (defun %rgfw-window-internal-mouse (object)
-   (%load (%offset object 92) :pointer))
- (defun (setf %rgfw-window-internal-mouse) (value object)
-   (%store (%offset object 92) :pointer value))
- (defun %rgfw-window-state-data-length (object)
-   (%load (%offset object 4) +c-code-size-t+))
- (defun (setf %rgfw-window-state-data-length) (value object)
-   (%store-native (%offset object 4) +c-code-size-t+ value))
- (defun %rgfw-window-state-drop-x (object) (%load (%offset object 8) -4))
- (defun (setf %rgfw-window-state-drop-x) (value object)
-   (%store-native (%offset object 8) -4 value))
- (defun %rgfw-window-state-drop-y (object) (%load (%offset object 12) -4))
- (defun (setf %rgfw-window-state-drop-y) (value object)
-   (%store-native (%offset object 12) -4 value))
- (defun %rgfw-window-state-mouse-leave (object)
-   (%load (%offset object 20) 1))
- (defun (setf %rgfw-window-state-mouse-leave) (value object)
-   (%store-native (%offset object 20) 1 value))
- (defun %rgfw-window-state-win (object) (%load (%offset object 16) :pointer))
- (defun (setf %rgfw-window-state-win) (value object)
-   (%store (%offset object 16) :pointer value))
- (defun %rgfw-window-state-win-leave (object)
-   (%load (%offset object 24) :pointer))
- (defun (setf %rgfw-window-state-win-leave) (value object)
-   (%store (%offset object 24) :pointer value))
- (defun %rgfw-window-update-event-h (object) (%load (%offset object 20) -4))
- (defun (setf %rgfw-window-update-event-h) (value object)
-   (%store (%offset object 20) -4 value))
- (defun %rgfw-window-update-event-w (object) (%load (%offset object 16) -4))
- (defun (setf %rgfw-window-update-event-w) (value object)
-   (%store (%offset object 16) -4 value))
- (defun %rgfw-window-update-event-x (object) (%load (%offset object 8) -4))
- (defun (setf %rgfw-window-update-event-x) (value object)
-   (%store (%offset object 8) -4 value))
- (defun %rgfw-window-update-event-y (object) (%load (%offset object 12) -4))
- (defun (setf %rgfw-window-update-event-y) (value object)
-   (%store (%offset object 12) -4 value)))
+   (%load (%offset object 12) :pointer)))
 #+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
 (progn
  (defun %address-rgfw-info-event-wait-force-stop (object)
@@ -4612,10 +4874,6 @@
    (%load (%offset object 216) +c-code-rr-output+))
  (defun (setf %rgfw-monitor-node-rr-output) (value object)
    (%store-native (%offset object 216) +c-code-rr-output+ value))
- (defun %rgfw-native-image-buffer (object)
-   (%load (%offset object 8) :string-pointer))
- (defun (setf %rgfw-native-image-buffer) (value object)
-   (%store (%offset object 8) :string-pointer value))
  (defun %rgfw-window-h (object) (%load (%offset object 196) -4))
  (defun (setf %rgfw-window-h) (value object)
    (%store-native (%offset object 196) -4 value))
@@ -5233,6 +5491,8 @@
    (%load (%offset object 2480) +c-code-atom+))
  (defun (setf %rgfw-info-xtext-uri-list) (value object)
    (%store-native (%offset object 2480) +c-code-atom+ value)))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun %address-rgfw-info-custom-view-classes (object) (%offset object 4144))
 #+(:and :windows (:or :x86-64 :arm64))
 (progn
  (defun %address-rgfw-info-keyboard (object) (%offset object 5856))
@@ -5257,6 +5517,13 @@
    (%offset object 196))
  (defun %address-rgfw-monitor-node-device-name (object) (%offset object 260))
  (defun %address-rgfw-native-image-bitmap-bits (object) (%offset object 4)))
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ (defun %address-rgfw-info-keyboard (object) (%offset object 4272))
+ (defun %address-rgfw-info-monitors (object) (%offset object 2640))
+ (defun %address-rgfw-info-mouse-buttons (object) (%offset object 4256))
+ (defun %address-rgfw-info-window-state (object) (%offset object 4208))
+ (defun %address-rgfw-native-image-buffer (object) (%offset object 8)))
 #+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
    (:or :freebsd :linux))
 (progn
@@ -5280,7 +5547,517 @@
  (defun %rgfw-monitor-node-rr-output (object)
    (%load (%offset object 192) +c-code-rr-output+))
  (defun (setf %rgfw-monitor-node-rr-output) (value object)
-   (%store-native (%offset object 192) +c-code-rr-output+ value))
+   (%store-native (%offset object 192) +c-code-rr-output+ value)))
+#+(:and :windows (:or :x86-64 :arm64))
+(progn
+ (defun %address-rgfw-window-internal (object) (%offset object 64))
+ (defun %address-tag-rawinput-data (object) (%offset object 24))
+ (defun %dwm-blurbehind-f-transition-on-maximized (object)
+   (%load (%offset object 16) -4))
+ (defun (setf %dwm-blurbehind-f-transition-on-maximized) (value object)
+   (%store-native (%offset object 16) -4 value))
+ (defun %flashwinfo-dw-flags (object) (%load (%offset object 16) 4))
+ (defun (setf %flashwinfo-dw-flags) (value object)
+   (%store-native (%offset object 16) 4 value))
+ (defun %flashwinfo-hwnd (object) (%load (%offset object 8) :pointer))
+ (defun (setf %flashwinfo-hwnd) (value object)
+   (%store (%offset object 8) :pointer value))
+ (defun %flashwinfo-u-count (object) (%load (%offset object 20) 4))
+ (defun (setf %flashwinfo-u-count) (value object)
+   (%store-native (%offset object 20) 4 value))
+ (defun %rgfw-info-clipboard (object) (%load (%offset object 2992) :pointer))
+ (defun (setf %rgfw-info-clipboard) (value object)
+   (%store (%offset object 2992) :pointer value))
+ (defun %rgfw-info-dnd-build (object) (%load (%offset object 3000) 1))
+ (defun (setf %rgfw-info-dnd-build) (value object)
+   (%store-native (%offset object 3000) 1 value))
+ (defun %rgfw-info-dnd-cur (object) (%load (%offset object 3016) :pointer))
+ (defun (setf %rgfw-info-dnd-cur) (value object)
+   (%store (%offset object 3016) :pointer value))
+ (defun %rgfw-info-dnd-root (object) (%load (%offset object 3008) :pointer))
+ (defun (setf %rgfw-info-dnd-root) (value object)
+   (%store (%offset object 3008) :pointer value))
+ (defun %rgfw-info-helper-window (object)
+   (%load (%offset object 3104) :pointer))
+ (defun (setf %rgfw-info-helper-window) (value object)
+   (%store (%offset object 3104) :pointer value))
+ (defun %rgfw-info-instance (object) (%load (%offset object 3024) :pointer))
+ (defun (setf %rgfw-info-instance) (value object)
+   (%store (%offset object 3024) :pointer value))
+ (defun %rgfw-info-raw-mouse (object) (%load (%offset object 5784) 1))
+ (defun (setf %rgfw-info-raw-mouse) (value object)
+   (%store-native (%offset object 5784) 1 value))
+ (defun %rgfw-info-scroll-x (object) (%load (%offset object 6368) :float))
+ (defun (setf %rgfw-info-scroll-x) (value object)
+   (%store-native (%offset object 6368) :float value))
+ (defun %rgfw-info-scroll-y (object) (%load (%offset object 6372) :float))
+ (defun (setf %rgfw-info-scroll-y) (value object)
+   (%store-native (%offset object 6372) :float value))
+ (defun %rgfw-info-vector-x (object) (%load (%offset object 6376) :float))
+ (defun (setf %rgfw-info-vector-x) (value object)
+   (%store-native (%offset object 6376) :float value))
+ (defun %rgfw-info-vector-y (object) (%load (%offset object 6380) :float))
+ (defun (setf %rgfw-info-vector-y) (value object)
+   (%store-native (%offset object 6380) :float value))
+ (defun %rgfw-monitor-node-h-monitor (object)
+   (%load (%offset object 216) :pointer))
+ (defun (setf %rgfw-monitor-node-h-monitor) (value object)
+   (%store (%offset object 216) :pointer value))
+ (defun %rgfw-native-image-bitmap-bits (object)
+   (%load (%offset object 8) :string-pointer))
+ (defun %rgfw-native-image-hdc-mem (object)
+   (%load (%offset object 24) :pointer))
+ (defun (setf %rgfw-native-image-hdc-mem) (value object)
+   (%store (%offset object 24) :pointer value)))
+#+(:and :windows :x86 (:not :x86-64))
+(progn
+ (defun %address-rgfw-window-internal (object) (%offset object 44))
+ (defun %address-tag-rawinput-data (object) (%offset object 16))
+ (defun %dwm-blurbehind-f-transition-on-maximized (object)
+   (%load (%offset object 12) -4))
+ (defun (setf %dwm-blurbehind-f-transition-on-maximized) (value object)
+   (%store-native (%offset object 12) -4 value))
+ (defun %flashwinfo-dw-flags (object) (%load (%offset object 8) 4))
+ (defun (setf %flashwinfo-dw-flags) (value object)
+   (%store-native (%offset object 8) 4 value))
+ (defun %flashwinfo-hwnd (object) (%load (%offset object 4) :pointer))
+ (defun (setf %flashwinfo-hwnd) (value object)
+   (%store (%offset object 4) :pointer value))
+ (defun %flashwinfo-u-count (object) (%load (%offset object 12) 4))
+ (defun (setf %flashwinfo-u-count) (value object)
+   (%store-native (%offset object 12) 4 value))
+ (defun %rgfw-info-clipboard (object) (%load (%offset object 2536) :pointer))
+ (defun (setf %rgfw-info-clipboard) (value object)
+   (%store (%offset object 2536) :pointer value))
+ (defun %rgfw-info-dnd-build (object) (%load (%offset object 2540) 1))
+ (defun (setf %rgfw-info-dnd-build) (value object)
+   (%store-native (%offset object 2540) 1 value))
+ (defun %rgfw-info-dnd-cur (object) (%load (%offset object 2548) :pointer))
+ (defun (setf %rgfw-info-dnd-cur) (value object)
+   (%store (%offset object 2548) :pointer value))
+ (defun %rgfw-info-dnd-root (object) (%load (%offset object 2544) :pointer))
+ (defun (setf %rgfw-info-dnd-root) (value object)
+   (%store (%offset object 2544) :pointer value))
+ (defun %rgfw-info-helper-window (object)
+   (%load (%offset object 2596) :pointer))
+ (defun (setf %rgfw-info-helper-window) (value object)
+   (%store (%offset object 2596) :pointer value))
+ (defun %rgfw-info-instance (object) (%load (%offset object 2552) :pointer))
+ (defun (setf %rgfw-info-instance) (value object)
+   (%store (%offset object 2552) :pointer value))
+ (defun %rgfw-info-raw-mouse (object) (%load (%offset object 5080) 1))
+ (defun (setf %rgfw-info-raw-mouse) (value object)
+   (%store-native (%offset object 5080) 1 value))
+ (defun %rgfw-info-scroll-x (object) (%load (%offset object 5640) :float))
+ (defun (setf %rgfw-info-scroll-x) (value object)
+   (%store-native (%offset object 5640) :float value))
+ (defun %rgfw-info-scroll-y (object) (%load (%offset object 5644) :float))
+ (defun (setf %rgfw-info-scroll-y) (value object)
+   (%store-native (%offset object 5644) :float value))
+ (defun %rgfw-info-vector-x (object) (%load (%offset object 5648) :float))
+ (defun (setf %rgfw-info-vector-x) (value object)
+   (%store-native (%offset object 5648) :float value))
+ (defun %rgfw-info-vector-y (object) (%load (%offset object 5652) :float))
+ (defun (setf %rgfw-info-vector-y) (value object)
+   (%store-native (%offset object 5652) :float value))
+ (defun %rgfw-monitor-node-h-monitor (object)
+   (%load (%offset object 192) :pointer))
+ (defun (setf %rgfw-monitor-node-h-monitor) (value object)
+   (%store (%offset object 192) :pointer value))
+ (defun %rgfw-native-image-bitmap-bits (object)
+   (%load (%offset object 4) :string-pointer))
+ (defun %rgfw-native-image-hdc-mem (object)
+   (%load (%offset object 12) :pointer))
+ (defun (setf %rgfw-native-image-hdc-mem) (value object)
+   (%store (%offset object 12) :pointer value)))
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ (defun %address-rgfw-window-internal (object) (%offset object 32))
+ (defun %cg-point-x (object) (%load (%offset object 0) :double))
+ (defun (setf %cg-point-x) (value object)
+   (%store-native (%offset object 0) :double value))
+ (defun %cg-point-y (object) (%load (%offset object 8) :double))
+ (defun (setf %cg-point-y) (value object)
+   (%store-native (%offset object 8) :double value))
+ (defun %cg-size-height (object) (%load (%offset object 8) :double))
+ (defun (setf %cg-size-height) (value object)
+   (%store-native (%offset object 8) :double value))
+ (defun %cg-size-width (object) (%load (%offset object 0) :double))
+ (defun (setf %cg-size-width) (value object)
+   (%store-native (%offset object 0) :double value))
+ (defun %objc-super-receiver (object) (%load (%offset object 0) :pointer))
+ (defun (setf %objc-super-receiver) (value object)
+   (%store (%offset object 0) :pointer value))
+ (defun %objc-super-super-class (object) (%load (%offset object 8) :pointer))
+ (defun (setf %objc-super-super-class) (value object)
+   (%store (%offset object 8) :pointer value))
+ (defun %rgfw-info-clipboard (object) (%load (%offset object 2608) :pointer))
+ (defun (setf %rgfw-info-clipboard) (value object)
+   (%store (%offset object 2608) :pointer value))
+ (defun %rgfw-info-custom-ns-app-delegate (object)
+   (%load (%offset object 4184) :pointer))
+ (defun (setf %rgfw-info-custom-ns-app-delegate) (value object)
+   (%store (%offset object 4184) :pointer value))
+ (defun %rgfw-info-custom-ns-app-delegate-class (object)
+   (%load (%offset object 4160) :pointer))
+ (defun (setf %rgfw-info-custom-ns-app-delegate-class) (value object)
+   (%store (%offset object 4160) :pointer value))
+ (defun %rgfw-info-custom-window-class (object)
+   (%load (%offset object 4176) :pointer))
+ (defun (setf %rgfw-info-custom-window-class) (value object)
+   (%store (%offset object 4176) :pointer value))
+ (defun %rgfw-info-custom-window-delegate-class (object)
+   (%load (%offset object 4168) :pointer))
+ (defun (setf %rgfw-info-custom-window-delegate-class) (value object)
+   (%store (%offset object 4168) :pointer value))
+ (defun %rgfw-info-dnd-build (object) (%load (%offset object 2616) 1))
+ (defun (setf %rgfw-info-dnd-build) (value object)
+   (%store-native (%offset object 2616) 1 value))
+ (defun %rgfw-info-dnd-cur (object) (%load (%offset object 2632) :pointer))
+ (defun (setf %rgfw-info-dnd-cur) (value object)
+   (%store (%offset object 2632) :pointer value))
+ (defun %rgfw-info-dnd-root (object) (%load (%offset object 2624) :pointer))
+ (defun (setf %rgfw-info-dnd-root) (value object)
+   (%store (%offset object 2624) :pointer value))
+ (defun %rgfw-info-flash (object) (%load (%offset object 4136) -8))
+ (defun (setf %rgfw-info-flash) (value object)
+   (%store-native (%offset object 4136) -8 value))
+ (defun %rgfw-info-ns-app (object) (%load (%offset object 4128) :pointer))
+ (defun (setf %rgfw-info-ns-app) (value object)
+   (%store (%offset object 4128) :pointer value))
+ (defun %rgfw-info-raw-mouse (object) (%load (%offset object 4200) 1))
+ (defun (setf %rgfw-info-raw-mouse) (value object)
+   (%store-native (%offset object 4200) 1 value))
+ (defun %rgfw-info-scroll-x (object) (%load (%offset object 4784) :float))
+ (defun (setf %rgfw-info-scroll-x) (value object)
+   (%store-native (%offset object 4784) :float value))
+ (defun %rgfw-info-scroll-y (object) (%load (%offset object 4788) :float))
+ (defun (setf %rgfw-info-scroll-y) (value object)
+   (%store-native (%offset object 4788) :float value))
+ (defun %rgfw-info-tis-bundle (object)
+   (%load (%offset object 4192) :pointer))
+ (defun (setf %rgfw-info-tis-bundle) (value object)
+   (%store (%offset object 4192) :pointer value))
+ (defun %rgfw-info-vector-x (object) (%load (%offset object 4792) :float))
+ (defun (setf %rgfw-info-vector-x) (value object)
+   (%store-native (%offset object 4792) :float value))
+ (defun %rgfw-info-vector-y (object) (%load (%offset object 4796) :float))
+ (defun (setf %rgfw-info-vector-y) (value object)
+   (%store-native (%offset object 4796) :float value))
+ (defun %rgfw-monitor-node-all-modes (object)
+   (%load (%offset object 232) :pointer))
+ (defun (setf %rgfw-monitor-node-all-modes) (value object)
+   (%store (%offset object 232) :pointer value))
+ (defun %rgfw-monitor-node-display (object) (%load (%offset object 224) 4))
+ (defun (setf %rgfw-monitor-node-display) (value object)
+   (%store-native (%offset object 224) 4 value))
+ (defun %rgfw-monitor-node-screen (object)
+   (%load (%offset object 216) :pointer))
+ (defun (setf %rgfw-monitor-node-screen) (value object)
+   (%store (%offset object 216) :pointer value))
+ (defun %rgfw-monitor-node-uint-num (object) (%load (%offset object 228) 4))
+ (defun (setf %rgfw-monitor-node-uint-num) (value object)
+   (%store-native (%offset object 228) 4 value)))
+#+(:and
+   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+   (:or :freebsd :linux))
+(progn
+ (defun %pollfd-events (object) (%load (%offset object 4) -2))
+ (defun (setf %pollfd-events) (value object)
+   (%store-native (%offset object 4) -2 value))
+ (defun %pollfd-fd (object) (%load (%offset object 0) -4))
+ (defun (setf %pollfd-fd) (value object)
+   (%store-native (%offset object 0) -4 value))
+ (defun %pollfd-revents (object) (%load (%offset object 6) -2))
+ (defun (setf %pollfd-revents) (value object)
+   (%store-native (%offset object 6) -2 value))
+ (defun %rgfw-window-src-h (object) (%load (%offset object 12) -4))
+ (defun (setf %rgfw-window-src-h) (value object)
+   (%store-native (%offset object 12) -4 value))
+ (defun %rgfw-window-src-w (object) (%load (%offset object 8) -4))
+ (defun (setf %rgfw-window-src-w) (value object)
+   (%store-native (%offset object 8) -4 value))
+ (defun %rgfw-window-src-window (object)
+   (%load (%offset object 16) +c-code-window+))
+ (defun (setf %rgfw-window-src-window) (value object)
+   (%store-native (%offset object 16) +c-code-window+ value))
+ (defun %rgfw-window-src-x (object) (%load (%offset object 0) -4))
+ (defun (setf %rgfw-window-src-x) (value object)
+   (%store-native (%offset object 0) -4 value))
+ (defun %rgfw-window-src-y (object) (%load (%offset object 4) -4))
+ (defun (setf %rgfw-window-src-y) (value object)
+   (%store-native (%offset object 4) -4 value))
+ (defun %x-class-hint-res-name (object)
+   (%load (%offset object 0) :string-pointer))
+ (defun (setf %x-class-hint-res-name) (value object)
+   (%store (%offset object 0) :string-pointer value))
+ (defun %x-client-message-event-type (object) (%load (%offset object 0) -4))
+ (defun (setf %x-client-message-event-type) (value object)
+   (%store (%offset object 0) -4 value))
+ (defun %x-set-window-attributes-background-pixmap (object)
+   (%load (%offset object 0) +c-code-pixmap+))
+ (defun (setf %x-set-window-attributes-background-pixmap) (value object)
+   (%store-native (%offset object 0) +c-code-pixmap+ value))
+ (defun %x-size-hints-flags (object)
+   (%load (%offset object 0) +c-code-long+))
+ (defun (setf %x-size-hints-flags) (value object)
+   (%store-native (%offset object 0) +c-code-long+ value))
+ (defun %x-size-hints-min-aspect-x (object) (%load (%offset object 0) -4))
+ (defun (setf %x-size-hints-min-aspect-x) (value object)
+   (%store-native (%offset object 0) -4 value))
+ (defun %x-size-hints-min-aspect-y (object) (%load (%offset object 4) -4))
+ (defun (setf %x-size-hints-min-aspect-y) (value object)
+   (%store-native (%offset object 4) -4 value))
+ (defun %x-visual-info-visual (object) (%load (%offset object 0) :pointer))
+ (defun (setf %x-visual-info-visual) (value object)
+   (%store (%offset object 0) :pointer value))
+ (defun %x-window-attributes-depth (object) (%load (%offset object 20) -4))
+ (defun %x-window-attributes-height (object) (%load (%offset object 12) -4))
+ (defun %x-window-attributes-visual (object)
+   (%load (%offset object 24) :pointer))
+ (defun %x-window-attributes-width (object) (%load (%offset object 8) -4))
+ (defun %x-window-attributes-x (object) (%load (%offset object 0) -4))
+ (defun %x-window-attributes-y (object) (%load (%offset object 4) -4))
+ (defun %xi-event-mask-deviceid (object) (%load (%offset object 0) -4))
+ (defun (setf %xi-event-mask-deviceid) (value object)
+   (%store-native (%offset object 0) -4 value))
+ (defun %xi-event-mask-mask (object)
+   (%load (%offset object 8) :string-pointer))
+ (defun (setf %xi-event-mask-mask) (value object)
+   (%store (%offset object 8) :string-pointer value))
+ (defun %xi-event-mask-mask-len (object) (%load (%offset object 4) -4))
+ (defun (setf %xi-event-mask-mask-len) (value object)
+   (%store-native (%offset object 4) -4 value))
+ (defun %xi-valuator-state-mask-len (object) (%load (%offset object 0) -4))
+ (defun %xim-callback-client-data (object)
+   (%load (%offset object 0) :string-pointer))
+ (defun (setf %xim-callback-client-data) (value object)
+   (%store (%offset object 0) :string-pointer value))
+ (defun %xim-styles-count-styles (object) (%load (%offset object 0) 2))
+ (defun %xwm-hints-flags (object) (%load (%offset object 0) +c-code-long+))
+ (defun (setf %xwm-hints-flags) (value object)
+   (%store-native (%offset object 0) +c-code-long+ value)))
+#+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
+(progn
+ (defun %address-tag-minmaxinfo-pt-max-track-size (object)
+   (%offset object 32))
+ (defun %address-tag-minmaxinfo-pt-min-track-size (object)
+   (%offset object 24))
+ (defun %address-tag-monitorinfoexa-rc-work (object) (%offset object 20))
+ (defun %address-tag-monitorinfoexw-rc-monitor (object) (%offset object 4))
+ (defun %address-tag-monitorinfoexw-sz-device (object) (%offset object 40))
+ (defun %address-tag-rawinput-data-mouse (object) (%offset object 0))
+ (defun %address-tag-rawinput-header (object) (%offset object 0))
+ (defun %address-tag-rect-left (object) (%offset object 0))
+ (defun %address-tag-rect-right (object) (%offset object 8))
+ (defun %bitmapv5header-b-v5bit-count (object) (%load (%offset object 14) 2))
+ (defun (setf %bitmapv5header-b-v5bit-count) (value object)
+   (%store-native (%offset object 14) 2 value))
+ (defun %bitmapv5header-b-v5compression (object)
+   (%load (%offset object 16) 4))
+ (defun (setf %bitmapv5header-b-v5compression) (value object)
+   (%store-native (%offset object 16) 4 value))
+ (defun %bitmapv5header-b-v5height (object)
+   (%load (%offset object 8) +c-code-long+))
+ (defun (setf %bitmapv5header-b-v5height) (value object)
+   (%store-native (%offset object 8) +c-code-long+ value))
+ (defun %bitmapv5header-b-v5planes (object) (%load (%offset object 12) 2))
+ (defun (setf %bitmapv5header-b-v5planes) (value object)
+   (%store-native (%offset object 12) 2 value))
+ (defun %bitmapv5header-b-v5size (object) (%load (%offset object 0) 4))
+ (defun (setf %bitmapv5header-b-v5size) (value object)
+   (%store-native (%offset object 0) 4 value))
+ (defun %bitmapv5header-b-v5width (object)
+   (%load (%offset object 4) +c-code-long+))
+ (defun (setf %bitmapv5header-b-v5width) (value object)
+   (%store-native (%offset object 4) +c-code-long+ value))
+ (defun %dwm-blurbehind-dw-flags (object) (%load (%offset object 0) 4))
+ (defun (setf %dwm-blurbehind-dw-flags) (value object)
+   (%store-native (%offset object 0) 4 value))
+ (defun %dwm-blurbehind-f-enable (object) (%load (%offset object 4) -4))
+ (defun (setf %dwm-blurbehind-f-enable) (value object)
+   (%store-native (%offset object 4) -4 value))
+ (defun %dwm-blurbehind-h-rgn-blur (object)
+   (%load (%offset object 8) :pointer))
+ (defun (setf %dwm-blurbehind-h-rgn-blur) (value object)
+   (%store (%offset object 8) :pointer value))
+ (defun %flashwinfo-cb-size (object) (%load (%offset object 0) 4))
+ (defun (setf %flashwinfo-cb-size) (value object)
+   (%store-native (%offset object 0) 4 value)))
+#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+(progn
+ (defun (setf %rgfw-info-hidden-mouse) (value object)
+   (%store (%offset object 24) :pointer value))
+ (defun %rgfw-native-image-format (object) (%load (%offset object 16) 1))
+ (defun (setf %rgfw-native-image-format) (value object)
+   (%store-native (%offset object 16) 1 value)))
+#+(:or (:and :arm (:not :arm64) (:or :linux :freebsd))
+   (:and :x86 (:not :x86-64) (:or :linux :windows :freebsd)))
+(progn
+ (defun (setf %rgfw-info-hidden-mouse) (value object)
+   (%store (%offset object 12) :pointer value))
+ (defun %rgfw-info-polled-events (object) (%load (%offset object 981) 1))
+ (defun (setf %rgfw-info-polled-events) (value object)
+   (%store-native (%offset object 981) 1 value))
+ (defun %rgfw-info-queue-events (object) (%load (%offset object 980) 1))
+ (defun (setf %rgfw-info-queue-events) (value object)
+   (%store-native (%offset object 980) 1 value))
+ (defun %rgfw-info-window-count (object) (%load (%offset object 8) -4))
+ (defun (setf %rgfw-info-window-count) (value object)
+   (%store-native (%offset object 8) -4 value))
+ (defun %rgfw-key-char-event-value (object) (%load (%offset object 8) 4))
+ (defun (setf %rgfw-key-char-event-value) (value object)
+   (%store (%offset object 8) 4 value))
+ (defun %rgfw-key-event-mod (object) (%load (%offset object 10) 1))
+ (defun (setf %rgfw-key-event-mod) (value object)
+   (%store (%offset object 10) 1 value))
+ (defun %rgfw-key-event-repeat (object) (%load (%offset object 9) 1))
+ (defun (setf %rgfw-key-event-repeat) (value object)
+   (%store (%offset object 9) 1 value))
+ (defun %rgfw-key-event-state (object) (%load (%offset object 11) 1))
+ (defun (setf %rgfw-key-event-state) (value object)
+   (%store (%offset object 11) 1 value))
+ (defun %rgfw-key-event-value (object) (%load (%offset object 8) 1))
+ (defun (setf %rgfw-key-event-value) (value object)
+   (%store (%offset object 8) 1 value))
+ (defun %rgfw-monitor-event-monitor (object)
+   (%load (%offset object 8) :pointer))
+ (defun (setf %rgfw-monitor-event-monitor) (value object)
+   (%store (%offset object 8) :pointer value))
+ (defun %rgfw-monitor-event-state (object) (%load (%offset object 12) 1))
+ (defun (setf %rgfw-monitor-event-state) (value object)
+   (%store (%offset object 12) 1 value))
+ (defun %rgfw-monitor-list-cur (object) (%load (%offset object 4) :pointer))
+ (defun (setf %rgfw-monitor-list-cur) (value object)
+   (%store (%offset object 4) :pointer value))
+ (defun %rgfw-monitor-node (object) (%load (%offset object 180) :pointer))
+ (defun (setf %rgfw-monitor-node) (value object)
+   (%store (%offset object 180) :pointer value))
+ (defun %rgfw-monitor-node-disconnected (object)
+   (%load (%offset object 184) 1))
+ (defun (setf %rgfw-monitor-node-disconnected) (value object)
+   (%store-native (%offset object 184) 1 value))
+ (defun %rgfw-monitor-node-next (object)
+   (%load (%offset object 188) :pointer))
+ (defun (setf %rgfw-monitor-node-next) (value object)
+   (%store (%offset object 188) :pointer value))
+ (defun %rgfw-monitor-user-ptr (object)
+   (%load (%offset object 176) :pointer))
+ (defun (setf %rgfw-monitor-user-ptr) (value object)
+   (%store (%offset object 176) :pointer value))
+ (defun %rgfw-monitors-count (object)
+   (%load (%offset object 8) +c-code-size-t+))
+ (defun (setf %rgfw-monitors-count) (value object)
+   (%store-native (%offset object 8) +c-code-size-t+ value))
+ (defun %rgfw-monitors-primary (object) (%load (%offset object 12) :pointer))
+ (defun (setf %rgfw-monitors-primary) (value object)
+   (%store (%offset object 12) :pointer value))
+ (defun %rgfw-mouse-button-event-state (object) (%load (%offset object 9) 1))
+ (defun (setf %rgfw-mouse-button-event-state) (value object)
+   (%store (%offset object 9) 1 value))
+ (defun %rgfw-mouse-button-event-value (object) (%load (%offset object 8) 1))
+ (defun (setf %rgfw-mouse-button-event-value) (value object)
+   (%store (%offset object 8) 1 value))
+ (defun %rgfw-mouse-delta-event-x (object) (%load (%offset object 8) :float))
+ (defun (setf %rgfw-mouse-delta-event-x) (value object)
+   (%store (%offset object 8) :float value))
+ (defun %rgfw-mouse-delta-event-y (object)
+   (%load (%offset object 12) :float))
+ (defun (setf %rgfw-mouse-delta-event-y) (value object)
+   (%store (%offset object 12) :float value))
+ (defun %rgfw-mouse-motion-event-in-window (object)
+   (%load (%offset object 16) 1))
+ (defun (setf %rgfw-mouse-motion-event-in-window) (value object)
+   (%store (%offset object 16) 1 value))
+ (defun %rgfw-mouse-motion-event-x (object) (%load (%offset object 8) -4))
+ (defun (setf %rgfw-mouse-motion-event-x) (value object)
+   (%store (%offset object 8) -4 value))
+ (defun %rgfw-mouse-motion-event-y (object) (%load (%offset object 12) -4))
+ (defun (setf %rgfw-mouse-motion-event-y) (value object)
+   (%store (%offset object 12) -4 value))
+ (defun %rgfw-native-image-format (object) (%load (%offset object 8) 1))
+ (defun (setf %rgfw-native-image-format) (value object)
+   (%store-native (%offset object 8) 1 value))
+ (defun %rgfw-surface-convert-func (object)
+   (%load (%offset object 16) :pointer))
+ (defun (setf %rgfw-surface-convert-func) (value object)
+   (%store (%offset object 16) :pointer value))
+ (defun %rgfw-surface-format (object) (%load (%offset object 12) 1))
+ (defun (setf %rgfw-surface-format) (value object)
+   (%store-native (%offset object 12) 1 value))
+ (defun %rgfw-surface-h (object) (%load (%offset object 8) -4))
+ (defun (setf %rgfw-surface-h) (value object)
+   (%store-native (%offset object 8) -4 value))
+ (defun %rgfw-surface-w (object) (%load (%offset object 4) -4))
+ (defun (setf %rgfw-surface-w) (value object)
+   (%store-native (%offset object 4) -4 value))
+ (defun %rgfw-window-focus-event-state (object) (%load (%offset object 8) 1))
+ (defun (setf %rgfw-window-focus-event-state) (value object)
+   (%store (%offset object 8) 1 value))
+ (defun %rgfw-window-internal-mouse (object)
+   (%load (%offset object 92) :pointer))
+ (defun (setf %rgfw-window-internal-mouse) (value object)
+   (%store (%offset object 92) :pointer value))
+ (defun %rgfw-window-state-data-length (object)
+   (%load (%offset object 4) +c-code-size-t+))
+ (defun (setf %rgfw-window-state-data-length) (value object)
+   (%store-native (%offset object 4) +c-code-size-t+ value))
+ (defun %rgfw-window-state-drop-x (object) (%load (%offset object 8) -4))
+ (defun (setf %rgfw-window-state-drop-x) (value object)
+   (%store-native (%offset object 8) -4 value))
+ (defun %rgfw-window-state-drop-y (object) (%load (%offset object 12) -4))
+ (defun (setf %rgfw-window-state-drop-y) (value object)
+   (%store-native (%offset object 12) -4 value))
+ (defun %rgfw-window-state-mouse-leave (object)
+   (%load (%offset object 20) 1))
+ (defun (setf %rgfw-window-state-mouse-leave) (value object)
+   (%store-native (%offset object 20) 1 value))
+ (defun %rgfw-window-state-win (object) (%load (%offset object 16) :pointer))
+ (defun (setf %rgfw-window-state-win) (value object)
+   (%store (%offset object 16) :pointer value))
+ (defun %rgfw-window-state-win-leave (object)
+   (%load (%offset object 24) :pointer))
+ (defun (setf %rgfw-window-state-win-leave) (value object)
+   (%store (%offset object 24) :pointer value))
+ (defun %rgfw-window-update-event-h (object) (%load (%offset object 20) -4))
+ (defun (setf %rgfw-window-update-event-h) (value object)
+   (%store (%offset object 20) -4 value))
+ (defun %rgfw-window-update-event-w (object) (%load (%offset object 16) -4))
+ (defun (setf %rgfw-window-update-event-w) (value object)
+   (%store (%offset object 16) -4 value))
+ (defun %rgfw-window-update-event-x (object) (%load (%offset object 8) -4))
+ (defun (setf %rgfw-window-update-event-x) (value object)
+   (%store (%offset object 8) -4 value))
+ (defun %rgfw-window-update-event-y (object) (%load (%offset object 12) -4))
+ (defun (setf %rgfw-window-update-event-y) (value object)
+   (%store (%offset object 12) -4 value)))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux)))
+(progn
+ (defun %rgfw-monitor-mode-src (object) (%load (%offset object 16) :pointer))
+ (defun (setf %rgfw-monitor-mode-src) (value object)
+   (%store (%offset object 16) :pointer value)))
+#+(:or
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
+(progn
+ (defun %rgfw-native-image-bitmap (object)
+   (%load (%offset object 0) :pointer))
+ (defun (setf %rgfw-native-image-bitmap) (value object)
+   (%store (%offset object 0) :pointer value)))
+#+(:and (:or :linux :darwin :freebsd) (:or :arm64 :x86-64))
+(progn
+ (defun %rgfw-native-image-buffer (object)
+   (%load (%offset object 8) :string-pointer))
+ (defun (setf %rgfw-native-image-buffer) (value object)
+   (%store (%offset object 8) :string-pointer value)))
+#+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+   (:or :freebsd :linux))
+(progn
  (defun %rgfw-native-image-buffer (object)
    (%load (%offset object 4) :string-pointer))
  (defun (setf %rgfw-native-image-buffer) (value object)
@@ -5456,67 +6233,16 @@
  (defun %xwm-hints-initial-state (object) (%load (%offset object 8) -4))
  (defun (setf %xwm-hints-initial-state) (value object)
    (%store-native (%offset object 8) -4 value)))
-#+(:and :windows (:or :x86-64 :arm64))
+#+(:and :darwin (:or :x86-64 :arm64))
 (progn
- (defun %address-rgfw-window-internal (object) (%offset object 64))
- (defun %address-tag-rawinput-data (object) (%offset object 24))
- (defun %dwm-blurbehind-f-transition-on-maximized (object)
-   (%load (%offset object 16) -4))
- (defun (setf %dwm-blurbehind-f-transition-on-maximized) (value object)
-   (%store-native (%offset object 16) -4 value))
- (defun %flashwinfo-dw-flags (object) (%load (%offset object 16) 4))
- (defun (setf %flashwinfo-dw-flags) (value object)
-   (%store-native (%offset object 16) 4 value))
- (defun %flashwinfo-hwnd (object) (%load (%offset object 8) :pointer))
- (defun (setf %flashwinfo-hwnd) (value object)
-   (%store (%offset object 8) :pointer value))
- (defun %flashwinfo-u-count (object) (%load (%offset object 20) 4))
- (defun (setf %flashwinfo-u-count) (value object)
-   (%store-native (%offset object 20) 4 value))
- (defun %rgfw-info-clipboard (object) (%load (%offset object 2992) :pointer))
- (defun (setf %rgfw-info-clipboard) (value object)
-   (%store (%offset object 2992) :pointer value))
- (defun %rgfw-info-dnd-build (object) (%load (%offset object 3000) 1))
- (defun (setf %rgfw-info-dnd-build) (value object)
-   (%store-native (%offset object 3000) 1 value))
- (defun %rgfw-info-dnd-cur (object) (%load (%offset object 3016) :pointer))
- (defun (setf %rgfw-info-dnd-cur) (value object)
-   (%store (%offset object 3016) :pointer value))
- (defun %rgfw-info-dnd-root (object) (%load (%offset object 3008) :pointer))
- (defun (setf %rgfw-info-dnd-root) (value object)
-   (%store (%offset object 3008) :pointer value))
- (defun %rgfw-info-helper-window (object)
-   (%load (%offset object 3104) :pointer))
- (defun (setf %rgfw-info-helper-window) (value object)
-   (%store (%offset object 3104) :pointer value))
- (defun %rgfw-info-instance (object) (%load (%offset object 3024) :pointer))
- (defun (setf %rgfw-info-instance) (value object)
-   (%store (%offset object 3024) :pointer value))
- (defun %rgfw-info-raw-mouse (object) (%load (%offset object 5784) 1))
- (defun (setf %rgfw-info-raw-mouse) (value object)
-   (%store-native (%offset object 5784) 1 value))
- (defun %rgfw-info-scroll-x (object) (%load (%offset object 6368) :float))
- (defun (setf %rgfw-info-scroll-x) (value object)
-   (%store-native (%offset object 6368) :float value))
- (defun %rgfw-info-scroll-y (object) (%load (%offset object 6372) :float))
- (defun (setf %rgfw-info-scroll-y) (value object)
-   (%store-native (%offset object 6372) :float value))
- (defun %rgfw-info-vector-x (object) (%load (%offset object 6376) :float))
- (defun (setf %rgfw-info-vector-x) (value object)
-   (%store-native (%offset object 6376) :float value))
- (defun %rgfw-info-vector-y (object) (%load (%offset object 6380) :float))
- (defun (setf %rgfw-info-vector-y) (value object)
-   (%store-native (%offset object 6380) :float value))
- (defun %rgfw-monitor-node-h-monitor (object)
-   (%load (%offset object 216) :pointer))
- (defun (setf %rgfw-monitor-node-h-monitor) (value object)
-   (%store (%offset object 216) :pointer value))
- (defun %rgfw-native-image-bitmap-bits (object)
-   (%load (%offset object 8) :string-pointer))
- (defun %rgfw-native-image-hdc-mem (object)
-   (%load (%offset object 24) :pointer))
- (defun (setf %rgfw-native-image-hdc-mem) (value object)
-   (%store (%offset object 24) :pointer value))
+ (defun %rgfw-native-image-format (object) (%load (%offset object 0) 1))
+ (defun (setf %rgfw-native-image-format) (value object)
+   (%store-native (%offset object 0) 1 value))
+ (defun %rgfw-native-image-rep (object) (%load (%offset object 16) :pointer))
+ (defun (setf %rgfw-native-image-rep) (value object)
+   (%store (%offset object 16) :pointer value)))
+#+(:and (:or :x86-64 :arm64) (:or :darwin :windows))
+(progn
  (defun %rgfw-scale-updated-event-x (object)
    (%load (%offset object 16) :float))
  (defun (setf %rgfw-scale-updated-event-x) (value object)
@@ -5524,7 +6250,19 @@
  (defun %rgfw-scale-updated-event-y (object)
    (%load (%offset object 20) :float))
  (defun (setf %rgfw-scale-updated-event-y) (value object)
-   (%store (%offset object 20) :float value))
+   (%store (%offset object 20) :float value)))
+#+(:and :windows :x86 (:not :x86-64))
+(progn
+ (defun %rgfw-scale-updated-event-x (object)
+   (%load (%offset object 8) :float))
+ (defun (setf %rgfw-scale-updated-event-x) (value object)
+   (%store (%offset object 8) :float value))
+ (defun %rgfw-scale-updated-event-y (object)
+   (%load (%offset object 12) :float))
+ (defun (setf %rgfw-scale-updated-event-y) (value object)
+   (%store (%offset object 12) :float value)))
+#+(:and :windows (:or :x86-64 :arm64))
+(progn
  (defun %rgfw-window-h (object) (%load (%offset object 204) -4))
  (defun (setf %rgfw-window-h) (value object)
    (%store-native (%offset object 204) -4 value))
@@ -5583,73 +6321,6 @@
    (%store-native (%offset object 196) -4 value)))
 #+(:and :windows :x86 (:not :x86-64))
 (progn
- (defun %address-rgfw-window-internal (object) (%offset object 44))
- (defun %address-tag-rawinput-data (object) (%offset object 16))
- (defun %dwm-blurbehind-f-transition-on-maximized (object)
-   (%load (%offset object 12) -4))
- (defun (setf %dwm-blurbehind-f-transition-on-maximized) (value object)
-   (%store-native (%offset object 12) -4 value))
- (defun %flashwinfo-dw-flags (object) (%load (%offset object 8) 4))
- (defun (setf %flashwinfo-dw-flags) (value object)
-   (%store-native (%offset object 8) 4 value))
- (defun %flashwinfo-hwnd (object) (%load (%offset object 4) :pointer))
- (defun (setf %flashwinfo-hwnd) (value object)
-   (%store (%offset object 4) :pointer value))
- (defun %flashwinfo-u-count (object) (%load (%offset object 12) 4))
- (defun (setf %flashwinfo-u-count) (value object)
-   (%store-native (%offset object 12) 4 value))
- (defun %rgfw-info-clipboard (object) (%load (%offset object 2536) :pointer))
- (defun (setf %rgfw-info-clipboard) (value object)
-   (%store (%offset object 2536) :pointer value))
- (defun %rgfw-info-dnd-build (object) (%load (%offset object 2540) 1))
- (defun (setf %rgfw-info-dnd-build) (value object)
-   (%store-native (%offset object 2540) 1 value))
- (defun %rgfw-info-dnd-cur (object) (%load (%offset object 2548) :pointer))
- (defun (setf %rgfw-info-dnd-cur) (value object)
-   (%store (%offset object 2548) :pointer value))
- (defun %rgfw-info-dnd-root (object) (%load (%offset object 2544) :pointer))
- (defun (setf %rgfw-info-dnd-root) (value object)
-   (%store (%offset object 2544) :pointer value))
- (defun %rgfw-info-helper-window (object)
-   (%load (%offset object 2596) :pointer))
- (defun (setf %rgfw-info-helper-window) (value object)
-   (%store (%offset object 2596) :pointer value))
- (defun %rgfw-info-instance (object) (%load (%offset object 2552) :pointer))
- (defun (setf %rgfw-info-instance) (value object)
-   (%store (%offset object 2552) :pointer value))
- (defun %rgfw-info-raw-mouse (object) (%load (%offset object 5080) 1))
- (defun (setf %rgfw-info-raw-mouse) (value object)
-   (%store-native (%offset object 5080) 1 value))
- (defun %rgfw-info-scroll-x (object) (%load (%offset object 5640) :float))
- (defun (setf %rgfw-info-scroll-x) (value object)
-   (%store-native (%offset object 5640) :float value))
- (defun %rgfw-info-scroll-y (object) (%load (%offset object 5644) :float))
- (defun (setf %rgfw-info-scroll-y) (value object)
-   (%store-native (%offset object 5644) :float value))
- (defun %rgfw-info-vector-x (object) (%load (%offset object 5648) :float))
- (defun (setf %rgfw-info-vector-x) (value object)
-   (%store-native (%offset object 5648) :float value))
- (defun %rgfw-info-vector-y (object) (%load (%offset object 5652) :float))
- (defun (setf %rgfw-info-vector-y) (value object)
-   (%store-native (%offset object 5652) :float value))
- (defun %rgfw-monitor-node-h-monitor (object)
-   (%load (%offset object 192) :pointer))
- (defun (setf %rgfw-monitor-node-h-monitor) (value object)
-   (%store (%offset object 192) :pointer value))
- (defun %rgfw-native-image-bitmap-bits (object)
-   (%load (%offset object 4) :string-pointer))
- (defun %rgfw-native-image-hdc-mem (object)
-   (%load (%offset object 12) :pointer))
- (defun (setf %rgfw-native-image-hdc-mem) (value object)
-   (%store (%offset object 12) :pointer value))
- (defun %rgfw-scale-updated-event-x (object)
-   (%load (%offset object 8) :float))
- (defun (setf %rgfw-scale-updated-event-x) (value object)
-   (%store (%offset object 8) :float value))
- (defun %rgfw-scale-updated-event-y (object)
-   (%load (%offset object 12) :float))
- (defun (setf %rgfw-scale-updated-event-y) (value object)
-   (%store (%offset object 12) :float value))
  (defun %rgfw-window-h (object) (%load (%offset object 160) -4))
  (defun (setf %rgfw-window-h) (value object)
    (%store-native (%offset object 160) -4 value))
@@ -5706,89 +6377,38 @@
  (defun %rgfw-window-y (object) (%load (%offset object 152) -4))
  (defun (setf %rgfw-window-y) (value object)
    (%store-native (%offset object 152) -4 value)))
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
+#+(:and :darwin (:or :x86-64 :arm64))
 (progn
- (defun %pollfd-events (object) (%load (%offset object 4) -2))
- (defun (setf %pollfd-events) (value object)
-   (%store-native (%offset object 4) -2 value))
- (defun %pollfd-fd (object) (%load (%offset object 0) -4))
- (defun (setf %pollfd-fd) (value object)
-   (%store-native (%offset object 0) -4 value))
- (defun %pollfd-revents (object) (%load (%offset object 6) -2))
- (defun (setf %pollfd-revents) (value object)
-   (%store-native (%offset object 6) -2 value))
- (defun %rgfw-monitor-mode-src (object) (%load (%offset object 16) :pointer))
- (defun (setf %rgfw-monitor-mode-src) (value object)
-   (%store (%offset object 16) :pointer value))
- (defun %rgfw-window-src-h (object) (%load (%offset object 12) -4))
- (defun (setf %rgfw-window-src-h) (value object)
-   (%store-native (%offset object 12) -4 value))
- (defun %rgfw-window-src-w (object) (%load (%offset object 8) -4))
- (defun (setf %rgfw-window-src-w) (value object)
-   (%store-native (%offset object 8) -4 value))
- (defun %rgfw-window-src-window (object)
-   (%load (%offset object 16) +c-code-window+))
- (defun (setf %rgfw-window-src-window) (value object)
-   (%store-native (%offset object 16) +c-code-window+ value))
- (defun %rgfw-window-src-x (object) (%load (%offset object 0) -4))
- (defun (setf %rgfw-window-src-x) (value object)
-   (%store-native (%offset object 0) -4 value))
- (defun %rgfw-window-src-y (object) (%load (%offset object 4) -4))
- (defun (setf %rgfw-window-src-y) (value object)
-   (%store-native (%offset object 4) -4 value))
- (defun %x-class-hint-res-name (object)
-   (%load (%offset object 0) :string-pointer))
- (defun (setf %x-class-hint-res-name) (value object)
-   (%store (%offset object 0) :string-pointer value))
- (defun %x-client-message-event-type (object) (%load (%offset object 0) -4))
- (defun (setf %x-client-message-event-type) (value object)
-   (%store (%offset object 0) -4 value))
- (defun %x-set-window-attributes-background-pixmap (object)
-   (%load (%offset object 0) +c-code-pixmap+))
- (defun (setf %x-set-window-attributes-background-pixmap) (value object)
-   (%store-native (%offset object 0) +c-code-pixmap+ value))
- (defun %x-size-hints-flags (object)
-   (%load (%offset object 0) +c-code-long+))
- (defun (setf %x-size-hints-flags) (value object)
-   (%store-native (%offset object 0) +c-code-long+ value))
- (defun %x-size-hints-min-aspect-x (object) (%load (%offset object 0) -4))
- (defun (setf %x-size-hints-min-aspect-x) (value object)
-   (%store-native (%offset object 0) -4 value))
- (defun %x-size-hints-min-aspect-y (object) (%load (%offset object 4) -4))
- (defun (setf %x-size-hints-min-aspect-y) (value object)
-   (%store-native (%offset object 4) -4 value))
- (defun %x-visual-info-visual (object) (%load (%offset object 0) :pointer))
- (defun (setf %x-visual-info-visual) (value object)
-   (%store (%offset object 0) :pointer value))
- (defun %x-window-attributes-depth (object) (%load (%offset object 20) -4))
- (defun %x-window-attributes-height (object) (%load (%offset object 12) -4))
- (defun %x-window-attributes-visual (object)
+ (defun %rgfw-window-h (object) (%load (%offset object 172) -4))
+ (defun (setf %rgfw-window-h) (value object)
+   (%store-native (%offset object 172) -4 value))
+ (defun %rgfw-window-next (object) (%load (%offset object 152) :pointer))
+ (defun (setf %rgfw-window-next) (value object)
+   (%store (%offset object 152) :pointer value))
+ (defun %rgfw-window-src-delegate (object)
    (%load (%offset object 24) :pointer))
- (defun %x-window-attributes-width (object) (%load (%offset object 8) -4))
- (defun %x-window-attributes-x (object) (%load (%offset object 0) -4))
- (defun %x-window-attributes-y (object) (%load (%offset object 4) -4))
- (defun %xi-event-mask-deviceid (object) (%load (%offset object 0) -4))
- (defun (setf %xi-event-mask-deviceid) (value object)
-   (%store-native (%offset object 0) -4 value))
- (defun %xi-event-mask-mask (object)
-   (%load (%offset object 8) :string-pointer))
- (defun (setf %xi-event-mask-mask) (value object)
-   (%store (%offset object 8) :string-pointer value))
- (defun %xi-event-mask-mask-len (object) (%load (%offset object 4) -4))
- (defun (setf %xi-event-mask-mask-len) (value object)
-   (%store-native (%offset object 4) -4 value))
- (defun %xi-valuator-state-mask-len (object) (%load (%offset object 0) -4))
- (defun %xim-callback-client-data (object)
-   (%load (%offset object 0) :string-pointer))
- (defun (setf %xim-callback-client-data) (value object)
-   (%store (%offset object 0) :string-pointer value))
- (defun %xim-styles-count-styles (object) (%load (%offset object 0) 2))
- (defun %xwm-hints-flags (object) (%load (%offset object 0) +c-code-long+))
- (defun (setf %xwm-hints-flags) (value object)
-   (%store-native (%offset object 0) +c-code-long+ value)))
-#+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
+ (defun (setf %rgfw-window-src-delegate) (value object)
+   (%store (%offset object 24) :pointer value))
+ (defun %rgfw-window-src-mouse (object) (%load (%offset object 16) :pointer))
+ (defun (setf %rgfw-window-src-mouse) (value object)
+   (%store (%offset object 16) :pointer value))
+ (defun %rgfw-window-src-view (object) (%load (%offset object 8) :pointer))
+ (defun (setf %rgfw-window-src-view) (value object)
+   (%store (%offset object 8) :pointer value))
+ (defun %rgfw-window-user-ptr (object) (%load (%offset object 144) :pointer))
+ (defun (setf %rgfw-window-user-ptr) (value object)
+   (%store (%offset object 144) :pointer value))
+ (defun %rgfw-window-w (object) (%load (%offset object 168) -4))
+ (defun (setf %rgfw-window-w) (value object)
+   (%store-native (%offset object 168) -4 value))
+ (defun %rgfw-window-x (object) (%load (%offset object 160) -4))
+ (defun (setf %rgfw-window-x) (value object)
+   (%store-native (%offset object 160) -4 value))
+ (defun %rgfw-window-y (object) (%load (%offset object 164) -4))
+ (defun (setf %rgfw-window-y) (value object)
+   (%store-native (%offset object 164) -4 value)))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (progn
  (defun %rgfw-window-src-window (object) (%load (%offset object 0) :pointer))
  (defun (setf %rgfw-window-src-window) (value object)
@@ -5818,307 +6438,140 @@
   (%arg-3 :int32) (%arg-4 :int32) (%arg-5 %native-address) (%arg-6 :uint32)
   (%arg-7 :uint32) (%arg-8 :int32) (%arg-9 :int32))
  (cffi:defcfun ("XOpenDisplay" x-open-display) %native-address
-  (%arg-0 %native-address)))
-#+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
-(progn
- (cffi:defcfun ("XInternAtom" x-intern-atom) :uint64 (%arg-0 %native-address)
-  (%arg-1 %native-address) (%arg-2 :int32))
- (cffi:defcfun ("XCreateColormap" x-create-colormap) :uint64
-  (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 %native-address)
+  (%arg-0 %native-address))
+ (cffi:defcfun ("XInternAtom" x-intern-atom) :unsigned-long
+  (%arg-0 %native-address) (%arg-1 %native-address) (%arg-2 :int32))
+ (cffi:defcfun ("XCreateColormap" x-create-colormap) :unsigned-long
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 %native-address)
   (%arg-3 :int32))
- (cffi:defcfun ("XCreateFontCursor" x-create-font-cursor) :uint64
+ (cffi:defcfun ("XCreateFontCursor" x-create-font-cursor) :unsigned-long
   (%arg-0 %native-address) (%arg-1 :uint32))
  (cffi:defcfun ("XCreateGC" x-create-gc) %native-address
-  (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 :uint64)
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 :unsigned-long)
   (%arg-3 %native-address))
- (cffi:defcfun ("XCreatePixmap" x-create-pixmap) :uint64
-  (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 :uint32) (%arg-3 :uint32)
-  (%arg-4 :uint32))
- (cffi:defcfun ("XGetSelectionOwner" x-get-selection-owner) :uint64
-  (%arg-0 %native-address) (%arg-1 :uint64))
- (cffi:defcfun ("XCreateWindow" x-create-window) :uint64
-  (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 :int32) (%arg-3 :int32)
-  (%arg-4 :uint32) (%arg-5 :uint32) (%arg-6 :uint32) (%arg-7 :int32)
-  (%arg-8 :uint32) (%arg-9 %native-address) (%arg-10 :uint64)
-  (%arg-11 %native-address)))
-#+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(progn
- (cffi:defcfun ("XInternAtom" x-intern-atom) :uint32 (%arg-0 %native-address)
-  (%arg-1 %native-address) (%arg-2 :int32))
- (cffi:defcfun ("XCreateColormap" x-create-colormap) :uint32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 %native-address)
-  (%arg-3 :int32))
- (cffi:defcfun ("XCreateFontCursor" x-create-font-cursor) :uint32
-  (%arg-0 %native-address) (%arg-1 :uint32))
- (cffi:defcfun ("XCreateGC" x-create-gc) %native-address
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :uint32)
-  (%arg-3 %native-address))
- (cffi:defcfun ("XCreatePixmap" x-create-pixmap) :uint32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :uint32) (%arg-3 :uint32)
-  (%arg-4 :uint32))
- (cffi:defcfun ("XGetSelectionOwner" x-get-selection-owner) :uint32
-  (%arg-0 %native-address) (%arg-1 :uint32))
- (cffi:defcfun ("XCreateWindow" x-create-window) :uint32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :int32) (%arg-3 :int32)
-  (%arg-4 :uint32) (%arg-5 :uint32) (%arg-6 :uint32) (%arg-7 :int32)
-  (%arg-8 :uint32) (%arg-9 %native-address) (%arg-10 :uint32)
-  (%arg-11 %native-address)))
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(progn
+ (cffi:defcfun ("XCreatePixmap" x-create-pixmap) :unsigned-long
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 :uint32)
+  (%arg-3 :uint32) (%arg-4 :uint32))
+ (cffi:defcfun ("XGetSelectionOwner" x-get-selection-owner) :unsigned-long
+  (%arg-0 %native-address) (%arg-1 :unsigned-long))
+ (cffi:defcfun ("XCreateWindow" x-create-window) :unsigned-long
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 :int32)
+  (%arg-3 :int32) (%arg-4 :uint32) (%arg-5 :uint32) (%arg-6 :uint32)
+  (%arg-7 :int32) (%arg-8 :uint32) (%arg-9 %native-address)
+  (%arg-10 :unsigned-long) (%arg-11 %native-address))
  (cffi:defcfun ("XResourceManagerString" x-resource-manager-string)
   %native-address (%arg-0 %native-address))
- (cffi:defcfun ("XInitThreads" x-init-threads) :int32))
-#+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
-(cffi:defcfun ("XDefaultRootWindow" x-default-root-window) :uint64
- (%arg-0 %native-address))
-#+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(cffi:defcfun ("XDefaultRootWindow" x-default-root-window) :uint32
- (%arg-0 %native-address))
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(cffi:defcfun ("XSetErrorHandler" x-set-error-handler) %native-address
- (%arg-0 %native-address))
-#+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
-(progn
+ (cffi:defcfun ("XInitThreads" x-init-threads) :int32)
+ (cffi:defcfun ("XDefaultRootWindow" x-default-root-window) :unsigned-long
+  (%arg-0 %native-address))
+ (cffi:defcfun ("XSetErrorHandler" x-set-error-handler) %native-address
+  (%arg-0 %native-address))
  (cffi:defcfun ("XSetWMProtocols" x-set-wm-protocols) :int32
-  (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 %native-address)
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 %native-address)
   (%arg-3 :int32))
  (cffi:defcfun ("XIconifyWindow" x-iconify-window) :int32
-  (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 :int32))
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 :int32))
  (cffi:defcfun ("XChangeProperty" x-change-property) :int32
-  (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 :uint64) (%arg-3 :uint64)
-  (%arg-4 :int32) (%arg-5 :int32) (%arg-6 %native-address) (%arg-7 :int32))
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 :unsigned-long)
+  (%arg-3 :unsigned-long) (%arg-4 :int32) (%arg-5 :int32)
+  (%arg-6 %native-address) (%arg-7 :int32))
  (cffi:defcfun ("XCheckTypedWindowEvent" x-check-typed-window-event) :int32
-  (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 :int32)
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 :int32)
   (%arg-3 %native-address))
  (cffi:defcfun ("XClearWindow" x-clear-window) :int32
-  (%arg-0 %native-address) (%arg-1 :uint64)))
-#+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(progn
- (cffi:defcfun ("XSetWMProtocols" x-set-wm-protocols) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 %native-address)
-  (%arg-3 :int32))
- (cffi:defcfun ("XIconifyWindow" x-iconify-window) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :int32))
- (cffi:defcfun ("XChangeProperty" x-change-property) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :uint32) (%arg-3 :uint32)
-  (%arg-4 :int32) (%arg-5 :int32) (%arg-6 %native-address) (%arg-7 :int32))
- (cffi:defcfun ("XCheckTypedWindowEvent" x-check-typed-window-event) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :int32)
-  (%arg-3 %native-address))
- (cffi:defcfun ("XClearWindow" x-clear-window) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32)))
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(cffi:defcfun ("XCloseDisplay" x-close-display) :int32
- (%arg-0 %native-address))
-#+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
-(progn
+  (%arg-0 %native-address) (%arg-1 :unsigned-long))
+ (cffi:defcfun ("XCloseDisplay" x-close-display) :int32
+  (%arg-0 %native-address))
  (cffi:defcfun ("XConvertSelection" x-convert-selection) :int32
-  (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 :uint64) (%arg-3 :uint64)
-  (%arg-4 :uint64) (%arg-5 :uint64))
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 :unsigned-long)
+  (%arg-3 :unsigned-long) (%arg-4 :unsigned-long) (%arg-5 :unsigned-long))
  (cffi:defcfun ("XDefineCursor" x-define-cursor) :int32
-  (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 :uint64))
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 :unsigned-long))
  (cffi:defcfun ("XDeleteProperty" x-delete-property) :int32
-  (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 :uint64))
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 :unsigned-long))
  (cffi:defcfun ("XDestroyWindow" x-destroy-window) :int32
-  (%arg-0 %native-address) (%arg-1 :uint64)))
-#+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(progn
- (cffi:defcfun ("XConvertSelection" x-convert-selection) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :uint32) (%arg-3 :uint32)
-  (%arg-4 :uint32) (%arg-5 :uint32))
- (cffi:defcfun ("XDefineCursor" x-define-cursor) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :uint32))
- (cffi:defcfun ("XDeleteProperty" x-delete-property) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :uint32))
- (cffi:defcfun ("XDestroyWindow" x-destroy-window) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32)))
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(progn
+  (%arg-0 %native-address) (%arg-1 :unsigned-long))
  (cffi:defcfun ("XEventsQueued" x-events-queued) :int32
   (%arg-0 %native-address) (%arg-1 :int32))
  (cffi:defcfun ("XFlush" x-flush) :int32 (%arg-0 %native-address))
- (cffi:defcfun ("XFree" x-free) :int32 (%arg-0 %native-address)))
-#+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
-(progn
+ (cffi:defcfun ("XFree" x-free) :int32 (%arg-0 %native-address))
  (cffi:defcfun ("XFreeColors" x-free-colors) :int32 (%arg-0 %native-address)
-  (%arg-1 :uint64) (%arg-2 %native-address) (%arg-3 :int32) (%arg-4 :uint64))
+  (%arg-1 :unsigned-long) (%arg-2 %native-address) (%arg-3 :int32)
+  (%arg-4 :unsigned-long))
  (cffi:defcfun ("XFreeCursor" x-free-cursor) :int32 (%arg-0 %native-address)
-  (%arg-1 :uint64)))
-#+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(progn
- (cffi:defcfun ("XFreeColors" x-free-colors) :int32 (%arg-0 %native-address)
-  (%arg-1 :uint32) (%arg-2 %native-address) (%arg-3 :int32) (%arg-4 :uint32))
- (cffi:defcfun ("XFreeCursor" x-free-cursor) :int32 (%arg-0 %native-address)
-  (%arg-1 :uint32)))
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(progn
+  (%arg-1 :unsigned-long))
  (cffi:defcfun ("XFreeGC" x-free-gc) :int32 (%arg-0 %native-address)
   (%arg-1 %native-address))
  (cffi:defcfun ("XGetErrorText" x-get-error-text) :int32
   (%arg-0 %native-address) (%arg-1 :int32) (%arg-2 %native-address)
-  (%arg-3 :int32)))
-#+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
-(progn
+  (%arg-3 :int32))
  (cffi:defcfun ("XGetWindowProperty" x-get-window-property) :int32
-  (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 :uint64) (%arg-3 :int64)
-  (%arg-4 :int64) (%arg-5 :int32) (%arg-6 :uint64) (%arg-7 %native-address)
-  (%arg-8 %native-address) (%arg-9 %native-address) (%arg-10 %native-address)
-  (%arg-11 %native-address))
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 :unsigned-long)
+  (%arg-3 :long) (%arg-4 :long) (%arg-5 :int32) (%arg-6 :unsigned-long)
+  (%arg-7 %native-address) (%arg-8 %native-address) (%arg-9 %native-address)
+  (%arg-10 %native-address) (%arg-11 %native-address))
  (cffi:defcfun ("XGetWindowAttributes" x-get-window-attributes) :int32
-  (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 %native-address))
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 %native-address))
  (cffi:defcfun ("XGrabPointer" x-grab-pointer) :int32
-  (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 :int32) (%arg-3 :uint32)
-  (%arg-4 :int32) (%arg-5 :int32) (%arg-6 :uint64) (%arg-7 :uint64)
-  (%arg-8 :uint64))
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 :int32)
+  (%arg-3 :uint32) (%arg-4 :int32) (%arg-5 :int32) (%arg-6 :unsigned-long)
+  (%arg-7 :unsigned-long) (%arg-8 :unsigned-long))
  (cffi:defcfun ("XMapRaised" x-map-raised) :int32 (%arg-0 %native-address)
-  (%arg-1 :uint64))
+  (%arg-1 :unsigned-long))
  (cffi:defcfun ("XMapWindow" x-map-window) :int32 (%arg-0 %native-address)
-  (%arg-1 :uint64))
+  (%arg-1 :unsigned-long))
  (cffi:defcfun ("XMoveWindow" x-move-window) :int32 (%arg-0 %native-address)
-  (%arg-1 :uint64) (%arg-2 :int32) (%arg-3 :int32)))
-#+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(progn
- (cffi:defcfun ("XGetWindowProperty" x-get-window-property) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :uint32) (%arg-3 :int32)
-  (%arg-4 :int32) (%arg-5 :int32) (%arg-6 :uint32) (%arg-7 %native-address)
-  (%arg-8 %native-address) (%arg-9 %native-address) (%arg-10 %native-address)
-  (%arg-11 %native-address))
- (cffi:defcfun ("XGetWindowAttributes" x-get-window-attributes) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 %native-address))
- (cffi:defcfun ("XGrabPointer" x-grab-pointer) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :int32) (%arg-3 :uint32)
-  (%arg-4 :int32) (%arg-5 :int32) (%arg-6 :uint32) (%arg-7 :uint32)
-  (%arg-8 :uint32))
- (cffi:defcfun ("XMapRaised" x-map-raised) :int32 (%arg-0 %native-address)
-  (%arg-1 :uint32))
- (cffi:defcfun ("XMapWindow" x-map-window) :int32 (%arg-0 %native-address)
-  (%arg-1 :uint32))
- (cffi:defcfun ("XMoveWindow" x-move-window) :int32 (%arg-0 %native-address)
-  (%arg-1 :uint32) (%arg-2 :int32) (%arg-3 :int32)))
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(progn
+  (%arg-1 :unsigned-long) (%arg-2 :int32) (%arg-3 :int32))
  (cffi:defcfun ("XNextEvent" x-next-event) :int32 (%arg-0 %native-address)
   (%arg-1 %native-address))
  (cffi:defcfun ("XPeekEvent" x-peek-event) :int32 (%arg-0 %native-address)
   (%arg-1 %native-address))
- (cffi:defcfun ("XPending" x-pending) :int32 (%arg-0 %native-address)))
-#+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
-(progn
+ (cffi:defcfun ("XPending" x-pending) :int32 (%arg-0 %native-address))
  (cffi:defcfun ("XPutImage" x-put-image) :int32 (%arg-0 %native-address)
-  (%arg-1 :uint64) (%arg-2 %native-address) (%arg-3 %native-address)
+  (%arg-1 :unsigned-long) (%arg-2 %native-address) (%arg-3 %native-address)
   (%arg-4 :int32) (%arg-5 :int32) (%arg-6 :int32) (%arg-7 :int32)
   (%arg-8 :uint32) (%arg-9 :uint32))
  (cffi:defcfun ("XQueryPointer" x-query-pointer) :int32
-  (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 %native-address)
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 %native-address)
   (%arg-3 %native-address) (%arg-4 %native-address) (%arg-5 %native-address)
   (%arg-6 %native-address) (%arg-7 %native-address) (%arg-8 %native-address))
  (cffi:defcfun ("XRaiseWindow" x-raise-window) :int32
-  (%arg-0 %native-address) (%arg-1 :uint64))
+  (%arg-0 %native-address) (%arg-1 :unsigned-long))
  (cffi:defcfun ("XResizeWindow" x-resize-window) :int32
-  (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 :uint32)
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 :uint32)
   (%arg-3 :uint32))
  (cffi:defcfun ("XSelectInput" x-select-input) :int32
-  (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 :int64))
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 :long))
  (cffi:defcfun ("XSendEvent" x-send-event) :int32 (%arg-0 %native-address)
-  (%arg-1 :uint64) (%arg-2 :int32) (%arg-3 :int64) (%arg-4 %native-address))
+  (%arg-1 :unsigned-long) (%arg-2 :int32) (%arg-3 :long)
+  (%arg-4 %native-address))
  (cffi:defcfun ("XSetInputFocus" x-set-input-focus) :int32
-  (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 :int32) (%arg-3 :uint64))
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 :int32)
+  (%arg-3 :unsigned-long))
  (cffi:defcfun ("XSetSelectionOwner" x-set-selection-owner) :int32
-  (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 :uint64)
-  (%arg-3 :uint64))
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 :unsigned-long)
+  (%arg-3 :unsigned-long))
  (cffi:defcfun ("XSetWindowBackground" x-set-window-background) :int32
-  (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 :uint64))
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 :unsigned-long))
  (cffi:defcfun ("XSetWindowBackgroundPixmap" x-set-window-background-pixmap)
-  :int32 (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 :uint64))
+  :int32 (%arg-0 %native-address) (%arg-1 :unsigned-long)
+  (%arg-2 :unsigned-long))
  (cffi:defcfun ("XStoreName" x-store-name) :int32 (%arg-0 %native-address)
-  (%arg-1 :uint64) (%arg-2 %native-address)))
-#+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(progn
- (cffi:defcfun ("XPutImage" x-put-image) :int32 (%arg-0 %native-address)
-  (%arg-1 :uint32) (%arg-2 %native-address) (%arg-3 %native-address)
-  (%arg-4 :int32) (%arg-5 :int32) (%arg-6 :int32) (%arg-7 :int32)
-  (%arg-8 :uint32) (%arg-9 :uint32))
- (cffi:defcfun ("XQueryPointer" x-query-pointer) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 %native-address)
-  (%arg-3 %native-address) (%arg-4 %native-address) (%arg-5 %native-address)
-  (%arg-6 %native-address) (%arg-7 %native-address) (%arg-8 %native-address))
- (cffi:defcfun ("XRaiseWindow" x-raise-window) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32))
- (cffi:defcfun ("XResizeWindow" x-resize-window) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :uint32)
-  (%arg-3 :uint32))
- (cffi:defcfun ("XSelectInput" x-select-input) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :int32))
- (cffi:defcfun ("XSendEvent" x-send-event) :int32 (%arg-0 %native-address)
-  (%arg-1 :uint32) (%arg-2 :int32) (%arg-3 :int32) (%arg-4 %native-address))
- (cffi:defcfun ("XSetInputFocus" x-set-input-focus) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :int32) (%arg-3 :uint32))
- (cffi:defcfun ("XSetSelectionOwner" x-set-selection-owner) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :uint32)
-  (%arg-3 :uint32))
- (cffi:defcfun ("XSetWindowBackground" x-set-window-background) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :uint32))
- (cffi:defcfun ("XSetWindowBackgroundPixmap" x-set-window-background-pixmap)
-  :int32 (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :uint32))
- (cffi:defcfun ("XStoreName" x-store-name) :int32 (%arg-0 %native-address)
-  (%arg-1 :uint32) (%arg-2 %native-address)))
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(cffi:defcfun ("XSync" x-sync) :int32 (%arg-0 %native-address)
- (%arg-1 :int32))
-#+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
-(progn
+  (%arg-1 :unsigned-long) (%arg-2 %native-address))
+ (cffi:defcfun ("XSync" x-sync) :int32 (%arg-0 %native-address)
+  (%arg-1 :int32))
  (cffi:defcfun ("XTranslateCoordinates" x-translate-coordinates) :int32
-  (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 :uint64) (%arg-3 :int32)
-  (%arg-4 :int32) (%arg-5 %native-address) (%arg-6 %native-address)
-  (%arg-7 %native-address))
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 :unsigned-long)
+  (%arg-3 :int32) (%arg-4 :int32) (%arg-5 %native-address)
+  (%arg-6 %native-address) (%arg-7 %native-address))
  (cffi:defcfun ("XUngrabPointer" x-ungrab-pointer) :int32
-  (%arg-0 %native-address) (%arg-1 :uint64))
+  (%arg-0 %native-address) (%arg-1 :unsigned-long))
  (cffi:defcfun ("XUnmapWindow" x-unmap-window) :int32
-  (%arg-0 %native-address) (%arg-1 :uint64))
+  (%arg-0 %native-address) (%arg-1 :unsigned-long))
  (cffi:defcfun ("XWarpPointer" x-warp-pointer) :int32
-  (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 :uint64) (%arg-3 :int32)
-  (%arg-4 :int32) (%arg-5 :uint32) (%arg-6 :uint32) (%arg-7 :int32)
-  (%arg-8 :int32)))
-#+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(progn
- (cffi:defcfun ("XTranslateCoordinates" x-translate-coordinates) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :uint32) (%arg-3 :int32)
-  (%arg-4 :int32) (%arg-5 %native-address) (%arg-6 %native-address)
-  (%arg-7 %native-address))
- (cffi:defcfun ("XUngrabPointer" x-ungrab-pointer) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32))
- (cffi:defcfun ("XUnmapWindow" x-unmap-window) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32))
- (cffi:defcfun ("XWarpPointer" x-warp-pointer) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :uint32) (%arg-3 :int32)
-  (%arg-4 :int32) (%arg-5 :uint32) (%arg-6 :uint32) (%arg-7 :int32)
-  (%arg-8 :int32)))
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(progn
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 :unsigned-long)
+  (%arg-3 :int32) (%arg-4 :int32) (%arg-5 :uint32) (%arg-6 :uint32)
+  (%arg-7 :int32) (%arg-8 :int32))
  (cffi:defcfun ("XSetLocaleModifiers" x-set-locale-modifiers) %native-address
   (%arg-0 %native-address))
  (cffi:defcfun ("XOpenIM" x-open-im) %native-address (%arg-0 %native-address)
@@ -6127,18 +6580,9 @@
  (cffi:defcfun ("XDestroyIC" x-destroy-ic) :void (%arg-0 %native-address))
  (cffi:defcfun ("XSetICFocus" x-set-ic-focus) :void (%arg-0 %native-address))
  (cffi:defcfun ("XUnsetICFocus" x-unset-ic-focus) :void
-  (%arg-0 %native-address)))
-#+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
-(cffi:defcfun ("XFilterEvent" x-filter-event) :int32 (%arg-0 %native-address)
- (%arg-1 :uint64))
-#+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(cffi:defcfun ("XFilterEvent" x-filter-event) :int32 (%arg-0 %native-address)
- (%arg-1 :uint32))
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(progn
+  (%arg-0 %native-address))
+ (cffi:defcfun ("XFilterEvent" x-filter-event) :int32
+  (%arg-0 %native-address) (%arg-1 :unsigned-long))
  (cffi:defcfun ("Xutf8LookupString" xutf8lookup-string) :int32
   (%arg-0 %native-address) (%arg-1 %native-address) (%arg-2 %native-address)
   (%arg-3 :int32) (%arg-4 %native-address) (%arg-5 %native-address))
@@ -6156,180 +6600,72 @@
   (%arg-0 %native-address) (%arg-1 %native-address))
  (cffi:defcfun ("XFreeEventData" x-free-event-data) :void
   (%arg-0 %native-address) (%arg-1 %native-address))
- (cffi:defcfun ("XCreateRegion" x-create-region) %native-address))
-#+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
-(cffi:defcfun ("XDeleteContext" x-delete-context) :int32
- (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 :int32))
-#+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(cffi:defcfun ("XDeleteContext" x-delete-context) :int32
- (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :int32))
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(cffi:defcfun ("XDestroyRegion" x-destroy-region) :int32
- (%arg-0 %native-address))
-#+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
-(progn
+ (cffi:defcfun ("XCreateRegion" x-create-region) %native-address)
+ (cffi:defcfun ("XDeleteContext" x-delete-context) :int32
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 :int32))
+ (cffi:defcfun ("XDestroyRegion" x-destroy-region) :int32
+  (%arg-0 %native-address))
  (cffi:defcfun ("XFindContext" x-find-context) :int32
-  (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 :int32)
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 :int32)
   (%arg-3 %native-address))
  (cffi:defcfun ("XGetWMHints" x-get-wm-hints) %native-address
-  (%arg-0 %native-address) (%arg-1 :uint64))
+  (%arg-0 %native-address) (%arg-1 :unsigned-long))
  (cffi:defcfun ("XGetWMNormalHints" x-get-wm-normal-hints) :int32
-  (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 %native-address)
-  (%arg-3 %native-address)))
-#+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(progn
- (cffi:defcfun ("XFindContext" x-find-context) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :int32)
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 %native-address)
   (%arg-3 %native-address))
- (cffi:defcfun ("XGetWMHints" x-get-wm-hints) %native-address
-  (%arg-0 %native-address) (%arg-1 :uint32))
- (cffi:defcfun ("XGetWMNormalHints" x-get-wm-normal-hints) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 %native-address)
-  (%arg-3 %native-address)))
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(cffi:defcfun ("XMatchVisualInfo" x-match-visual-info) :int32
- (%arg-0 %native-address) (%arg-1 :int32) (%arg-2 :int32) (%arg-3 :int32)
- (%arg-4 %native-address))
-#+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
-(progn
+ (cffi:defcfun ("XMatchVisualInfo" x-match-visual-info) :int32
+  (%arg-0 %native-address) (%arg-1 :int32) (%arg-2 :int32) (%arg-3 :int32)
+  (%arg-4 %native-address))
  (cffi:defcfun ("XSaveContext" x-save-context) :int32
-  (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 :int32)
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 :int32)
   (%arg-3 %native-address))
  (cffi:defcfun ("XSetClassHint" x-set-class-hint) :int32
-  (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 %native-address))
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 %native-address))
  (cffi:defcfun ("XSetWMHints" x-set-wm-hints) :int32 (%arg-0 %native-address)
-  (%arg-1 :uint64) (%arg-2 %native-address))
+  (%arg-1 :unsigned-long) (%arg-2 %native-address))
  (cffi:defcfun ("XSetWMNormalHints" x-set-wm-normal-hints) :void
-  (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 %native-address))
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 %native-address))
  (cffi:defcfun ("Xutf8SetWMProperties" xutf8set-wm-properties) :void
-  (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 %native-address)
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 %native-address)
   (%arg-3 %native-address) (%arg-4 %native-address) (%arg-5 :int32)
   (%arg-6 %native-address) (%arg-7 %native-address) (%arg-8 %native-address))
  (cffi:defcfun ("XSetWMSizeHints" x-set-wm-size-hints) :void
-  (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 %native-address)
-  (%arg-3 :uint64)))
-#+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(progn
- (cffi:defcfun ("XSaveContext" x-save-context) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :int32)
-  (%arg-3 %native-address))
- (cffi:defcfun ("XSetClassHint" x-set-class-hint) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 %native-address))
- (cffi:defcfun ("XSetWMHints" x-set-wm-hints) :int32 (%arg-0 %native-address)
-  (%arg-1 :uint32) (%arg-2 %native-address))
- (cffi:defcfun ("XSetWMNormalHints" x-set-wm-normal-hints) :void
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 %native-address))
- (cffi:defcfun ("Xutf8SetWMProperties" xutf8set-wm-properties) :void
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 %native-address)
-  (%arg-3 %native-address) (%arg-4 %native-address) (%arg-5 :int32)
-  (%arg-6 %native-address) (%arg-7 %native-address) (%arg-8 %native-address))
- (cffi:defcfun ("XSetWMSizeHints" x-set-wm-size-hints) :void
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 %native-address)
-  (%arg-3 :uint32)))
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(cffi:defcfun ("XRRQueryExtension" xrr-query-extension) :int32
- (%arg-0 %native-address) (%arg-1 %native-address) (%arg-2 %native-address))
-#+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
-(cffi:defcfun ("XRRSelectInput" xrr-select-input) :void
- (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 :int32))
-#+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(cffi:defcfun ("XRRSelectInput" xrr-select-input) :void
- (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :int32))
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(cffi:defcfun ("XRRFreeScreenResources" xrr-free-screen-resources) :void
- (%arg-0 %native-address))
-#+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
-(cffi:defcfun ("XRRGetOutputInfo" xrr-get-output-info) %native-address
- (%arg-0 %native-address) (%arg-1 %native-address) (%arg-2 :uint64))
-#+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(cffi:defcfun ("XRRGetOutputInfo" xrr-get-output-info) %native-address
- (%arg-0 %native-address) (%arg-1 %native-address) (%arg-2 :uint32))
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(cffi:defcfun ("XRRFreeOutputInfo" xrr-free-output-info) :void
- (%arg-0 %native-address))
-#+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
-(cffi:defcfun ("XRRGetCrtcInfo" xrr-get-crtc-info) %native-address
- (%arg-0 %native-address) (%arg-1 %native-address) (%arg-2 :uint64))
-#+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(cffi:defcfun ("XRRGetCrtcInfo" xrr-get-crtc-info) %native-address
- (%arg-0 %native-address) (%arg-1 %native-address) (%arg-2 :uint32))
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(cffi:defcfun ("XRRFreeCrtcInfo" xrr-free-crtc-info) :void
- (%arg-0 %native-address))
-#+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
-(progn
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 %native-address)
+  (%arg-3 :unsigned-long))
+ (cffi:defcfun ("XRRQueryExtension" xrr-query-extension) :int32
+  (%arg-0 %native-address) (%arg-1 %native-address) (%arg-2 %native-address))
+ (cffi:defcfun ("XRRSelectInput" xrr-select-input) :void
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 :int32))
+ (cffi:defcfun ("XRRFreeScreenResources" xrr-free-screen-resources) :void
+  (%arg-0 %native-address))
+ (cffi:defcfun ("XRRGetOutputInfo" xrr-get-output-info) %native-address
+  (%arg-0 %native-address) (%arg-1 %native-address) (%arg-2 :unsigned-long))
+ (cffi:defcfun ("XRRFreeOutputInfo" xrr-free-output-info) :void
+  (%arg-0 %native-address))
+ (cffi:defcfun ("XRRGetCrtcInfo" xrr-get-crtc-info) %native-address
+  (%arg-0 %native-address) (%arg-1 %native-address) (%arg-2 :unsigned-long))
+ (cffi:defcfun ("XRRFreeCrtcInfo" xrr-free-crtc-info) :void
+  (%arg-0 %native-address))
  (cffi:defcfun ("XRRSetCrtcConfig" xrr-set-crtc-config) :int32
-  (%arg-0 %native-address) (%arg-1 %native-address) (%arg-2 :uint64)
-  (%arg-3 :uint64) (%arg-4 :int32) (%arg-5 :int32) (%arg-6 :uint64)
-  (%arg-7 :uint16) (%arg-8 %native-address) (%arg-9 :int32))
+  (%arg-0 %native-address) (%arg-1 %native-address) (%arg-2 :unsigned-long)
+  (%arg-3 :unsigned-long) (%arg-4 :int32) (%arg-5 :int32)
+  (%arg-6 :unsigned-long) (%arg-7 :uint16) (%arg-8 %native-address)
+  (%arg-9 :int32))
  (cffi:defcfun ("XRRGetCrtcGammaSize" xrr-get-crtc-gamma-size) :int32
-  (%arg-0 %native-address) (%arg-1 :uint64))
+  (%arg-0 %native-address) (%arg-1 :unsigned-long))
  (cffi:defcfun ("XRRGetCrtcGamma" xrr-get-crtc-gamma) %native-address
-  (%arg-0 %native-address) (%arg-1 :uint64)))
-#+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(progn
- (cffi:defcfun ("XRRSetCrtcConfig" xrr-set-crtc-config) :int32
-  (%arg-0 %native-address) (%arg-1 %native-address) (%arg-2 :uint32)
-  (%arg-3 :uint32) (%arg-4 :int32) (%arg-5 :int32) (%arg-6 :uint32)
-  (%arg-7 :uint16) (%arg-8 %native-address) (%arg-9 :int32))
- (cffi:defcfun ("XRRGetCrtcGammaSize" xrr-get-crtc-gamma-size) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32))
- (cffi:defcfun ("XRRGetCrtcGamma" xrr-get-crtc-gamma) %native-address
-  (%arg-0 %native-address) (%arg-1 :uint32)))
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(cffi:defcfun ("XRRAllocGamma" xrr-alloc-gamma) %native-address
- (%arg-0 :int32))
-#+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
-(cffi:defcfun ("XRRSetCrtcGamma" xrr-set-crtc-gamma) :void
- (%arg-0 %native-address) (%arg-1 :uint64) (%arg-2 %native-address))
-#+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(cffi:defcfun ("XRRSetCrtcGamma" xrr-set-crtc-gamma) :void
- (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 %native-address))
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(cffi:defcfun ("XRRFreeGamma" xrr-free-gamma) :void (%arg-0 %native-address))
-#+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
-(progn
+  (%arg-0 %native-address) (%arg-1 :unsigned-long))
+ (cffi:defcfun ("XRRAllocGamma" xrr-alloc-gamma) %native-address
+  (%arg-0 :int32))
+ (cffi:defcfun ("XRRSetCrtcGamma" xrr-set-crtc-gamma) :void
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 %native-address))
+ (cffi:defcfun ("XRRFreeGamma" xrr-free-gamma) :void
+  (%arg-0 %native-address))
  (cffi:defcfun
   ("XRRGetScreenResourcesCurrent" xrr-get-screen-resources-current)
-  %native-address (%arg-0 %native-address) (%arg-1 :uint64))
- (cffi:defcfun ("XRRGetOutputPrimary" xrr-get-output-primary) :uint64
-  (%arg-0 %native-address) (%arg-1 :uint64)))
-#+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(progn
- (cffi:defcfun
-  ("XRRGetScreenResourcesCurrent" xrr-get-screen-resources-current)
-  %native-address (%arg-0 %native-address) (%arg-1 :uint32))
- (cffi:defcfun ("XRRGetOutputPrimary" xrr-get-output-primary) :uint32
-  (%arg-0 %native-address) (%arg-1 :uint32)))
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(progn
+  %native-address (%arg-0 %native-address) (%arg-1 :unsigned-long))
+ (cffi:defcfun ("XRRGetOutputPrimary" xrr-get-output-primary) :unsigned-long
+  (%arg-0 %native-address) (%arg-1 :unsigned-long))
  (cffi:defcfun ("XrmUniqueQuark" xrm-unique-quark) :int32)
  (cffi:defcfun ("XrmDestroyDatabase" xrm-destroy-database) :void
   (%arg-0 %native-address))
@@ -6355,14 +6691,12 @@
    (:or :freebsd :linux))
 (cffi:defcfun ("dlsym" dlsym) %native-address (%arg-0 %native-address)
  (%arg-1 %native-address))
-#+(:and :linux (:or :x86-64 :arm64))
-(cffi:defcfun ("poll" poll) :int32 (%arg-0 %native-address) (%arg-1 :uint64)
- (%arg-2 :int32))
-#+(:or
-   (:and :linux (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64))))
-   (:and :freebsd
-    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64))
-     (:and :arm (:not :arm64)))))
+#+(:and :linux
+   (:or :x86-64 :arm64 (:and (:not :x86-64) :x86) (:and (:not :arm64) :arm)))
+(cffi:defcfun ("poll" poll) :int32 (%arg-0 %native-address)
+ (%arg-1 :unsigned-long) (%arg-2 :int32))
+#+(:and :freebsd
+   (:or :x86-64 :arm64 (:and (:not :x86-64) :x86) (:and (:not :arm64) :arm)))
 (cffi:defcfun ("poll" poll) :int32 (%arg-0 %native-address) (%arg-1 :uint32)
  (%arg-2 :int32))
 #+(:and
@@ -6374,36 +6708,28 @@
 (cffi:defcfun ("pipe" pipe) :int32 (%arg-0 %native-address))
 #+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
 (progn
- (cffi:defcfun ("read" read) :int64 (%arg-0 :int32) (%arg-1 %native-address)
-  (%arg-2 :uint64))
- (cffi:defcfun ("write" write) :int64 (%arg-0 :int32)
-  (%arg-1 %native-address) (%arg-2 :uint64)))
+ (cffi:defcfun ("read" read) :long (%arg-0 :int32) (%arg-1 %native-address)
+  (%arg-2 :size))
+ (cffi:defcfun ("write" write) :long (%arg-0 :int32) (%arg-1 %native-address)
+  (%arg-2 :size)))
 #+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
    (:or :freebsd :linux))
 (progn
  (cffi:defcfun ("read" read) :int32 (%arg-0 :int32) (%arg-1 %native-address)
-  (%arg-2 :uint32))
+  (%arg-2 :size))
  (cffi:defcfun ("write" write) :int32 (%arg-0 :int32)
-  (%arg-1 %native-address) (%arg-2 :uint32)))
+  (%arg-1 %native-address) (%arg-2 :size)))
 #+(:and :linux
    (:or :x86-64 :arm64 (:and (:not :x86-64) :x86) (:and (:not :arm64) :arm)))
 (cffi:defcfun ("pipe" pipe) :int32 (%arg-0 %native-address))
 #+(:and
    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
    (:or :freebsd :linux))
-(cffi:defcfun ("clock_gettime" clock-gettime) :int32 (%arg-0 :int32)
- (%arg-1 %native-address))
-#+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
-(cffi:defcfun ("XkbKeycodeToKeysym" xkb-keycode-to-keysym) :uint64
- (%arg-0 %native-address) (%arg-1 :uint8) (%arg-2 :int32) (%arg-3 :int32))
-#+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
-(cffi:defcfun ("XkbKeycodeToKeysym" xkb-keycode-to-keysym) :uint32
- (%arg-0 %native-address) (%arg-1 :uint8) (%arg-2 :int32) (%arg-3 :int32))
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
 (progn
+ (cffi:defcfun ("clock_gettime" clock-gettime) :int32 (%arg-0 :int32)
+  (%arg-1 %native-address))
+ (cffi:defcfun ("XkbKeycodeToKeysym" xkb-keycode-to-keysym) :unsigned-long
+  (%arg-0 %native-address) (%arg-1 :uint8) (%arg-2 :int32) (%arg-3 :int32))
  (cffi:defcfun ("XkbFreeKeyboard" xkb-free-keyboard) :void
   (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :int32))
  (cffi:defcfun ("XkbGetMap" xkb-get-map) %native-address
@@ -6996,13 +7322,13 @@
    (%store (%offset object 36) :pointer value)))
 #+(:and :windows :x86-64)
 (progn
- (cffi:defcfun ("malloc" malloc) %native-address (%arg-0 :uint64))
+ (cffi:defcfun ("malloc" malloc) %native-address (%arg-0 :size))
  (cffi:defcfun ("free" free) :void (%arg-0 %native-address)))
 #+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
 (progn
  (cffi:defcfun ("CreateDIBSection" create-dib-section) %native-address
   (%arg-0 %native-address) (%arg-1 %native-address) (%arg-2 :uint32)
-  (%arg-3 %native-address) (%arg-4 %native-address) (%arg-5 :uint32))
+  (%arg-3 %native-address) (%arg-4 %native-address) (%arg-5 :unsigned-long))
  (cffi:defcfun ("CreateCompatibleDC" create-compatible-dc) %native-address
   (%arg-0 %native-address))
  (cffi:defcfun ("SelectObject" select-object) %native-address
@@ -7026,44 +7352,51 @@
  (cffi:defcfun ("DestroyCursor" destroy-cursor) :int32
   (%arg-0 %native-address))
  (cffi:defcfun ("EnumDisplaySettingsW" enum-display-settings-w) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 %native-address))
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 %native-address))
  (cffi:defcfun ("ChangeDisplaySettingsExW" change-display-settings-ex-w)
-  :int32 (%arg-0 %native-address) (%arg-1 %native-address)
-  (%arg-2 %native-address) (%arg-3 :uint32) (%arg-4 %native-address)))
+  :long (%arg-0 %native-address) (%arg-1 %native-address)
+  (%arg-2 %native-address) (%arg-3 :unsigned-long) (%arg-4 %native-address)))
 #+(:and :windows :x86 (:not :x86-64))
 (progn
  (cffi:defcfun ("DestroyCursor" destroy-cursor :convention :stdcall) :int32
   (%arg-0 %native-address))
  (cffi:defcfun
   ("EnumDisplaySettingsW" enum-display-settings-w :convention :stdcall)
-  :int32 (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 %native-address))
+  :int32 (%arg-0 %native-address) (%arg-1 :unsigned-long)
+  (%arg-2 %native-address))
  (cffi:defcfun
   ("ChangeDisplaySettingsExW" change-display-settings-ex-w :convention
    :stdcall)
-  :int32 (%arg-0 %native-address) (%arg-1 %native-address)
-  (%arg-2 %native-address) (%arg-3 :uint32) (%arg-4 %native-address)))
+  :long (%arg-0 %native-address) (%arg-1 %native-address)
+  (%arg-2 %native-address) (%arg-3 :unsigned-long) (%arg-4 %native-address)))
 #+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
 (cffi:defcfun ("CreateDCW" create-dcw) %native-address
  (%arg-0 %native-address) (%arg-1 %native-address) (%arg-2 %native-address)
  (%arg-3 %native-address))
 #+(:and :windows (:or :x86-64 :arm64))
+(cffi:defcfun ("GetDeviceGammaRamp" get-device-gamma-ramp) :int32
+ (%arg-0 %native-address) (%arg-1 %native-address))
+#+(:and :windows :x86 (:not :x86-64))
+(cffi:defcfun
+ ("GetDeviceGammaRamp" get-device-gamma-ramp :convention :stdcall) :int32
+ (%arg-0 %native-address) (%arg-1 %native-address))
+#+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
+(cffi:defcfun ("memcpy" memcpy) %native-address (%arg-0 %native-address)
+ (%arg-1 %native-address) (%arg-2 :size))
+#+(:and :windows (:or :x86-64 :arm64))
 (progn
- (cffi:defcfun ("GetDeviceGammaRamp" get-device-gamma-ramp) :int32
-  (%arg-0 %native-address) (%arg-1 %native-address))
- (cffi:defcfun ("memcpy" memcpy) %native-address (%arg-0 %native-address)
-  (%arg-1 %native-address) (%arg-2 :uint64))
  (cffi:defcfun ("SetDeviceGammaRamp" set-device-gamma-ramp) :int32
   (%arg-0 %native-address) (%arg-1 %native-address))
  (cffi:defcfun ("GetMonitorInfoA" get-monitor-info-a) :int32
   (%arg-0 %native-address) (%arg-1 %native-address))
  (cffi:defcfun ("EnumDisplayDevicesW" enum-display-devices-w) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 %native-address)
-  (%arg-3 :uint32))
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 %native-address)
+  (%arg-3 :unsigned-long))
  (cffi:defcfun ("wcscmp" wcscmp) :int32 (%arg-0 %native-address)
   (%arg-1 %native-address))
  (cffi:defcfun ("MsgWaitForMultipleObjects" msg-wait-for-multiple-objects)
-  :uint32 (%arg-0 :uint32) (%arg-1 %native-address) (%arg-2 :int32)
-  (%arg-3 :uint32) (%arg-4 :uint32))
+  :unsigned-long (%arg-0 :unsigned-long) (%arg-1 %native-address)
+  (%arg-2 :int32) (%arg-3 :unsigned-long) (%arg-4 :unsigned-long))
  (cffi:defcfun ("PeekMessageA" peek-message-a) :int32
   (%arg-0 %native-address) (%arg-1 %native-address) (%arg-2 :uint32)
   (%arg-3 :uint32) (%arg-4 :uint32))
@@ -7075,7 +7408,8 @@
   (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :uint64) (%arg-3 :int64))
  (cffi:defcfun ("BitBlt" bit-blt) :int32 (%arg-0 %native-address)
   (%arg-1 :int32) (%arg-2 :int32) (%arg-3 :int32) (%arg-4 :int32)
-  (%arg-5 %native-address) (%arg-6 :int32) (%arg-7 :int32) (%arg-8 :uint32))
+  (%arg-5 %native-address) (%arg-6 :int32) (%arg-7 :int32)
+  (%arg-8 :unsigned-long))
  (cffi:defcfun ("GetClientRect" get-client-rect) :int32
   (%arg-0 %native-address) (%arg-1 %native-address))
  (cffi:defcfun ("SetForegroundWindow" set-foreground-window) :int32
@@ -7083,39 +7417,34 @@
 #+(:and :windows :x86 (:not :x86-64))
 (progn
  (cffi:defcfun
-  ("GetDeviceGammaRamp" get-device-gamma-ramp :convention :stdcall) :int32
-  (%arg-0 %native-address) (%arg-1 %native-address))
- (cffi:defcfun ("memcpy" memcpy) %native-address (%arg-0 %native-address)
-  (%arg-1 %native-address) (%arg-2 :uint32))
- (cffi:defcfun
   ("SetDeviceGammaRamp" set-device-gamma-ramp :convention :stdcall) :int32
   (%arg-0 %native-address) (%arg-1 %native-address))
  (cffi:defcfun ("GetMonitorInfoA" get-monitor-info-a :convention :stdcall)
   :int32 (%arg-0 %native-address) (%arg-1 %native-address))
  (cffi:defcfun
   ("EnumDisplayDevicesW" enum-display-devices-w :convention :stdcall) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 %native-address)
-  (%arg-3 :uint32))
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 %native-address)
+  (%arg-3 :unsigned-long))
  (cffi:defcfun ("wcscmp" wcscmp :convention :cdecl) :int32
   (%arg-0 %native-address) (%arg-1 %native-address))
  (cffi:defcfun
   ("MsgWaitForMultipleObjects" msg-wait-for-multiple-objects :convention
    :stdcall)
-  :uint32 (%arg-0 :uint32) (%arg-1 %native-address) (%arg-2 :int32)
-  (%arg-3 :uint32) (%arg-4 :uint32))
+  :unsigned-long (%arg-0 :unsigned-long) (%arg-1 %native-address)
+  (%arg-2 :int32) (%arg-3 :unsigned-long) (%arg-4 :unsigned-long))
  (cffi:defcfun ("PeekMessageA" peek-message-a :convention :stdcall) :int32
   (%arg-0 %native-address) (%arg-1 %native-address) (%arg-2 :uint32)
   (%arg-3 :uint32) (%arg-4 :uint32))
  (cffi:defcfun ("TranslateMessage" translate-message :convention :stdcall)
   :int32 (%arg-0 %native-address))
  (cffi:defcfun ("DispatchMessageA" dispatch-message-a :convention :stdcall)
-  :int32 (%arg-0 %native-address))
+  :long (%arg-0 %native-address))
  (cffi:defcfun ("PostMessageW" post-message-w :convention :stdcall) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :uint32) (%arg-3 :int32))
+  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :uint32) (%arg-3 :long))
  (cffi:defcfun ("BitBlt" bit-blt :convention :stdcall) :int32
   (%arg-0 %native-address) (%arg-1 :int32) (%arg-2 :int32) (%arg-3 :int32)
   (%arg-4 :int32) (%arg-5 %native-address) (%arg-6 :int32) (%arg-7 :int32)
-  (%arg-8 :uint32))
+  (%arg-8 :unsigned-long))
  (cffi:defcfun ("GetClientRect" get-client-rect :convention :stdcall) :int32
   (%arg-0 %native-address) (%arg-1 %native-address))
  (cffi:defcfun
@@ -7130,29 +7459,30 @@
  (cffi:defcfun ("SetWindowPos" set-window-pos) :int32
   (%arg-0 %native-address) (%arg-1 %native-address) (%arg-2 :int32)
   (%arg-3 :int32) (%arg-4 :int32) (%arg-5 :int32) (%arg-6 :uint32))
- (cffi:defcfun ("SetWindowLongA" set-window-long-a) :int32
-  (%arg-0 %native-address) (%arg-1 :int32) (%arg-2 :int32))
+ (cffi:defcfun ("SetWindowLongA" set-window-long-a) :long
+  (%arg-0 %native-address) (%arg-1 :int32) (%arg-2 :long))
  (cffi:defcfun ("SetLayeredWindowAttributes" set-layered-window-attributes)
-  :int32 (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :uint8)
-  (%arg-3 :uint32))
- (cffi:defcfun ("GetWindowLongA" get-window-long-a) :int32
+  :int32 (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 :uint8)
+  (%arg-3 :unsigned-long))
+ (cffi:defcfun ("GetWindowLongA" get-window-long-a) :long
   (%arg-0 %native-address) (%arg-1 :int32))
  (cffi:defcfun ("ClientToScreen" client-to-screen) :int32
   (%arg-0 %native-address) (%arg-1 %native-address))
  (cffi:defcfun ("AdjustWindowRectEx" adjust-window-rect-ex) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :int32) (%arg-3 :uint32))
- (cffi:defcfun ("SetWindowLongW" set-window-long-w) :int32
-  (%arg-0 %native-address) (%arg-1 :int32) (%arg-2 :int32))
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 :int32)
+  (%arg-3 :unsigned-long))
+ (cffi:defcfun ("SetWindowLongW" set-window-long-w) :long
+  (%arg-0 %native-address) (%arg-1 :int32) (%arg-2 :long))
  (cffi:defcfun ("DragAcceptFiles" drag-accept-files) :void
   (%arg-0 %native-address) (%arg-1 :int32))
- (cffi:defcfun ("GetWindowLongW" get-window-long-w) :int32
+ (cffi:defcfun ("GetWindowLongW" get-window-long-w) :long
   (%arg-0 %native-address) (%arg-1 :int32))
  (cffi:defcfun ("GetLayeredWindowAttributes" get-layered-window-attributes)
   :int32 (%arg-0 %native-address) (%arg-1 %native-address)
   (%arg-2 %native-address) (%arg-3 %native-address))
  (cffi:defcfun ("MultiByteToWideChar" multi-byte-to-wide-char) :int32
-  (%arg-0 :uint32) (%arg-1 :uint32) (%arg-2 %native-address) (%arg-3 :int32)
-  (%arg-4 %native-address) (%arg-5 :int32))
+  (%arg-0 :uint32) (%arg-1 :unsigned-long) (%arg-2 %native-address)
+  (%arg-3 :int32) (%arg-4 %native-address) (%arg-5 :int32))
  (cffi:defcfun ("SetWindowTextW" set-window-text-w) :int32
   (%arg-0 %native-address) (%arg-1 %native-address))
  (cffi:defcfun ("DestroyIcon" destroy-icon) :int32 (%arg-0 %native-address)))
@@ -7164,25 +7494,26 @@
   (%arg-0 %native-address) (%arg-1 %native-address) (%arg-2 :int32)
   (%arg-3 :int32) (%arg-4 :int32) (%arg-5 :int32) (%arg-6 :uint32))
  (cffi:defcfun ("SetWindowLongA" set-window-long-a :convention :stdcall)
-  :int32 (%arg-0 %native-address) (%arg-1 :int32) (%arg-2 :int32))
+  :long (%arg-0 %native-address) (%arg-1 :int32) (%arg-2 :long))
  (cffi:defcfun
   ("SetLayeredWindowAttributes" set-layered-window-attributes :convention
    :stdcall)
-  :int32 (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :uint8)
-  (%arg-3 :uint32))
+  :int32 (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 :uint8)
+  (%arg-3 :unsigned-long))
  (cffi:defcfun ("GetWindowLongA" get-window-long-a :convention :stdcall)
-  :int32 (%arg-0 %native-address) (%arg-1 :int32))
+  :long (%arg-0 %native-address) (%arg-1 :int32))
  (cffi:defcfun ("ClientToScreen" client-to-screen :convention :stdcall)
   :int32 (%arg-0 %native-address) (%arg-1 %native-address))
  (cffi:defcfun
   ("AdjustWindowRectEx" adjust-window-rect-ex :convention :stdcall) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :int32) (%arg-3 :uint32))
+  (%arg-0 %native-address) (%arg-1 :unsigned-long) (%arg-2 :int32)
+  (%arg-3 :unsigned-long))
  (cffi:defcfun ("SetWindowLongW" set-window-long-w :convention :stdcall)
-  :int32 (%arg-0 %native-address) (%arg-1 :int32) (%arg-2 :int32))
+  :long (%arg-0 %native-address) (%arg-1 :int32) (%arg-2 :long))
  (cffi:defcfun ("DragAcceptFiles" drag-accept-files :convention :stdcall)
   :void (%arg-0 %native-address) (%arg-1 :int32))
  (cffi:defcfun ("GetWindowLongW" get-window-long-w :convention :stdcall)
-  :int32 (%arg-0 %native-address) (%arg-1 :int32))
+  :long (%arg-0 %native-address) (%arg-1 :int32))
  (cffi:defcfun
   ("GetLayeredWindowAttributes" get-layered-window-attributes :convention
    :stdcall)
@@ -7190,8 +7521,8 @@
   (%arg-2 %native-address) (%arg-3 %native-address))
  (cffi:defcfun
   ("MultiByteToWideChar" multi-byte-to-wide-char :convention :stdcall) :int32
-  (%arg-0 :uint32) (%arg-1 :uint32) (%arg-2 %native-address) (%arg-3 :int32)
-  (%arg-4 %native-address) (%arg-5 :int32))
+  (%arg-0 :uint32) (%arg-1 :unsigned-long) (%arg-2 %native-address)
+  (%arg-3 :int32) (%arg-4 %native-address) (%arg-5 :int32))
  (cffi:defcfun ("SetWindowTextW" set-window-text-w :convention :stdcall)
   :int32 (%arg-0 %native-address) (%arg-1 %native-address))
  (cffi:defcfun ("DestroyIcon" destroy-icon :convention :stdcall) :int32
@@ -7220,8 +7551,8 @@
   (%arg-0 %native-address) (%arg-1 :int32)))
 #+(:and :windows :x86 (:not :x86-64))
 (progn
- (cffi:defcfun ("SendMessageA" send-message-a :convention :stdcall) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :uint32) (%arg-3 :int32))
+ (cffi:defcfun ("SendMessageA" send-message-a :convention :stdcall) :long
+  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :uint32) (%arg-3 :long))
  (cffi:defcfun ("ShowWindow" show-window :convention :stdcall) :int32
   (%arg-0 %native-address) (%arg-1 :int32))
  (cffi:defcfun ("FlashWindowEx" flash-window-ex :convention :stdcall) :int32
@@ -7239,7 +7570,7 @@
   (%arg-0 %native-address)))
 #+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
 (cffi:defcfun ("MonitorFromWindow" monitor-from-window) %native-address
- (%arg-0 %native-address) (%arg-1 :uint32))
+ (%arg-0 %native-address) (%arg-1 :unsigned-long))
 #+(:and :windows (:or :x86-64 :arm64))
 (cffi:defcfun ("OpenClipboard" open-clipboard) :int32
  (%arg-0 %native-address))
@@ -7259,9 +7590,9 @@
 #+(:and :windows (:or :x86-64 :arm64))
 (progn
  (cffi:defcfun ("WideCharToMultiByte" wide-char-to-multi-byte) :int32
-  (%arg-0 :uint32) (%arg-1 :uint32) (%arg-2 %native-address) (%arg-3 :int32)
-  (%arg-4 %native-address) (%arg-5 :int32) (%arg-6 %native-address)
-  (%arg-7 %native-address))
+  (%arg-0 :uint32) (%arg-1 :unsigned-long) (%arg-2 %native-address)
+  (%arg-3 :int32) (%arg-4 %native-address) (%arg-5 :int32)
+  (%arg-6 %native-address) (%arg-7 %native-address))
  (cffi:defcfun ("GlobalUnlock" global-unlock) :int32
   (%arg-0 %native-address))
  (cffi:defcfun ("GlobalAlloc" global-alloc) %native-address (%arg-0 :uint32)
@@ -7270,13 +7601,13 @@
 (progn
  (cffi:defcfun
   ("WideCharToMultiByte" wide-char-to-multi-byte :convention :stdcall) :int32
-  (%arg-0 :uint32) (%arg-1 :uint32) (%arg-2 %native-address) (%arg-3 :int32)
-  (%arg-4 %native-address) (%arg-5 :int32) (%arg-6 %native-address)
-  (%arg-7 %native-address))
+  (%arg-0 :uint32) (%arg-1 :unsigned-long) (%arg-2 %native-address)
+  (%arg-3 :int32) (%arg-4 %native-address) (%arg-5 :int32)
+  (%arg-6 %native-address) (%arg-7 %native-address))
  (cffi:defcfun ("GlobalUnlock" global-unlock :convention :stdcall) :int32
   (%arg-0 %native-address))
  (cffi:defcfun ("GlobalAlloc" global-alloc) %native-address (%arg-0 :uint32)
-  (%arg-1 :uint32)))
+  (%arg-1 :unsigned-long)))
 #+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
 (cffi:defcfun ("GlobalFree" global-free) %native-address
  (%arg-0 %native-address))
@@ -7301,7 +7632,7 @@
   :uint32 (%arg-0 :uint32) (%arg-1 :uint32)))
 #+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
 (cffi:defcfun ("GetKeyboardLayout" get-keyboard-layout) %native-address
- (%arg-0 :uint32))
+ (%arg-0 :unsigned-long))
 #+(:and :windows (:or :x86-64 :arm64))
 (cffi:defcfun ("ToUnicodeEx" to-unicode-ex) :int32 (%arg-0 :uint32)
  (%arg-1 :uint32) (%arg-2 %native-address) (%arg-3 %native-address)
@@ -7313,8 +7644,8 @@
  (%arg-6 %native-address))
 #+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
 (cffi:defcfun ("CreateWindowExW" create-window-ex-w) %native-address
- (%arg-0 :uint32) (%arg-1 %native-address) (%arg-2 %native-address)
- (%arg-3 :uint32) (%arg-4 :int32) (%arg-5 :int32) (%arg-6 :int32)
+ (%arg-0 :unsigned-long) (%arg-1 %native-address) (%arg-2 %native-address)
+ (%arg-3 :unsigned-long) (%arg-4 :int32) (%arg-5 :int32) (%arg-6 :int32)
  (%arg-7 :int32) (%arg-8 %native-address) (%arg-9 %native-address)
  (%arg-10 %native-address) (%arg-11 %native-address))
 #+(:and :windows (:or :x86-64 :arm64))
@@ -7343,7 +7674,7 @@
  (cffi:defcfun ("DestroyWindow" destroy-window :convention :stdcall) :int32
   (%arg-0 %native-address))
  (cffi:defcfun ("SetClassLongA" set-class-long-a :convention :stdcall)
-  :uint32 (%arg-0 %native-address) (%arg-1 :int32) (%arg-2 :int32)))
+  :unsigned-long (%arg-0 %native-address) (%arg-1 :int32) (%arg-2 :long)))
 #+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
 (cffi:defcfun ("SetCursor" set-cursor) %native-address
  (%arg-0 %native-address))
@@ -7382,9 +7713,9 @@
  (cffi:defcfun ("FreeLibrary" free-library) :int32 (%arg-0 %native-address))
  (cffi:defcfun ("UnregisterClassW" unregister-class-w) :int32
   (%arg-0 %native-address) (%arg-1 %native-address))
- (cffi:defcfun ("RegGetValueW" reg-get-value-w) :int32
+ (cffi:defcfun ("RegGetValueW" reg-get-value-w) :long
   (%arg-0 %native-address) (%arg-1 %native-address) (%arg-2 %native-address)
-  (%arg-3 :uint32) (%arg-4 %native-address) (%arg-5 %native-address)
+  (%arg-3 :unsigned-long) (%arg-4 %native-address) (%arg-5 %native-address)
   (%arg-6 %native-address))
  (cffi:defcfun ("DefWindowProcW" def-window-proc-w) :int64
   (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :uint64) (%arg-3 :int64)))
@@ -7396,13 +7727,13 @@
   (%arg-0 %native-address))
  (cffi:defcfun ("UnregisterClassW" unregister-class-w :convention :stdcall)
   :int32 (%arg-0 %native-address) (%arg-1 %native-address))
- (cffi:defcfun ("RegGetValueW" reg-get-value-w :convention :stdcall) :int32
+ (cffi:defcfun ("RegGetValueW" reg-get-value-w :convention :stdcall) :long
   (%arg-0 %native-address) (%arg-1 %native-address) (%arg-2 %native-address)
-  (%arg-3 :uint32) (%arg-4 %native-address) (%arg-5 %native-address)
+  (%arg-3 :unsigned-long) (%arg-4 %native-address) (%arg-5 %native-address)
   (%arg-6 %native-address))
  (cffi:defcfun ("DefWindowProcW" def-window-proc-w :convention :stdcall)
-  :int32 (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :uint32)
-  (%arg-3 :int32)))
+  :long (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :uint32)
+  (%arg-3 :long)))
 #+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
 (cffi:defcfun ("GetPropW" get-prop-w) %native-address
  (%arg-0 %native-address) (%arg-1 %native-address))
@@ -7436,7 +7767,7 @@
  (cffi:defcfun ("ScreenToClient" screen-to-client :convention :stdcall)
   :int32 (%arg-0 %native-address) (%arg-1 %native-address))
  (cffi:defcfun ("PostMessageA" post-message-a :convention :stdcall) :int32
-  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :uint32) (%arg-3 :int32))
+  (%arg-0 %native-address) (%arg-1 :uint32) (%arg-2 :uint32) (%arg-3 :long))
  (cffi:defcfun ("GetKeyState" get-key-state :convention :stdcall) :int16
   (%arg-0 :int32))
  (cffi:defcfun ("GetRawInputData" get-raw-input-data :convention :stdcall)
@@ -7479,7 +7810,7 @@
  (cffi:defcfun
   ("EnumDisplayMonitors" enum-display-monitors :convention :stdcall) :int32
   (%arg-0 %native-address) (%arg-1 %native-address) (%arg-2 %native-address)
-  (%arg-3 :int32))
+  (%arg-3 :long))
  (cffi:defcfun ("GetDeviceCaps" get-device-caps :convention :stdcall) :int32
   (%arg-0 %native-address) (%arg-1 :int32)))
 #+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
@@ -7964,9 +8295,2176 @@
           rgfw-win32-get-monitor-handle)
          (ftype (function (t integer integer (unsigned-byte 8) integer) t)
           rgfw-load-handle-image))
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ (cffi:defcstruct (%abi-struct-0 :class %abi-struct-0-type)
+  (%field-0 :double) (%field-1 :double))
+ (defmethod cffi:translate-to-foreign
+            (value (common-lisp:type %abi-struct-0-type))
+   (%native-pointer value))
+ (defmethod cffi:free-translated-object
+            (pointer (common-lisp:type %abi-struct-0-type) freep)
+   (declare (ignore pointer freep)))
+ (defmethod cffi:translate-into-foreign-memory
+            (value (common-lisp:type %abi-struct-0-type) pointer)
+   (%copy (cffi:pointer-address pointer) value 16))
+ (defmethod cffi:translate-from-foreign
+            (pointer (common-lisp:type %abi-struct-0-type))
+   (let ((address (%allocate-local 16)))
+     (%copy address (cffi:pointer-address pointer) 16)
+     address))
+ (cffi:defcstruct (%abi-struct-1 :class %abi-struct-1-type)
+  (%field-0 :double) (%field-1 :double))
+ (defmethod cffi:translate-to-foreign
+            (value (common-lisp:type %abi-struct-1-type))
+   (%native-pointer value))
+ (defmethod cffi:free-translated-object
+            (pointer (common-lisp:type %abi-struct-1-type) freep)
+   (declare (ignore pointer freep)))
+ (defmethod cffi:translate-into-foreign-memory
+            (value (common-lisp:type %abi-struct-1-type) pointer)
+   (%copy (cffi:pointer-address pointer) value 16))
+ (defmethod cffi:translate-from-foreign
+            (pointer (common-lisp:type %abi-struct-1-type))
+   (let ((address (%allocate-local 16)))
+     (%copy address (cffi:pointer-address pointer) 16)
+     address))
+ (cffi:defcstruct (%abi-struct-2 :class %abi-struct-2-type)
+  (%field-0 (:struct %abi-struct-1)) (%field-1 (:struct %abi-struct-0)))
+ (defmethod cffi:translate-to-foreign
+            (value (common-lisp:type %abi-struct-2-type))
+   (%native-pointer value))
+ (defmethod cffi:free-translated-object
+            (pointer (common-lisp:type %abi-struct-2-type) freep)
+   (declare (ignore pointer freep)))
+ (defmethod cffi:translate-into-foreign-memory
+            (value (common-lisp:type %abi-struct-2-type) pointer)
+   (%copy (cffi:pointer-address pointer) value 32))
+ (defmethod cffi:translate-from-foreign
+            (pointer (common-lisp:type %abi-struct-2-type))
+   (let ((address (%allocate-local 32)))
+     (%copy address (cffi:pointer-address pointer) 32)
+     address))
+ (cffi:defcstruct (%abi-struct-4 :class %abi-struct-4-type)
+  (%field-0 :double) (%field-1 :double))
+ (defmethod cffi:translate-to-foreign
+            (value (common-lisp:type %abi-struct-4-type))
+   (%native-pointer value))
+ (defmethod cffi:free-translated-object
+            (pointer (common-lisp:type %abi-struct-4-type) freep)
+   (declare (ignore pointer freep)))
+ (defmethod cffi:translate-into-foreign-memory
+            (value (common-lisp:type %abi-struct-4-type) pointer)
+   (%copy (cffi:pointer-address pointer) value 16))
+ (defmethod cffi:translate-from-foreign
+            (pointer (common-lisp:type %abi-struct-4-type))
+   (let ((address (%allocate-local 16)))
+     (%copy address (cffi:pointer-address pointer) 16)
+     address))
+ (cffi:defcstruct (%abi-struct-5 :class %abi-struct-5-type)
+  (%field-0 :double) (%field-1 :double))
+ (defmethod cffi:translate-to-foreign
+            (value (common-lisp:type %abi-struct-5-type))
+   (%native-pointer value))
+ (defmethod cffi:free-translated-object
+            (pointer (common-lisp:type %abi-struct-5-type) freep)
+   (declare (ignore pointer freep)))
+ (defmethod cffi:translate-into-foreign-memory
+            (value (common-lisp:type %abi-struct-5-type) pointer)
+   (%copy (cffi:pointer-address pointer) value 16))
+ (defmethod cffi:translate-from-foreign
+            (pointer (common-lisp:type %abi-struct-5-type))
+   (let ((address (%allocate-local 16)))
+     (%copy address (cffi:pointer-address pointer) 16)
+     address))
+ (cffi:defcstruct (%abi-struct-3 :class %abi-struct-3-type)
+  (%field-0 (:struct %abi-struct-4)) (%field-1 (:struct %abi-struct-5)))
+ (defmethod cffi:translate-to-foreign
+            (value (common-lisp:type %abi-struct-3-type))
+   (%native-pointer value))
+ (defmethod cffi:free-translated-object
+            (pointer (common-lisp:type %abi-struct-3-type) freep)
+   (declare (ignore pointer freep)))
+ (defmethod cffi:translate-into-foreign-memory
+            (value (common-lisp:type %abi-struct-3-type) pointer)
+   (%copy (cffi:pointer-address pointer) value 32))
+ (defmethod cffi:translate-from-foreign
+            (pointer (common-lisp:type %abi-struct-3-type))
+   (let ((address (%allocate-local 32)))
+     (%copy address (cffi:pointer-address pointer) 32)
+     address))
+ (cffi:defcfun ("CFRelease" cf-release) :void (%arg-0 %native-address))
+ (cffi:defcfun ("CFDataGetBytePtr" cf-data-get-byte-ptr) %native-address
+  (%arg-0 %native-address))
+ (cffi:defcfun ("CFArrayGetCount" cf-array-get-count) :long
+  (%arg-0 %native-address))
+ (cffi:defcfun ("CFArrayGetValueAtIndex" cf-array-get-value-at-index)
+  %native-address (%arg-0 %native-address) (%arg-1 :long))
+ (cffi:defcfun ("CFStringCompare" cf-string-compare) :long
+  (%arg-0 %native-address) (%arg-1 %native-address) (%arg-2 :unsigned-long))
+ (cffi:defcfun
+  ("__CFStringMakeConstantString" --cf-string-make-constant-string)
+  %native-address (%arg-0 %native-address))
+ (cffi:defcfun
+  ("CFURLGetFileSystemRepresentation" cfurl-get-file-system-representation)
+  :uint8 (%arg-0 %native-address) (%arg-1 :uint8) (%arg-2 %native-address)
+  (%arg-3 :long))
+ (cffi:defcfun ("CFURLCopyLastPathComponent" cfurl-copy-last-path-component)
+  %native-address (%arg-0 %native-address))
+ (cffi:defcfun ("CFNumberGetValue" cf-number-get-value) :uint8
+  (%arg-0 %native-address) (%arg-1 :long) (%arg-2 %native-address))
+ (cffi:defcfun ("chdir" chdir) :int32 (%arg-0 %native-address))
+ (cffi:defcfun ("CFBundleGetMainBundle" cf-bundle-get-main-bundle)
+  %native-address)
+ (cffi:defcfun
+  ("CFBundleGetBundleWithIdentifier" cf-bundle-get-bundle-with-identifier)
+  %native-address (%arg-0 %native-address))
+ (cffi:defcfun
+  ("CFBundleCopyResourcesDirectoryURL"
+   cf-bundle-copy-resources-directory-url)
+  %native-address (%arg-0 %native-address))
+ (cffi:defcfun
+  ("CFBundleGetFunctionPointerForName"
+   cf-bundle-get-function-pointer-for-name)
+  %native-address (%arg-0 %native-address) (%arg-1 %native-address))
+ (cffi:defcfun
+  ("CFBundleGetDataPointerForName" cf-bundle-get-data-pointer-for-name)
+  %native-address (%arg-0 %native-address) (%arg-1 %native-address))
+ (cffi:defcfun ("CGMainDisplayID" cg-main-display-id) :uint32)
+ (cffi:defcfun ("CGGetActiveDisplayList" cg-get-active-display-list) :int32
+  (%arg-0 :uint32) (%arg-1 %native-address) (%arg-2 %native-address))
+ (cffi:defcfun
+  ("CGOpenGLDisplayMaskToDisplayID" cg-open-gl-display-mask-to-display-id)
+  :uint32 (%arg-0 :uint32))
+ (defun cg-display-bounds (%arg-0)
+   (cffi:foreign-funcall "CGDisplayBounds"
+      :uint32 %arg-0
+      (:struct %abi-struct-3)))
+ (cffi:defcfun
+  ("CGDisplayCopyAllDisplayModes" cg-display-copy-all-display-modes)
+  %native-address (%arg-0 :uint32) (%arg-1 %native-address))
+ (cffi:defcfun ("CGDisplayCopyDisplayMode" cg-display-copy-display-mode)
+  %native-address (%arg-0 :uint32))
+ (cffi:defcfun ("CGDisplaySetDisplayMode" cg-display-set-display-mode) :int32
+  (%arg-0 :uint32) (%arg-1 %native-address) (%arg-2 %native-address))
+ (cffi:defcfun ("CGDisplayModeGetWidth" cg-display-mode-get-width) :size
+  (%arg-0 %native-address))
+ (cffi:defcfun ("CGDisplayModeGetHeight" cg-display-mode-get-height) :size
+  (%arg-0 %native-address))
+ (cffi:defcfun
+  ("CGDisplayModeGetRefreshRate" cg-display-mode-get-refresh-rate) :double
+  (%arg-0 %native-address))
+ (cffi:defcfun
+  ("CGDisplayGammaTableCapacity" cg-display-gamma-table-capacity) :uint32
+  (%arg-0 :uint32))
+ (cffi:defcfun
+  ("CGSetDisplayTransferByTable" cg-set-display-transfer-by-table) :int32
+  (%arg-0 :uint32) (%arg-1 :uint32) (%arg-2 %native-address)
+  (%arg-3 %native-address) (%arg-4 %native-address))
+ (cffi:defcfun
+  ("CGGetDisplayTransferByTable" cg-get-display-transfer-by-table) :int32
+  (%arg-0 :uint32) (%arg-1 :uint32) (%arg-2 %native-address)
+  (%arg-3 %native-address) (%arg-4 %native-address) (%arg-5 %native-address))
+ (cffi:defcfun ("CGDisplayHideCursor" cg-display-hide-cursor) :int32
+  (%arg-0 :uint32))
+ (cffi:defcfun ("CGDisplayShowCursor" cg-display-show-cursor) :int32
+  (%arg-0 :uint32))
+ (cffi:defcfun ("IOObjectRelease" io-object-release) :int32 (%arg-0 :uint32))
+ (cffi:defcfun ("IOIteratorNext" io-iterator-next) :uint32 (%arg-0 :uint32))
+ (cffi:defcfun
+  ("IORegistryEntryCreateCFProperty" io-registry-entry-create-cf-property)
+  %native-address (%arg-0 :uint32) (%arg-1 %native-address)
+  (%arg-2 %native-address) (%arg-3 :uint32))
+ (cffi:defcfun ("CGDisplayUnitNumber" cg-display-unit-number) :uint32
+  (%arg-0 :uint32))
+ (defun cg-display-screen-size (%arg-0)
+   (cffi:foreign-funcall "CGDisplayScreenSize"
+      :uint32 %arg-0
+      (:struct %abi-struct-5)))
+ ;; C source (CGRemoteOperation.h:1-3):
+;; CoreGraphics - CGRemoteOperation.h
+;;    Copyright (c) 2000-2011 Apple Inc.
+;;    All rights reserved.
+
+ (defun cg-warp-mouse-cursor-position (%arg-0)
+   (cffi:foreign-funcall "CGWarpMouseCursorPosition"
+      (:struct %abi-struct-4) %arg-0
+      :int32)))
+#+(:and :darwin :x86-64)
+(cffi:defcfun
+ ("CGAssociateMouseAndMouseCursorPosition"
+  cg-associate-mouse-and-mouse-cursor-position)
+ :int32 (%arg-0 :uint32))
+#+(:and :darwin :arm64)
+(cffi:defcfun
+ ("CGAssociateMouseAndMouseCursorPosition"
+  cg-associate-mouse-and-mouse-cursor-position)
+ :int32 (%arg-0 :int32))
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ (cffi:defcfun ("CGEventCreate" cg-event-create) %native-address
+  (%arg-0 %native-address))
+ ;; C source (CGEvent.h:29-158):
+;; Return a "flattened" data representation of an event.
+;; Return an event created from a "flattened" data representation of the
+;;    event.
+;; Return a new mouse event.
+;;
+;;    The event source may be taken from another event, or may be NULL.
+;;    `mouseType' should be one of the mouse event types. `mouseCursorPosition'
+;;    should be the position of the mouse cursor in global coordinates.
+;;    `mouseButton' should be the button that's changing state; `mouseButton'
+;;    is ignored unless `mouseType' is one of `kCGEventOtherMouseDown',
+;;    `kCGEventOtherMouseDragged', or `kCGEventOtherMouseUp'.
+;;
+;;    The current implemementation of the event system supports a maximum of
+;;    thirty-two buttons. Mouse button 0 is the primary button on the mouse.
+;;    Mouse button 1 is the secondary mouse button (right). Mouse button 2 is
+;;    the center button, and the remaining buttons are in USB device order.
+;; Return a new keyboard event.
+;;
+;;    The event source may be taken from another event, or may be NULL. Based
+;;    on the virtual key code values entered, the appropriate key down, key up,
+;;    or flags changed events are generated.
+;;
+;;    All keystrokes needed to generate a character must be entered, including
+;;    SHIFT, CONTROL, OPTION, and COMMAND keys. For example, to produce a 'Z',
+;;    the SHIFT key must be down, the 'z' key must go down, and then the SHIFT
+;;    and 'z' key must be released:
+;;
+;;      CGEventCreateKeyboardEvent(source, (CGKeyCode)56, true);  // shift down
+;;      CGEventCreateKeyboardEvent(source, (CGKeyCode) 6, true);  // 'z' down
+;;      CGEventCreateKeyboardEvent(source, (CGKeyCode) 6, false); // 'z' up
+;;      CGEventCreateKeyboardEvent(source, (CGKeyCode)56, false); // 'shift up
+;; Return a new scrollwheel event.
+;;
+;;    The event source may be taken from another event, or may be NULL. The
+;;    scrolling units may be specified in lines using `kCGScrollEventUnitLine'
+;;    or in pixels using `kCGScrollEventUnitPixel'. `kCGScrollEventUnitPixel'
+;;    will produce an event that most applications interpret as a smooth
+;;    scrolling event.
+;;
+;;    One or more wheels must be specified. The current implementation supports
+;;    up to three wheels.
+;;
+;;    Every scrollwheel event can be interpreted to be scrolling by pixel or by
+;;    line. The scale between the two is about 10 pixels per line by default.
+;;    The scale can be altered by setting a custom value for the event source,
+;;    using `CGEventSourceSetPixelsPerLine'.
+;; A non-variadic variant version of SLEventCreateScrollWheelEvent.
+;; Return a copy of `event'.
+;; Return an event source created from an existing event.
+;;
+;;    Event filters may use the event source to generate events that are
+;;    compatible with an event being filtered.
+;;
+;;    Note that `CGEventCreateSourceFromEvent' may return NULL if the event
+;;    was generated with a private CGEventSourceStateID owned by another
+;;    process.  Such events should be filtered based on the public state.
+;; Set the event source of an event.
+;; Return the event type of an event (left mouse down, for example).
+;; Set the event type of an event.
+;; Return the timestamp of an event.
+;; Set the timestamp of an event.
+;; Return the location of an event in global display coordinates.
+;;    CGPointZero is returned if event is not a valid CGEventRef.
+
+ (defun cg-event-get-location (%arg-0)
+   (let ((*string-arguments* *string-arguments*))
+     (cffi:foreign-funcall "CGEventGetLocation"
+        :pointer (%native-argument-pointer %arg-0)
+        (:struct %abi-struct-4))))
+ (cffi:defcfun ("UCKeyTranslate" uc-key-translate) :int32
+  (%arg-0 %native-address) (%arg-1 :uint16) (%arg-2 :uint16) (%arg-3 :uint32)
+  (%arg-4 :uint32) (%arg-5 :uint32) (%arg-6 %native-address)
+  (%arg-7 :unsigned-long) (%arg-8 %native-address) (%arg-9 %native-address))
+ (cffi:defcfun ("sel_registerName" sel-register-name) %native-address
+  (%arg-0 %native-address))
+ (cffi:defcfun ("sel_getUid" sel-get-uid) %native-address
+  (%arg-0 %native-address))
+ (cffi:defcfun ("object_getClass" object-get-class) %native-address
+  (%arg-0 %native-address))
+ (cffi:defcfun ("object_setInstanceVariable" object-set-instance-variable)
+  %native-address (%arg-0 %native-address) (%arg-1 %native-address)
+  (%arg-2 %native-address))
+ (cffi:defcfun ("object_getInstanceVariable" object-get-instance-variable)
+  %native-address (%arg-0 %native-address) (%arg-1 %native-address)
+  (%arg-2 %native-address))
+ (cffi:defcfun ("objc_getClass" objc-get-class) %native-address
+  (%arg-0 %native-address))
+ (cffi:defcfun ("class_getSuperclass" class-get-superclass) %native-address
+  (%arg-0 %native-address))
+ (cffi:defcfun ("class_addMethod" class-add-method) :int8
+  (%arg-0 %native-address) (%arg-1 %native-address) (%arg-2 %native-address)
+  (%arg-3 %native-address))
+ (cffi:defcfun ("class_addIvar" class-add-ivar) :int8
+  (%arg-0 %native-address) (%arg-1 %native-address) (%arg-2 :size)
+  (%arg-3 :uint8) (%arg-4 %native-address))
+ (cffi:defcfun ("objc_allocateClassPair" objc-allocate-class-pair)
+  %native-address (%arg-0 %native-address) (%arg-1 %native-address)
+  (%arg-2 :size))
+ (cffi:defcfun ("objc_registerClassPair" objc-register-class-pair) :void
+  (%arg-0 %native-address))
+ (cffi:defcfun ("objc_disposeClassPair" objc-dispose-class-pair) :void
+  (%arg-0 %native-address))
+ (cffi:defcfun ("objc_msgSend" objc-msg-send) :void)
+ (cffi:defcfun ("objc_msgSendSuper" objc-msg-send-super) :void))
+#+(:and :darwin :x86-64)
+(progn
+ (cffi:defcfun ("objc_msgSend_stret" objc-msg-send-stret) :void)
+ (cffi:defcfun ("objc_msgSend_fpret" objc-msg-send-fpret) :void))
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ (declaim (ftype (function ((unsigned-byte 64)) t) rgfw-alloc)
+          (ftype (function (t) null) rgfw-free rgfw-deinit-ptr rgfw-set-info
+           rgfw-surface-free rgfw-surface-free-ptr rgfw-free-mouse
+           rgfw-free-modes rgfw-free-gamma-ramp rgfw-window-close
+           rgfw-window-close-ptr rgfw-window-focus rgfw-window-raise
+           rgfw-window-maximize rgfw-window-center rgfw-window-minimize
+           rgfw-window-restore rgfw-window-hide rgfw-window-show
+           rgfw-window-scale-to-monitor rgfw-set-root-window
+           rgfw-event-queue-push rgfw-event-queue-push-and-call
+           rgfw-window-close-platform rgfw-window-show-platform
+           rgfw-window-restore-platform rgfw-window-minimize-platform
+           rgfw-window-maximize-platform rgfw-monitor-node-free
+           rgfw-window-minimized-callback rgfw-window-close-callback
+           rgfw-cocoa-fetch-rect)
+          (ftype (function nil (unsigned-byte 64)) rgfw-sizeof-info
+           rgfw-sizeof-window rgfw-sizeof-window-src rgfw-sizeof-native-image
+           rgfw-sizeof-surface)
+          (ftype (function (t (unsigned-byte 8)) integer) rgfw-init
+           rgfw-init-platform)
+          (ftype (function nil null) rgfw-deinit
+           rgfw-move-to-mac-os-resource-dir rgfw-poll-monitors
+           rgfw-free-monitors rgfw-poll-events rgfw-stop-check-events
+           rgfw-event-queue-flush rgfw-init-keycodes
+           rgfw-init-keycodes-platform rgfw-reset-prev-state rgfw-reset-key
+           rgfw-unload-gl rgfw-unload-egl rgfw-monitors-refresh
+           rgfw-deinit-platform)
+          (ftype (function (t (unsigned-byte 8) t) integer) rgfw-init-ptr)
+          (ftype (function nil t) rgfw-get-info rgfw-get-layer-osx
+           rgfw-get-display-x11 rgfw-get-display-wayland
+           rgfw-get-primary-monitor rgfw-read-clipboard-string
+           rgfw-get-root-window rgfw-event-queue-pop
+           ns-pasteboard-general-pasteboard)
+          (ftype (function nil (unsigned-byte 8)) rgfw-using-wayland
+           rgfw-native-format rgfw-load-gl rgfw-load-egl rgfw-load-vulkan)
+          (ftype
+           (function
+            (t integer integer (unsigned-byte 8) t (unsigned-byte 8) t) null)
+           rgfw-copy-image-data)
+          (ftype (function (t integer integer (unsigned-byte 8)) t)
+           rgfw-create-surface rgfw-create-mouse)
+          (ftype
+           (function (t integer integer (unsigned-byte 8) t)
+            (unsigned-byte 8))
+           rgfw-create-surface-ptr)
+          (ftype (function (t) t) rgfw-surface-get-native-image
+           rgfw-monitor-get-gamma-ramp rgfw-monitor-get-name
+           rgfw-monitor-get-user-ptr rgfw-get-monitors
+           rgfw-window-get-user-ptr rgfw-window-get-src
+           rgfw-window-get-view-osx rgfw-window-get-window-osx
+           rgfw-window-get-hwnd rgfw-window-get-hdc
+           rgfw-window-get-window-wayland rgfw-window-get-data-drop
+           rgfw-window-get-monitor rgfw-set-debug-callback
+           rgfw-window-event-queue-pop rgfw-monitors-add
+           ns-string-string-with-utf8string ns-string-to-char
+           ns-bitmap-image-rep-bitmap-data ns-cursor-arrow-str)
+          (ftype (function ((unsigned-byte 8)) t) rgfw-create-mouse-standard
+           rgfw-read-clipboard)
+          (ftype (function (t t) t) rgfw-monitor-get-modes)
+          (ftype (function (t t) (unsigned-byte 64))
+           rgfw-monitor-get-modes-ptr rgfw-monitor-get-gamma-ramp-ptr)
+          (ftype (function (t t t) (unsigned-byte 8))
+           rgfw-monitor-find-closest-mode rgfw-monitor-get-position
+           rgfw-monitor-get-scale rgfw-monitor-get-physical-size
+           rgfw-window-get-position rgfw-window-get-size
+           rgfw-window-get-size-in-pixels rgfw-window-get-data-drag
+           rgfw-window-fetch-size rgfw-window-get-mouse)
+          (ftype (function (t t) (unsigned-byte 8))
+           rgfw-monitor-set-gamma-ramp rgfw-monitor-get-mode
+           rgfw-monitor-set-mode rgfw-monitor-scale-to-window
+           rgfw-window-check-event rgfw-window-check-queued-event
+           rgfw-window-set-mouse rgfw-get-global-mouse
+           rgfw-window-set-mouse-platform)
+          (ftype (function (t single-float) (unsigned-byte 8))
+           rgfw-monitor-set-gamma)
+          (ftype
+           (function (t single-float t (unsigned-byte 64)) (unsigned-byte 8))
+           rgfw-monitor-set-gamma-ptr)
+          (ftype (function (t t t t t) (unsigned-byte 8))
+           rgfw-monitor-get-workarea)
+          (ftype (function (t t) null) rgfw-monitor-set-user-ptr
+           rgfw-set-all-event-callbacks rgfw-get-mouse-scroll
+           rgfw-get-mouse-vector rgfw-surface-set-convert-func
+           rgfw-window-blit-surface rgfw-window-set-user-ptr
+           rgfw-window-set-layer-osx rgfw-window-move-to-monitor
+           rgfw-window-set-name rgfw-monitors-remove rgfw-osx-init-view
+           rgfw--osx-update-tracking-areas rgfw--osx-view-dealloc
+           rgfw--osx-view-did-change-backing-properties
+           rgfw--osx-update-layer)
+          (ftype (function ((unsigned-byte 64) t t) (unsigned-byte 8))
+           rgfw-get-monitors-ptr)
+          (ftype (function (t t (unsigned-byte 8)) (unsigned-byte 8))
+           rgfw-monitor-request-mode rgfw-monitor-mode-compare)
+          (ftype (function ((unsigned-byte 8)) null) rgfw-set-raw-mouse-mode
+           rgfw-set-build-dnd rgfw-set-queue-events)
+          (ftype (function (integer) null) rgfw-wait-for-event)
+          (ftype (function ((unsigned-byte 8) t) t) rgfw-set-event-callback)
+          (ftype (function ((unsigned-byte 8) t t t) null)
+           rgfw-set-dual-event-callback)
+          (ftype (function (t) (unsigned-byte 8)) rgfw-check-event
+           rgfw-check-queued-event rgfw-window-get-exit-key
+           rgfw-window-did-mouse-leave rgfw-window-did-mouse-enter
+           rgfw-window-is-mouse-inside rgfw-window-is-data-dragging
+           rgfw-window-did-data-drop rgfw-window-is-in-focus
+           rgfw-window-borderless rgfw-window-allows-dnd
+           rgfw-window-set-mouse-default rgfw-window-is-raw-mouse-mode
+           rgfw-window-is-captured rgfw-window-is-mouse-hidden
+           rgfw-window-should-close rgfw-window-is-fullscreen
+           rgfw-window-is-fullscreen-exclusive
+           rgfw-window-is-fullscreen-borderless rgfw-window-is-hidden
+           rgfw-window-is-minimized rgfw-window-is-maximized
+           rgfw-window-is-floating rgfw-write-clipboard)
+          (ftype (function ((unsigned-byte 8)) (unsigned-byte 8))
+           rgfw-is-key-pressed rgfw-is-key-released rgfw-is-key-down
+           rgfw-is-mouse-pressed rgfw-is-mouse-released rgfw-is-mouse-down
+           rgfw-physical-to-mapped-key)
+          (ftype
+           (function (t integer integer integer integer (unsigned-byte 32))
+            t)
+           rgfw-create-window)
+          (ftype
+           (function (t integer integer integer integer (unsigned-byte 32) t)
+            t)
+           rgfw-create-window-ptr)
+          (ftype (function (t t integer integer (unsigned-byte 8)) t)
+           rgfw-window-create-surface)
+          (ftype
+           (function (t t integer integer (unsigned-byte 8) t)
+            (unsigned-byte 8))
+           rgfw-window-create-surface-ptr)
+          (ftype (function (t) (unsigned-byte 32)) rgfw-window-get-flags
+           rgfw-window-get-enabled-events)
+          (ftype (function (t (unsigned-byte 8)) null)
+           rgfw-window-set-exit-key rgfw-window-set-fullscreen
+           rgfw-window-set-floating rgfw-window-set-opacity
+           rgfw-window-set-border rgfw-window-set-dnd
+           rgfw-window-set-mouse-passthrough rgfw-window-set-raw-mouse-mode
+           rgfw-window-capture-mouse rgfw-window-capture-raw-mouse
+           rgfw-window-flash rgfw-window-set-should-close
+           rgfw-window-show-mouse rgfw-window-set-fullscreen-platform
+           rgfw-window-show-mouse-flags rgfw-window-focus-callback
+           rgfw-window-capture-mouse-platform
+           rgfw-window-set-raw-mouse-mode-platform)
+          (ftype (function (t (unsigned-byte 32)) null)
+           rgfw-window-set-enabled-events rgfw-window-set-disabled-events
+           rgfw-window-set-flags rgfw-key-char-callback)
+          (ftype (function (t (unsigned-byte 32) (unsigned-byte 8)) null)
+           rgfw-window-set-event-state rgfw-set-bit)
+          (ftype (function (t) (unsigned-byte 64))
+           rgfw-window-get-window-x11)
+          (ftype (function (t (unsigned-byte 8)) (unsigned-byte 8))
+           rgfw-window-is-key-pressed rgfw-window-is-key-down
+           rgfw-window-is-key-released rgfw-window-is-mouse-pressed
+           rgfw-window-is-mouse-down rgfw-window-is-mouse-released
+           rgfw-window-set-mouse-standard)
+          (ftype (function (t integer integer) null) rgfw-window-move
+           rgfw-window-resize rgfw-window-set-aspect-ratio
+           rgfw-window-set-min-size rgfw-window-set-max-size
+           rgfw-window-move-mouse rgfw-window-move-platform
+           rgfw-window-resize-platform rgfw-window-moved-callback
+           rgfw-window-resized-callback rgfw-mouse-motion-callback)
+          (ftype
+           (function (t t integer integer (unsigned-byte 8))
+            (unsigned-byte 8))
+           rgfw-window-set-icon)
+          (ftype
+           (function
+            (t t integer integer (unsigned-byte 8) (unsigned-byte 8))
+            (unsigned-byte 8))
+           rgfw-window-set-icon-ex)
+          (ftype
+           (function ((unsigned-byte 8) t (unsigned-byte 64) t)
+            (unsigned-byte 8))
+           rgfw-read-clipboard-ptr)
+          (ftype (function (t (unsigned-byte 64) t) (unsigned-byte 8))
+           rgfw-read-clipboard-string-ptr)
+          (ftype (function ((unsigned-byte 8) (unsigned-byte 8) t) null)
+           rgfw-debug-callback)
+          (ftype (function ((unsigned-byte 32)) (unsigned-byte 8))
+           rgfw-api-key-to-rgfw)
+          (ftype (function ((unsigned-byte 8)) (unsigned-byte 32))
+           rgfw-rgfw-to-api-key)
+          (ftype (function (t (unsigned-byte 32) t) t)
+           rgfw-create-window-platform)
+          (ftype (function (t (unsigned-byte 32) (unsigned-byte 32)) null)
+           rgfw-window-set-flags-internal)
+          (ftype
+           (function
+            (t (unsigned-byte 8) (unsigned-byte 8) (unsigned-byte 8)
+             (unsigned-byte 8) (unsigned-byte 8) (unsigned-byte 8)
+             (unsigned-byte 8))
+            null)
+           rgfw-key-update-key-mods-ex)
+          (ftype (function (t (unsigned-byte 8) (unsigned-byte 8)) null)
+           rgfw-key-update-key-mod rgfw-mouse-button-callback)
+          (ftype (function (t integer integer integer integer) null)
+           rgfw-window-maximized-callback rgfw-window-restored-callback
+           rgfw-window-refresh-callback)
+          (ftype (function (t single-float single-float) null)
+           rgfw-raw-motion-callback rgfw-mouse-scroll-callback
+           rgfw-scale-updated-callback)
+          (ftype (function (t integer integer (unsigned-byte 8)) null)
+           rgfw-mouse-notify-callback)
+          (ftype (function (t t (unsigned-byte 64) (unsigned-byte 8)) null)
+           rgfw-data-drop-callback)
+          (ftype
+           (function (t (unsigned-byte 8) (unsigned-byte 8) integer integer)
+            null)
+           rgfw-data-drag-callback)
+          (ftype
+           (function
+            (t (unsigned-byte 8) (unsigned-byte 8) (unsigned-byte 8)
+             (unsigned-byte 8))
+            null)
+           rgfw-key-callback)
+          (ftype (function (t t (unsigned-byte 8)) null)
+           rgfw-monitor-callback)
+          (ftype
+           (function
+            (t integer integer (unsigned-byte 8) t (unsigned-byte 8)
+             (unsigned-byte 8) t)
+            null)
+           rgfw-copy-image-data64)
+          (ftype
+           (function (t t t t (unsigned-byte 64) (unsigned-byte 8)) null)
+           rgfw-convert-image-data64)
+          (ftype (function (t t) (unsigned-byte 32)) rgfw-decode-utf8)
+          (ftype (function (single-float) single-float)
+           rgfw-cocoa-y-transform)
+          (ftype
+           (function
+            (t integer integer integer integer (integer 0 1) (integer 0 1) t
+             (unsigned-byte 64) integer integer)
+            t)
+           ns-bitmap-image-rep-init-with-bitmap-data)
+          (ftype
+           (function (double-float double-float double-float double-float) t)
+           ns-color-color-with-srgb)
+          (ftype (function (t (unsigned-byte 64)) t) cstr-to-ns-string-array
+           c-array-to-ns-array)
+          (ftype (function (t t t) t) ns-pasteboard-string-for-type
+           rgfw--osx-custom-init-with-rgfw-window)
+          (ftype (function (t t (unsigned-byte 64)) null)
+           n-sregister-for-dragged-types)
+          (ftype (function (t t (unsigned-byte 64) t) integer)
+           ns-paste-board-declare-types)
+          (ftype (function (t t t) integer) rgfw-osx-window-should-close
+           rgfw--osx-perform-key-equivalent rgfw--osx-accepts-first-mouse
+           rgfw--osx-perform-drag-operation)
+          (ftype (function (t t) integer) rgfw--osx-accepts-first-responder
+           rgfw--osx-wants-update-layer rgfw--osx-can-become-key-window
+           rgfw--osx-can-become-main-window)
+          (ftype (function (t t t) (unsigned-byte 64))
+           rgfw--osx-dragging-entered rgfw--osx-dragging-updated
+           rgfw--osx-application-should-terminate)
+          (ftype (function (t) integer) rgfw--osx-prepare-for-drag-operation)
+          (ftype (function (t t t) null) rgfw--osx-dragging-ended
+           rgfw--osx-did-change-screen-parameters
+           rgfw--osx-window-deminiaturize rgfw--osx-window-miniaturize
+           rgfw--osx-window-became-key rgfw--osx-window-resign-key
+           rgfw--osx-did-window-resize rgfw--osx-window-move
+           rgfw--osx-draw-rect rgfw--osx-mouse-entered rgfw--osx-mouse-exited
+           rgfw--osx-key-down rgfw--osx-key-up rgfw--osx-flags-changed
+           rgfw--osx-mouse-moved rgfw--osx-mouse-down rgfw--osx-mouse-up
+           rgfw--osx-scroll-wheel)
+          (ftype (function ((unsigned-byte 32)) single-float)
+           rgfw-osx-get-fallback-refresh-rate)
+          (ftype (function ((unsigned-byte 32)) t)
+           rgfw-get-ns-screen-for-display-u-int)
+          (ftype (function ((unsigned-byte 32) t) single-float)
+           rgfw-osx-get-refresh-rate))
+ (defun c-array-to-ns-array (array len)
+   (%with-native-frame nil
+    (%call-pointer
+     (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+     :pointer
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer (objc-get-class (%literal "NSArray")) :pointer
+      (sel-register-name (%literal "alloc")) :pointer)
+     :pointer (sel-register-name (%literal "initWithObjects:count:"))
+     :pointer array :unsigned-long len :pointer)))
+ ;; C2LISP [storage]
+
+ (defun cstr-to-ns-string-array (strs len)
+   (let ((nstrs
+          (or %static-2
+              (setf %static-2
+                      (let ((%temporary-1 (%allocate 48)))
+                        %temporary-1))))
+         (i 0))
+     (setf i 0)
+     (loop :while (< i len)
+           :do (%store (%offset nstrs (* i 8)) :pointer
+                (ns-string-string-with-utf8string
+                 (%load (%offset strs (* i +c-size-pointer+))
+                  :string-pointer))) (setf i
+                                             (%c-expression-to-size-t
+                                              (+ (%c-expression-to-size-t i)
+                                                 1))))
+     nstrs))
+ (defun n-sregister-for-dragged-types (view new-types len)
+   (%with-native-frame nil
+    (progn
+     (let ((ntypes 0) (array 0))
+       (setf ntypes (cstr-to-ns-string-array new-types len)
+             array (c-array-to-ns-array ntypes len))
+       (%call-pointer
+        (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+        nil :pointer view :pointer
+        (sel-register-name (%literal "registerForDraggedTypes:")) :pointer
+        array :void)
+       (%call-pointer
+        (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+        nil :pointer array :pointer (sel-register-name (%literal "release"))
+        :void))
+     nil)))
+ (defun ns-bitmap-image-rep-bitmap-data (image-rep)
+   (%with-native-frame nil
+    (%call-pointer
+     (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+     :pointer image-rep :pointer (sel-register-name (%literal "bitmapData"))
+     :pointer)))
+ (defun ns-bitmap-image-rep-init-with-bitmap-data
+        (planes width height bps spp alpha is-planar color-space-name
+         bitmap-format row-bytes pixel-bits)
+   (%with-native-frame nil
+    (%with-string-inputs (color-space-name)
+     (let ((func
+            (sel-register-name
+             (%literal
+              "initWithBitmapDataPlanes:pixelsWide:pixelsHigh:bitsPerSample:samplesPerPixel:hasAlpha:isPlanar:colorSpaceName:bitmapFormat:bytesPerRow:bitsPerPixel:"))))
+       (%call-pointer
+        (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+        nil :pointer
+        (%call-pointer
+         (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+         nil :pointer (objc-get-class (%literal "NSBitmapImageRep")) :pointer
+         (sel-register-name (%literal "alloc")) :pointer)
+        :pointer func :pointer planes :long width :long height :long bps
+        :long spp :uint8 alpha :uint8 is-planar :pointer
+        (ns-string-string-with-utf8string color-space-name) :unsigned-long
+        bitmap-format :long row-bytes :long pixel-bits :pointer)))))
+ (defun ns-color-color-with-srgb (red green blue alpha)
+   (%with-native-frame nil
+    (let ((nsclass 0) (func 0))
+      (setf nsclass (objc-get-class (%literal "NSColor"))
+            func
+              (sel-register-name
+               (%literal "colorWithSRGBRed:green:blue:alpha:")))
+      (%call-pointer
+       (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+       nil :pointer nsclass :pointer func :double red :double green :double
+       blue :double alpha :pointer))))
+ (defun ns-cursor-arrow-str (str)
+   (%with-native-frame nil
+    (%with-string-inputs (str)
+     (let ((nclass 0) (func 0) (mouse 0))
+       (setf nclass (objc-get-class (%literal "NSCursor"))
+             func (sel-register-name str)
+             mouse
+               (%call-pointer
+                (cffi:pointer-address
+                 (cffi:foreign-symbol-pointer "objc_msgSend"))
+                nil :pointer nclass :pointer func :pointer))
+       (%call-pointer
+        (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+        nil :pointer mouse :pointer (sel-register-name (%literal "retain"))
+        :void)
+       mouse))))
+ (defun ns-paste-board-declare-types (|pasteboard| new-types len owner)
+   (%with-native-frame nil
+    (let ((ntypes 0) (func 0) (array 0) (output 0))
+      (setf ntypes (cstr-to-ns-string-array new-types len)
+            func (sel-register-name (%literal "declareTypes:owner:"))
+            array (c-array-to-ns-array ntypes len)
+            output
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer |pasteboard| :pointer func :pointer array
+               :pointer owner :long))
+      (%call-pointer
+       (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+       nil :pointer array :pointer (sel-register-name (%literal "release"))
+       :void)
+      output)))
+ (defun ns-pasteboard-general-pasteboard ()
+   (%with-native-frame nil
+    (%call-pointer
+     (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+     :pointer (objc-get-class (%literal "NSPasteboard")) :pointer
+     (sel-register-name (%literal "generalPasteboard")) :pointer)))
+ ;; C2LISP [storage]
+
+ (defun ns-pasteboard-string-for-type (|pasteboard| data-type len)
+   (%with-native-frame nil
+    (%with-string-inputs (data-type)
+     (let ((func 0) (nsstr 0) (|nsString| 0) (str 0))
+       (setf func (sel-register-name (%literal "stringForType:"))
+             nsstr (ns-string-string-with-utf8string data-type)
+             |nsString|
+               (%call-pointer
+                (cffi:pointer-address
+                 (cffi:foreign-symbol-pointer "objc_msgSend"))
+                nil :pointer |pasteboard| :pointer func :pointer nsstr
+                :pointer)
+             str (ns-string-to-char |nsString|))
+       (when (not (%pointer-equal len 0))
+         (%store len +c-code-size-t+
+          (%call-pointer
+           (cffi:pointer-address
+            (cffi:foreign-symbol-pointer "objc_msgSend"))
+           nil :pointer |nsString| :pointer
+           (sel-register-name
+            (%literal "maximumLengthOfBytesUsingEncoding:"))
+           :int32 4 :unsigned-long)))
+       str)))))
+#+(:and :darwin :x86-64)
+(progn
+ ;; C source (RGFW.h:13664-13684):
+;; 0 means is alpha last (RGBA, CMYKA, etc.)
+;; 0 means is premultiplied
+;; 0 is integer
+;; x86 just uses abi_objc_msgSend_fpret and (NSColor *)objc_msgSend_id respectively
+)
+#+(:and :darwin :arm64)
+(progn
+ ;; C source (RGFW.h:13664-13683):
+;; 0 means is alpha last (RGBA, CMYKA, etc.)
+;; 0 means is premultiplied
+;; 0 is integer
+;; ARM just uses objc_msgSend
+;; __i386__
+)
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ (defun ns-string-string-with-utf8string (str)
+   (%with-native-frame nil
+    (%with-string-inputs (str)
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer (objc-get-class (%literal "NSString")) :pointer
+      (sel-register-name (%literal "stringWithUTF8String:")) :pointer str
+      :pointer))))
+ (defun ns-string-to-char (str)
+   (%with-native-frame nil
+    (%call-pointer
+     (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+     :pointer str :pointer (sel-register-name (%literal "UTF8String"))
+     :pointer)))
+ (defun rgfw--osx-accepts-first-mouse (self -cmd event) self -cmd event 1)
+ (defun rgfw--osx-accepts-first-responder (self -cmd) self -cmd 1)
+ ;; C source (RGFW.h:14108):
+;; NSTerminateCancel
+;; C2LISP [storage]
+
+ (defun rgfw--osx-application-should-terminate (self -cmd sender)
+   (%with-native-frame nil
+    (let ((windows 0) (count 0))
+      self
+      -cmd
+      sender
+      (setf windows
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer (%rgfw-info-ns-app (%load -rgfw :pointer))
+               :pointer (sel-register-name (%literal "windows")) :pointer)
+            count
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer windows :pointer
+               (sel-register-name (%literal "count")) :unsigned-long))
+      (let ((i 0))
+        (loop :while (< i count)
+              :do (let ((window 0) (delegate 0))
+                    (setf window
+                            (%call-pointer
+                             (cffi:pointer-address
+                              (cffi:foreign-symbol-pointer "objc_msgSend"))
+                             nil :pointer windows :pointer
+                             (sel-register-name (%literal "objectAtIndex:"))
+                             :int32 (%c-unsigned-long-to-int i) :pointer)
+                          delegate
+                            (%call-pointer
+                             (cffi:pointer-address
+                              (cffi:foreign-symbol-pointer "objc_msgSend"))
+                             nil :pointer window :pointer
+                             (sel-register-name (%literal "delegate"))
+                             :pointer))
+                    (%call-pointer
+                     (cffi:pointer-address
+                      (cffi:foreign-symbol-pointer "objc_msgSend"))
+                     nil :pointer delegate :pointer
+                     (sel-register-name (%literal "windowShouldClose:"))
+                     :pointer window :void)) (setf i
+                                                     (%c-expression-to-unsigned-long
+                                                      (+
+                                                       (%c-expression-to-unsigned-long
+                                                        i)
+                                                       1)))))
+      0)))
+ (defun rgfw--osx-can-become-key-window (self -cmd) self -cmd 1)
+ (defun rgfw--osx-can-become-main-window (self -cmd) self -cmd 1)
+ ;; C source (RGFW.h:13808-13810):
+;; 	End of cocoa wrapper
+;; C2LISP [storage]
+
+ (defun rgfw--osx-custom-init-with-rgfw-window (self -cmd win)
+   (%with-native-frame nil
+    (let ((s (%allocate-local 16)))
+      -cmd
+      (%fill s 0 16)
+      (setf (%objc-super-receiver s) self
+            (%objc-super-super-class s)
+              (class-get-superclass (object-get-class self))
+            self
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSendSuper"))
+               nil :pointer s :pointer (sel-register-name (%literal "init"))
+               :pointer))
+      (when (%pointer-equal self 0)
+        (return-from rgfw--osx-custom-init-with-rgfw-window 0))
+      (rgfw-osx-init-view win self)
+      self)))
+ (defun rgfw--osx-did-change-screen-parameters (self -cmd notification)
+   self
+   -cmd
+   notification
+   (rgfw-poll-monitors)
+   nil)
+ ;; C2LISP [storage]
+)
+#+(:and :darwin :x86-64)
+(defun rgfw--osx-did-window-resize (self -cmd notification)
+  (%with-native-frame nil
+   (progn
+    (let* ((win (%allocate-local +c-size-pointer+))
+           (frame (%allocate-local 32))
+           (mon 0)
+           (%size (%address-cg-rect-size frame)))
+      -cmd
+      notification
+      (%store win :pointer 0)
+      (object-get-instance-variable self (%literal "RGFW_window") win)
+      (when (%pointer-equal (%load win :pointer) 0)
+        (return-from rgfw--osx-did-window-resize nil))
+      (if (not
+           (%zero-p
+            (%rgfw-window-src-view
+             (%address-rgfw-window-src (%load win :pointer)))))
+          (%copy frame
+           (%call-pointer
+            (cffi:pointer-address
+             (cffi:foreign-symbol-pointer "objc_msgSend_stret"))
+            nil :pointer
+            (%rgfw-window-src-view
+             (%address-rgfw-window-src (%load win :pointer)))
+            :pointer (sel-register-name (%literal "frame"))
+            (:struct %abi-struct-2))
+           32)
+          (return-from rgfw--osx-did-window-resize nil))
+      (when
+          (or (= (%cg-size-width %size) 0.0d0)
+              (= (%cg-size-height %size) 0.0d0))
+        (return-from rgfw--osx-did-window-resize nil))
+      (setf (%rgfw-window-w (%load win :pointer))
+              (%c-cg-float-to-i32 (%cg-size-width %size))
+            (%rgfw-window-h (%load win :pointer))
+              (%c-cg-float-to-i32 (%cg-size-height %size))
+            mon (rgfw-window-get-monitor (%load win :pointer)))
+      (when (%pointer-equal mon 0)
+        (return-from rgfw--osx-did-window-resize nil))
+      (cond
+       ((= (rgfw-window-is-maximized (%load win :pointer)) 1)
+        (rgfw-window-maximized-callback (%load win :pointer) 0 0
+         (%rgfw-window-w (%load win :pointer))
+         (%rgfw-window-h (%load win :pointer))))
+       ((not
+         (%zero-p
+          (%c-expression-to-u32
+           (logand
+            (%rgfw-window-internal-flags
+             (%address-rgfw-window-internal (%load win :pointer)))
+            1024))))
+        (rgfw-window-restored-callback (%load win :pointer)
+         (%rgfw-window-x (%load win :pointer))
+         (%rgfw-window-y (%load win :pointer))
+         (%rgfw-window-w (%load win :pointer))
+         (%rgfw-window-h (%load win :pointer)))))
+      (rgfw-window-resized-callback (%load win :pointer)
+       (%rgfw-window-w (%load win :pointer))
+       (%rgfw-window-h (%load win :pointer))))
+    nil)))
+#+(:and :darwin :arm64)
+(defun rgfw--osx-did-window-resize (self -cmd notification)
+  (%with-native-frame nil
+   (progn
+    (let* ((win (%allocate-local +c-size-pointer+))
+           (frame (%allocate-local 32))
+           (mon 0)
+           (%size (%address-cg-rect-size frame)))
+      -cmd
+      notification
+      (%store win :pointer 0)
+      (object-get-instance-variable self (%literal "RGFW_window") win)
+      (when (%pointer-equal (%load win :pointer) 0)
+        (return-from rgfw--osx-did-window-resize nil))
+      (if (not
+           (%zero-p
+            (%rgfw-window-src-view
+             (%address-rgfw-window-src (%load win :pointer)))))
+          (%copy frame
+           (%call-pointer
+            (cffi:pointer-address
+             (cffi:foreign-symbol-pointer "objc_msgSend"))
+            nil :pointer
+            (%rgfw-window-src-view
+             (%address-rgfw-window-src (%load win :pointer)))
+            :pointer (sel-register-name (%literal "frame"))
+            (:struct %abi-struct-2))
+           32)
+          (return-from rgfw--osx-did-window-resize nil))
+      (when
+          (or (= (%cg-size-width %size) 0.0d0)
+              (= (%cg-size-height %size) 0.0d0))
+        (return-from rgfw--osx-did-window-resize nil))
+      (setf (%rgfw-window-w (%load win :pointer))
+              (%c-cg-float-to-i32 (%cg-size-width %size))
+            (%rgfw-window-h (%load win :pointer))
+              (%c-cg-float-to-i32 (%cg-size-height %size))
+            mon (rgfw-window-get-monitor (%load win :pointer)))
+      (when (%pointer-equal mon 0)
+        (return-from rgfw--osx-did-window-resize nil))
+      (cond
+       ((= (rgfw-window-is-maximized (%load win :pointer)) 1)
+        (rgfw-window-maximized-callback (%load win :pointer) 0 0
+         (%rgfw-window-w (%load win :pointer))
+         (%rgfw-window-h (%load win :pointer))))
+       ((not
+         (%zero-p
+          (%c-expression-to-u32
+           (logand
+            (%rgfw-window-internal-flags
+             (%address-rgfw-window-internal (%load win :pointer)))
+            1024))))
+        (rgfw-window-restored-callback (%load win :pointer)
+         (%rgfw-window-x (%load win :pointer))
+         (%rgfw-window-y (%load win :pointer))
+         (%rgfw-window-w (%load win :pointer))
+         (%rgfw-window-h (%load win :pointer)))))
+      (rgfw-window-resized-callback (%load win :pointer)
+       (%rgfw-window-w (%load win :pointer))
+       (%rgfw-window-h (%load win :pointer))))
+    nil)))
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ ;; C2LISP [storage]
+
+ (defun rgfw--osx-dragging-ended (self sel sender)
+   (%with-native-frame nil
+    (let ((win (%allocate-local +c-size-pointer+)) (p (make-%value-cg-point)))
+      (declare (common-lisp:type %value-cg-point p)
+               (dynamic-extent p))
+      sel
+      (%store win :pointer 0)
+      (object-get-instance-variable self (%literal "RGFW_window") win)
+      (when (%pointer-equal (%load win :pointer) 0)
+        (return-from rgfw--osx-dragging-ended nil))
+      (when
+          (%zero-p
+           (%c-expression-to-rgfw-event-flag
+            (logand
+             (%rgfw-window-internal-enabled-events
+              (%address-rgfw-window-internal (%load win :pointer)))
+             2097152)))
+        (return-from rgfw--osx-dragging-ended nil))
+      (let ((%temporary-1
+             (%call-pointer
+              (cffi:pointer-address
+               (cffi:foreign-symbol-pointer "objc_msgSend"))
+              nil :pointer sender :pointer
+              (sel-register-name (%literal "draggingLocation"))
+              (:struct %abi-struct-1))))
+        (setf (%value-cg-point-x p) (%load %temporary-1 :double)
+              (%value-cg-point-y p) (%load (%offset %temporary-1 8) :double))
+        %temporary-1)
+      (rgfw-data-drag-callback (%load win :pointer) 2 3
+       (%c-cg-float-to-i32 (%value-cg-point-x p))
+       (%c-cg-float-to-i32
+        (- (coerce (%rgfw-window-h (%load win :pointer)) 'double-float)
+           (%value-cg-point-y p))))
+      nil)))
+ ;; C2LISP [storage]
+
+ (defun rgfw--osx-dragging-entered (self sel sender)
+   (%with-native-frame nil
+    (let ((win (%allocate-local +c-size-pointer+)) (p (make-%value-cg-point)))
+      (declare (common-lisp:type %value-cg-point p)
+               (dynamic-extent p))
+      sel
+      (%store win :pointer 0)
+      (object-get-instance-variable self (%literal "RGFW_window") win)
+      (when (%pointer-equal (%load win :pointer) 0)
+        (return-from rgfw--osx-dragging-entered 0))
+      (let ((%temporary-1
+             (%call-pointer
+              (cffi:pointer-address
+               (cffi:foreign-symbol-pointer "objc_msgSend"))
+              nil :pointer sender :pointer
+              (sel-register-name (%literal "draggingLocation"))
+              (:struct %abi-struct-1))))
+        (setf (%value-cg-point-x p) (%load %temporary-1 :double)
+              (%value-cg-point-y p) (%load (%offset %temporary-1 8) :double))
+        %temporary-1)
+      (rgfw-data-drag-callback (%load win :pointer) 2 1
+       (%c-cg-float-to-i32 (%value-cg-point-x p))
+       (%c-cg-float-to-i32
+        (- (coerce (%rgfw-window-h (%load win :pointer)) 'double-float)
+           (%value-cg-point-y p))))
+      1)))
+ ;; C2LISP [storage]
+
+ (defun rgfw--osx-dragging-updated (self sel sender)
+   (%with-native-frame nil
+    (let ((win (%allocate-local +c-size-pointer+)) (p (make-%value-cg-point)))
+      (declare (common-lisp:type %value-cg-point p)
+               (dynamic-extent p))
+      sel
+      (%store win :pointer 0)
+      (object-get-instance-variable self (%literal "RGFW_window") win)
+      (when (%pointer-equal (%load win :pointer) 0)
+        (return-from rgfw--osx-dragging-updated 0))
+      (when
+          (%zero-p
+           (%c-expression-to-rgfw-event-flag
+            (logand
+             (%rgfw-window-internal-enabled-events
+              (%address-rgfw-window-internal (%load win :pointer)))
+             2097152)))
+        (return-from rgfw--osx-dragging-updated 1))
+      (let ((%temporary-1
+             (%call-pointer
+              (cffi:pointer-address
+               (cffi:foreign-symbol-pointer "objc_msgSend"))
+              nil :pointer sender :pointer
+              (sel-register-name (%literal "draggingLocation"))
+              (:struct %abi-struct-1))))
+        (setf (%value-cg-point-x p) (%load %temporary-1 :double)
+              (%value-cg-point-y p) (%load (%offset %temporary-1 8) :double))
+        %temporary-1)
+      (rgfw-data-drag-callback (%load win :pointer) 2 2
+       (%c-cg-float-to-i32 (%value-cg-point-x p))
+       (%c-cg-float-to-i32
+        (- (coerce (%rgfw-window-h (%load win :pointer)) 'double-float)
+           (%value-cg-point-y p))))
+      1)))
+ ;; C2LISP [storage]
+
+ (defun rgfw--osx-draw-rect (self -cmd rect)
+   (%with-native-frame nil
+    (let* ((%temporary-1 0)
+           (%temporary-2 0)
+           (%temporary-3 (%allocate-local 32))
+           (%size (%address-cg-rect-size %temporary-3)))
+      (setf %temporary-1 self
+            %temporary-2 -cmd)
+      (%copy %temporary-3 rect 32)
+      (let ((win (%allocate-local +c-size-pointer+)) (y 0.0))
+        %temporary-3
+        %temporary-2
+        (%store win :pointer 0)
+        (object-get-instance-variable %temporary-1 (%literal "RGFW_window")
+         win)
+        (when (%pointer-equal (%load win :pointer) 0)
+          (return-from rgfw--osx-draw-rect nil))
+        (setf y
+                (rgfw-cocoa-y-transform
+                 (coerce (- (%cg-size-height %size) 1.0d0) 'single-float)))
+        (rgfw-window-refresh-callback (%load win :pointer)
+         (%c-cg-float-to-i32
+          (%cg-point-x (%address-cg-rect-origin %temporary-3)))
+         (%c-float-to-i32 y) (%c-cg-float-to-i32 (%cg-size-width %size))
+         (%c-cg-float-to-i32 (%cg-size-height %size))))
+      nil)))
+ ;; C2LISP [storage]
+
+ (defun rgfw--osx-flags-changed (self -cmd event)
+   (%with-native-frame nil
+    (progn
+     (let ((win (%allocate-local +c-size-pointer+))
+           (value 0)
+           (pressed 0)
+           (flags 0)
+           (i 0))
+       -cmd
+       (%store win :pointer 0)
+       (object-get-instance-variable self (%literal "RGFW_window") win)
+       (when (%pointer-equal (%load win :pointer) 0)
+         (return-from rgfw--osx-flags-changed nil))
+       (setf value 0
+             pressed 0
+             flags
+               (%call-pointer
+                (cffi:pointer-address
+                 (cffi:foreign-symbol-pointer "objc_msgSend"))
+                nil :pointer event :pointer
+                (sel-register-name (%literal "modifierFlags")) :uint32))
+       (rgfw-key-update-key-mods-ex (%load win :pointer)
+        (%c-expression-to-rgfw-bool
+         (rem (%c-expression-to-u32 (logand flags 65536)) 255))
+        (%c-expression-to-rgfw-bool
+         (rem (%c-expression-to-u32 (logand flags 2097152)) 255))
+        (%c-expression-to-rgfw-bool
+         (rem (%c-expression-to-u32 (logand flags 262144)) 255))
+        (%c-expression-to-rgfw-bool
+         (rem (%c-expression-to-u32 (logand flags 524288)) 255))
+        (%c-expression-to-rgfw-bool
+         (rem (%c-expression-to-u32 (logand flags 131072)) 255))
+        (%c-expression-to-rgfw-bool
+         (rem (%c-expression-to-u32 (logand flags 1048576)) 255))
+        0)
+       (setf i 0)
+       (loop :while (< i 9)
+             :do (setf (%rgfw-key-state-prev
+                        (%offset
+                         (%address-rgfw-info-keyboard (%load -rgfw :pointer))
+                         (* (+ i 153) 2)))
+                         (%rgfw-key-state-current
+                          (%offset
+                           (%address-rgfw-info-keyboard
+                            (%load -rgfw :pointer))
+                           (* (+ i 153) 2)))) (setf i
+                                                      (%c-int-to-u8
+                                                       (+ i 1))))
+       (setf i 0)
+       (loop :while (< i 5)
+             :do (let ((shift 0) (key 0))
+                   (setf shift (%c-int-to-u32 (ash 1 (+ i 16)))
+                         key (%c-int-to-rgfw-key (+ i 153)))
+                   (when
+                       (and
+                        (not
+                         (%zero-p
+                          (%c-expression-to-u32 (logand flags shift))))
+                        (%zero-p (rgfw-is-key-down key)))
+                     (setf pressed 1
+                           value key)
+                     (return))
+                   (when
+                       (and
+                        (%zero-p (%c-expression-to-u32 (logand flags shift)))
+                        (not (%zero-p (rgfw-is-key-down key))))
+                     (setf pressed 0
+                           value key)
+                     (return))) (setf i (%c-int-to-u8 (+ i 1))))
+       (rgfw-key-callback (%load win :pointer) value
+        (%rgfw-window-internal-mod
+         (%address-rgfw-window-internal (%load win :pointer)))
+        (%c-expression-to-rgfw-bool
+         (if (and (not (%zero-p (rgfw-is-key-down value)))
+                  (not (%zero-p pressed)))
+             1
+             0))
+        pressed)
+       (when (/= value 153)
+         (rgfw-key-callback (%load win :pointer)
+          (%c-int-to-rgfw-key (+ value 4))
+          (%rgfw-window-internal-mod
+           (%address-rgfw-window-internal (%load win :pointer)))
+          (%c-expression-to-rgfw-bool
+           (if (and
+                (not
+                 (%zero-p
+                  (rgfw-is-key-down (%c-int-to-rgfw-key (+ value 4)))))
+                (not (%zero-p pressed)))
+               1
+               0))
+          pressed)))
+     nil)))
+ ;; C2LISP [storage]
+
+ (defun rgfw--osx-key-down (self -cmd event)
+   (%with-native-frame nil
+    (progn
+     (let ((win (%allocate-local +c-size-pointer+))
+           (key 0)
+           (value 0)
+           (repeat 0)
+           (|nsstring| 0)
+           (string 0)
+           (count 0))
+       -cmd
+       (%store win :pointer 0)
+       (object-get-instance-variable self (%literal "RGFW_window") win)
+       (when
+           (or (%pointer-equal (%load win :pointer) 0)
+               (%zero-p
+                (%c-expression-to-rgfw-event-flag
+                 (logand
+                  (%rgfw-window-internal-enabled-events
+                   (%address-rgfw-window-internal (%load win :pointer)))
+                  2))))
+         (return-from rgfw--osx-key-down nil))
+       (setf key
+               (%c-u16-to-u32
+                (%c-u32-to-u16
+                 (%call-pointer
+                  (cffi:pointer-address
+                   (cffi:foreign-symbol-pointer "objc_msgSend"))
+                  nil :pointer event :pointer
+                  (sel-register-name (%literal "keyCode")) :uint32)))
+             value (rgfw-api-key-to-rgfw key)
+             repeat (rgfw-is-key-down value))
+       (rgfw-key-callback (%load win :pointer) value
+        (%rgfw-window-internal-mod
+         (%address-rgfw-window-internal (%load win :pointer)))
+        repeat 1)
+       (setf |nsstring|
+               (%call-pointer
+                (cffi:pointer-address
+                 (cffi:foreign-symbol-pointer "objc_msgSend"))
+                nil :pointer event :pointer
+                (sel-register-name (%literal "charactersIgnoringModifiers"))
+                :pointer)
+             string (ns-string-to-char |nsstring|)
+             count
+               (%c-int-to-size-t
+                (%call-pointer
+                 (cffi:pointer-address
+                  (cffi:foreign-symbol-pointer "objc_msgSend"))
+                 nil :pointer |nsstring| :pointer
+                 (sel-register-name (%literal "length")) :int32)))
+       (let ((index (%allocate-local +c-size-size-t+)))
+         (%store index +c-code-size-t+ 0)
+         (loop :while (< (%load index +c-code-size-t+) count)
+               :do (rgfw-key-char-callback (%load win :pointer)
+                    (rgfw-decode-utf8
+                     (%offset string (* (%load index +c-code-size-t+) 1))
+                     index)))))
+     nil)))
+ ;; C2LISP [storage]
+
+ (defun rgfw--osx-key-up (self -cmd event)
+   (%with-native-frame nil
+    (progn
+     (let ((win (%allocate-local +c-size-pointer+)) (key 0) (value 0))
+       -cmd
+       (%store win :pointer 0)
+       (object-get-instance-variable self (%literal "RGFW_window") win)
+       (when
+           (or (%pointer-equal (%load win :pointer) 0)
+               (%zero-p
+                (%c-expression-to-rgfw-event-flag
+                 (logand
+                  (%rgfw-window-internal-enabled-events
+                   (%address-rgfw-window-internal (%load win :pointer)))
+                  4))))
+         (return-from rgfw--osx-key-up nil))
+       (setf key
+               (%c-u16-to-u32
+                (%c-u32-to-u16
+                 (%call-pointer
+                  (cffi:pointer-address
+                   (cffi:foreign-symbol-pointer "objc_msgSend"))
+                  nil :pointer event :pointer
+                  (sel-register-name (%literal "keyCode")) :uint32)))
+             value (rgfw-api-key-to-rgfw key))
+       (rgfw-key-callback (%load win :pointer) value
+        (%rgfw-window-internal-mod
+         (%address-rgfw-window-internal (%load win :pointer)))
+        0 0))
+     nil)))
+ ;; C2LISP [storage]
+
+ (defun rgfw--osx-mouse-down (self -cmd event)
+   (%with-native-frame nil
+    (progn
+     (let ((win (%allocate-local +c-size-pointer+))
+           (button-number 0)
+           (value 0))
+       -cmd
+       (%store win :pointer 0)
+       (object-get-instance-variable self (%literal "RGFW_window") win)
+       (when (%pointer-equal (%load win :pointer) 0)
+         (return-from rgfw--osx-mouse-down nil))
+       (setf button-number
+               (%call-pointer
+                (cffi:pointer-address
+                 (cffi:foreign-symbol-pointer "objc_msgSend"))
+                nil :pointer event :pointer
+                (sel-register-name (%literal "buttonNumber")) :uint32)
+             value 0)
+       (case button-number
+         (0 (setf value 0))
+         (1 (setf value 2))
+         (2 (setf value 1))
+         (t (setf value (%c-u32-to-u8 button-number))))
+       (rgfw-mouse-button-callback (%load win :pointer) value 1))
+     nil)))
+ ;; C2LISP [storage]
+
+ (defun rgfw--osx-mouse-entered (self -cmd event)
+   (%with-native-frame nil
+    (progn
+     (let ((win (%allocate-local +c-size-pointer+))
+           (p (make-%value-cg-point)))
+       (declare (common-lisp:type %value-cg-point p)
+                (dynamic-extent p))
+       -cmd
+       (%store win :pointer 0)
+       (object-get-instance-variable self (%literal "RGFW_window") win)
+       (when (%pointer-equal (%load win :pointer) 0)
+         (return-from rgfw--osx-mouse-entered nil))
+       (let ((%temporary-1
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer event :pointer
+               (sel-register-name (%literal "locationInWindow"))
+               (:struct %abi-struct-1))))
+         (setf (%value-cg-point-x p) (%load %temporary-1 :double)
+               (%value-cg-point-y p)
+                 (%load (%offset %temporary-1 8) :double))
+         %temporary-1)
+       (rgfw-mouse-notify-callback (%load win :pointer)
+        (%c-cg-float-to-i32 (%value-cg-point-x p))
+        (%c-cg-float-to-i32
+         (- (coerce (%rgfw-window-h (%load win :pointer)) 'double-float)
+            (%value-cg-point-y p)))
+        1))
+     nil)))
+ ;; C2LISP [storage]
+
+ (defun rgfw--osx-mouse-exited (self -cmd event)
+   (%with-native-frame nil
+    (progn
+     (let ((win (%allocate-local +c-size-pointer+)))
+       -cmd
+       event
+       (%store win :pointer 0)
+       (object-get-instance-variable self (%literal "RGFW_window") win)
+       (when (%pointer-equal (%load win :pointer) 0)
+         (return-from rgfw--osx-mouse-exited nil))
+       (rgfw-mouse-notify-callback (%load win :pointer)
+        (%rgfw-window-internal-last-mouse-x
+         (%address-rgfw-window-internal (%load win :pointer)))
+        (%rgfw-window-internal-last-mouse-y
+         (%address-rgfw-window-internal (%load win :pointer)))
+        0))
+     nil)))
+ ;; C2LISP [storage]
+)
+#+(:and :darwin :x86-64)
+(defun rgfw--osx-mouse-moved (self -cmd event)
+  (%with-native-frame nil
+   (progn
+    (let ((win (%allocate-local +c-size-pointer+))
+          (p (make-%value-cg-point))
+          (vec-x 0.0d0)
+          (vec-y 0.0d0))
+      (declare (common-lisp:type %value-cg-point p)
+               (dynamic-extent p))
+      -cmd
+      (%store win :pointer 0)
+      (object-get-instance-variable self (%literal "RGFW_window") win)
+      (when (%pointer-equal (%load win :pointer) 0)
+        (return-from rgfw--osx-mouse-moved nil))
+      (let ((%temporary-1
+             (%call-pointer
+              (cffi:pointer-address
+               (cffi:foreign-symbol-pointer "objc_msgSend"))
+              nil :pointer event :pointer
+              (sel-register-name (%literal "locationInWindow"))
+              (:struct %abi-struct-1))))
+        (setf (%value-cg-point-x p) (%load %temporary-1 :double)
+              (%value-cg-point-y p) (%load (%offset %temporary-1 8) :double))
+        %temporary-1)
+      (setf vec-x
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend_fpret"))
+               nil :pointer event :pointer
+               (sel-register-name (%literal "deltaX")) :double)
+            vec-y
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend_fpret"))
+               nil :pointer event :pointer
+               (sel-register-name (%literal "deltaY")) :double))
+      (rgfw-mouse-motion-callback (%load win :pointer)
+       (%c-cg-float-to-i32 (%value-cg-point-x p))
+       (%c-cg-float-to-i32
+        (- (coerce (%rgfw-window-h (%load win :pointer)) 'double-float)
+           (%value-cg-point-y p))))
+      (rgfw-raw-motion-callback (%load win :pointer)
+       (coerce vec-x 'single-float) (coerce vec-y 'single-float)))
+    nil)))
+#+(:and :darwin :arm64)
+(defun rgfw--osx-mouse-moved (self -cmd event)
+  (%with-native-frame nil
+   (progn
+    (let ((win (%allocate-local +c-size-pointer+))
+          (p (make-%value-cg-point))
+          (vec-x 0.0d0)
+          (vec-y 0.0d0))
+      (declare (common-lisp:type %value-cg-point p)
+               (dynamic-extent p))
+      -cmd
+      (%store win :pointer 0)
+      (object-get-instance-variable self (%literal "RGFW_window") win)
+      (when (%pointer-equal (%load win :pointer) 0)
+        (return-from rgfw--osx-mouse-moved nil))
+      (let ((%temporary-1
+             (%call-pointer
+              (cffi:pointer-address
+               (cffi:foreign-symbol-pointer "objc_msgSend"))
+              nil :pointer event :pointer
+              (sel-register-name (%literal "locationInWindow"))
+              (:struct %abi-struct-1))))
+        (setf (%value-cg-point-x p) (%load %temporary-1 :double)
+              (%value-cg-point-y p) (%load (%offset %temporary-1 8) :double))
+        %temporary-1)
+      (setf vec-x
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer event :pointer
+               (sel-register-name (%literal "deltaX")) :double)
+            vec-y
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer event :pointer
+               (sel-register-name (%literal "deltaY")) :double))
+      (rgfw-mouse-motion-callback (%load win :pointer)
+       (%c-cg-float-to-i32 (%value-cg-point-x p))
+       (%c-cg-float-to-i32
+        (- (coerce (%rgfw-window-h (%load win :pointer)) 'double-float)
+           (%value-cg-point-y p))))
+      (rgfw-raw-motion-callback (%load win :pointer)
+       (coerce vec-x 'single-float) (coerce vec-y 'single-float)))
+    nil)))
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ ;; C2LISP [storage]
+
+ (defun rgfw--osx-mouse-up (self -cmd event)
+   (%with-native-frame nil
+    (progn
+     (let ((win (%allocate-local +c-size-pointer+))
+           (button-number 0)
+           (value 0))
+       -cmd
+       (%store win :pointer 0)
+       (object-get-instance-variable self (%literal "RGFW_window") win)
+       (when (%pointer-equal (%load win :pointer) 0)
+         (return-from rgfw--osx-mouse-up nil))
+       (setf button-number
+               (%call-pointer
+                (cffi:pointer-address
+                 (cffi:foreign-symbol-pointer "objc_msgSend"))
+                nil :pointer event :pointer
+                (sel-register-name (%literal "buttonNumber")) :uint32)
+             value 0)
+       (case button-number
+         (0 (setf value 0))
+         (1 (setf value 2))
+         (2 (setf value 1))
+         (t (setf value (%c-u32-to-u8 button-number))))
+       (rgfw-mouse-button-callback (%load win :pointer) value 0))
+     nil)))
+ ;; C source (RGFW.h:13974-13996):
+;; id pasteBoard = objc_msgSend_id(sender, sel_registerName("draggingPasteboard"));
+;; Get the types of data available on the pasteboard
+;; Get the string type for file URLs
+;; Check if the pasteboard contains file URLs
+;; } if (objc_msgSend_id_bool(propertyList, sel_registerName("isKindOfClass:"), objc_getClass("NSData"))) {
+;; C2LISP [storage]
+
+ (defun rgfw--osx-perform-drag-operation (self sel sender)
+   (%with-native-frame nil
+    (let ((win (%allocate-local +c-size-pointer+))
+          (|pasteBoard| 0)
+          (types 0)
+          (file-ur-ls-type 0)
+          (property-list 0)
+          (count 0)
+          (i 0))
+      sender
+      self
+      sel
+      (%store win :pointer 0)
+      (object-get-instance-variable self (%literal "RGFW_window") win)
+      (when
+          (or (%pointer-equal (%load win :pointer) 0)
+              (%zero-p
+               (%c-expression-to-rgfw-event-flag
+                (logand
+                 (%rgfw-window-internal-enabled-events
+                  (%address-rgfw-window-internal (%load win :pointer)))
+                 1048576))))
+        (return-from rgfw--osx-perform-drag-operation 0))
+      (setf |pasteBoard|
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer sender :pointer
+               (sel-register-name (%literal "draggingPasteboard")) :pointer)
+            types
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer |pasteBoard| :pointer
+               (sel-register-name (%literal "types")) :pointer)
+            file-ur-ls-type
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer (objc-get-class (%literal "NSString")) :pointer
+               (sel-register-name (%literal "stringWithUTF8String:"))
+               :pointer (%literal "NSFilenamesPboardType") :pointer))
+      (when
+          (=
+           (%call-pointer
+            (cffi:pointer-address
+             (cffi:foreign-symbol-pointer "objc_msgSend"))
+            nil :pointer types :pointer
+            (sel-register-name (%literal "containsObject:")) :pointer
+            file-ur-ls-type :int8)
+           0)
+        (rgfw-debug-callback 0 8
+         (%literal "No files found on the pasteboard."))
+        (return-from rgfw--osx-perform-drag-operation 0))
+      (setf property-list
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer |pasteBoard| :pointer
+               (sel-register-name (%literal "propertyListForType:")) :pointer
+               file-ur-ls-type :pointer))
+      (when
+          (not
+           (%zero-p
+            (%call-pointer
+             (cffi:pointer-address
+              (cffi:foreign-symbol-pointer "objc_msgSend"))
+             nil :pointer property-list :pointer
+             (sel-register-name (%literal "isKindOfClass:")) :pointer
+             (objc-get-class (%literal "NSString")) :int8)))
+        (let ((string-count 0) (file-path 0))
+          (setf string-count
+                  (%call-pointer
+                   (cffi:pointer-address
+                    (cffi:foreign-symbol-pointer "objc_msgSend"))
+                   nil :pointer property-list :pointer
+                   (sel-register-name (%literal "length")) :int32)
+                file-path
+                  (%call-pointer
+                   (cffi:pointer-address
+                    (cffi:foreign-symbol-pointer "objc_msgSend"))
+                   nil :pointer property-list :pointer
+                   (sel-register-name (%literal "UTF8String")) :pointer))
+          (rgfw-data-drop-callback (%load win :pointer) file-path
+           (%c-expression-to-size-t (+ (%c-int-to-size-t string-count) 1))
+           2)))
+      (when
+          (=
+           (%call-pointer
+            (cffi:pointer-address
+             (cffi:foreign-symbol-pointer "objc_msgSend"))
+            nil :pointer property-list :pointer
+            (sel-register-name (%literal "isKindOfClass:")) :pointer
+            (objc-get-class (%literal "NSArray")) :int8)
+           0)
+        (return-from rgfw--osx-perform-drag-operation 0))
+      (setf count
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer property-list :pointer
+               (sel-register-name (%literal "count")) :int32))
+      (when (= count 0) (return-from rgfw--osx-perform-drag-operation 0))
+      (setf i 0)
+      (loop :while (< i (%c-int-to-u32 count))
+            :do (let ((file-url 0) (file-path-2 0) (string-count-2 0))
+                  (setf file-url
+                          (%call-pointer
+                           (cffi:pointer-address
+                            (cffi:foreign-symbol-pointer "objc_msgSend"))
+                           nil :pointer property-list :pointer
+                           (sel-register-name (%literal "objectAtIndex:"))
+                           :int32 (%c-u32-to-int i) :pointer)
+                        file-path-2
+                          (%call-pointer
+                           (cffi:pointer-address
+                            (cffi:foreign-symbol-pointer "objc_msgSend"))
+                           nil :pointer file-url :pointer
+                           (sel-register-name (%literal "UTF8String"))
+                           :pointer)
+                        string-count-2
+                          (%call-pointer
+                           (cffi:pointer-address
+                            (cffi:foreign-symbol-pointer "objc_msgSend"))
+                           nil :pointer file-url :pointer
+                           (sel-register-name (%literal "length")) :int32))
+                  (rgfw-data-drop-callback (%load win :pointer) file-path-2
+                   (%c-expression-to-size-t
+                    (+ (%c-int-to-size-t string-count-2) 1))
+                   2)) (setf i
+                               (%c-expression-to-u32
+                                (+ (%c-expression-to-u32 i) 1))))
+      0)))
+ ;; C source (RGFW.h:13880):
+;; claim and emit consumed key combinations so they aren't missed (hack borrowed from GLFW (I'm not giving it back))
+;; C2LISP [storage]
+
+ (defun rgfw--osx-perform-key-equivalent (self -cmd event)
+   (%with-native-frame nil
+    (let ((win (%allocate-local +c-size-pointer+))
+          (key 0)
+          (value 0)
+          (flags 0)
+          (repeat 0)
+          (s (%allocate-local 16)))
+      -cmd
+      (%store win :pointer 0)
+      (object-get-instance-variable self (%literal "RGFW_window") win)
+      (when (%pointer-equal (%load win :pointer) 0)
+        (return-from rgfw--osx-perform-key-equivalent 1))
+      (setf key
+              (%c-u16-to-u32
+               (%c-u32-to-u16
+                (%call-pointer
+                 (cffi:pointer-address
+                  (cffi:foreign-symbol-pointer "objc_msgSend"))
+                 nil :pointer event :pointer
+                 (sel-register-name (%literal "keyCode")) :uint32)))
+            value (rgfw-api-key-to-rgfw key)
+            flags
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer event :pointer
+               (sel-register-name (%literal "modifierFlags")) :uint32))
+      (rgfw-key-update-key-mods-ex (%load win :pointer)
+       (%c-expression-to-rgfw-bool
+        (rem (%c-expression-to-u32 (logand flags 65536)) 255))
+       (%c-expression-to-rgfw-bool
+        (rem (%c-expression-to-u32 (logand flags 2097152)) 255))
+       (%c-expression-to-rgfw-bool
+        (rem (%c-expression-to-u32 (logand flags 262144)) 255))
+       (%c-expression-to-rgfw-bool
+        (rem (%c-expression-to-u32 (logand flags 524288)) 255))
+       (%c-expression-to-rgfw-bool
+        (rem (%c-expression-to-u32 (logand flags 131072)) 255))
+       (%c-expression-to-rgfw-bool
+        (rem (%c-expression-to-u32 (logand flags 1048576)) 255))
+       0)
+      (setf repeat (rgfw-is-key-down value))
+      (when
+          (not
+           (%zero-p
+            (logand
+             (%rgfw-window-internal-mod
+              (%address-rgfw-window-internal (%load win :pointer)))
+             4)))
+        (when (or (= key 9) (= key 27))
+          (rgfw-key-callback (%load win :pointer) value
+           (%rgfw-window-internal-mod
+            (%address-rgfw-window-internal (%load win :pointer)))
+           repeat 1)
+          (return-from rgfw--osx-perform-key-equivalent 1)))
+      (when
+          (not
+           (%zero-p
+            (logand
+             (%rgfw-window-internal-mod
+              (%address-rgfw-window-internal (%load win :pointer)))
+             32)))
+        (when (= key 46)
+          (rgfw-key-callback (%load win :pointer) value
+           (%rgfw-window-internal-mod
+            (%address-rgfw-window-internal (%load win :pointer)))
+           repeat 1)
+          (return-from rgfw--osx-perform-key-equivalent 1)))
+      (%fill s 0 16)
+      (setf (%objc-super-receiver s) self
+            (%objc-super-super-class s)
+              (class-get-superclass (object-get-class self)))
+      (%c-builtin-bool-to-bool
+       (%call-pointer
+        (cffi:pointer-address
+         (cffi:foreign-symbol-pointer "objc_msgSendSuper"))
+        nil :pointer s :pointer
+        (sel-register-name (%literal "performKeyEquivalent:")) :pointer event
+        :uint8)))))
+ ;; C2LISP [storage]
+
+ (defun rgfw--osx-prepare-for-drag-operation (self)
+   (%with-native-frame nil
+    (let ((win (%allocate-local +c-size-pointer+)))
+      (%store win :pointer 0)
+      (object-get-instance-variable self (%literal "RGFW_window") win)
+      (when
+          (or (%pointer-equal (%load win :pointer) 0)
+              (%zero-p
+               (%c-expression-to-rgfw-event-flag
+                (logand
+                 (%rgfw-window-internal-enabled-events
+                  (%address-rgfw-window-internal (%load win :pointer)))
+                 1048576))))
+        (return-from rgfw--osx-prepare-for-drag-operation 1))
+      (when
+          (%zero-p
+           (%c-expression-to-u32
+            (logand
+             (%rgfw-window-internal-flags
+              (%address-rgfw-window-internal (%load win :pointer)))
+             4)))
+        (return-from rgfw--osx-prepare-for-drag-operation 0))
+      1)))
+ ;; C2LISP [storage]
+)
+#+(:and :darwin :x86-64)
+(defun rgfw--osx-scroll-wheel (self -cmd event)
+  (%with-native-frame nil
+   (progn
+    (let ((win (%allocate-local +c-size-pointer+))
+          (delta-x 0.0d0)
+          (delta-y 0.0d0))
+      -cmd
+      (%store win :pointer 0)
+      (object-get-instance-variable self (%literal "RGFW_window") win)
+      (when (%pointer-equal (%load win :pointer) 0)
+        (return-from rgfw--osx-scroll-wheel nil))
+      (setf delta-x
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend_fpret"))
+               nil :pointer event :pointer
+               (sel-register-name (%literal "scrollingDeltaX")) :double)
+            delta-y
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend_fpret"))
+               nil :pointer event :pointer
+               (sel-register-name (%literal "scrollingDeltaY")) :double))
+      (when
+          (not
+           (%zero-p
+            (%call-pointer
+             (cffi:pointer-address
+              (cffi:foreign-symbol-pointer "objc_msgSend"))
+             nil :pointer event :pointer
+             (sel-register-name (%literal "hasPreciseScrollingDeltas"))
+             :int8)))
+        (setf delta-x (* delta-x 0.1d0)
+              delta-y (* delta-y 0.1d0)))
+      (rgfw-mouse-scroll-callback (%load win :pointer)
+       (coerce delta-x 'single-float) (coerce delta-y 'single-float)))
+    nil)))
+#+(:and :darwin :arm64)
+(defun rgfw--osx-scroll-wheel (self -cmd event)
+  (%with-native-frame nil
+   (progn
+    (let ((win (%allocate-local +c-size-pointer+))
+          (delta-x 0.0d0)
+          (delta-y 0.0d0))
+      -cmd
+      (%store win :pointer 0)
+      (object-get-instance-variable self (%literal "RGFW_window") win)
+      (when (%pointer-equal (%load win :pointer) 0)
+        (return-from rgfw--osx-scroll-wheel nil))
+      (setf delta-x
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer event :pointer
+               (sel-register-name (%literal "scrollingDeltaX")) :double)
+            delta-y
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer event :pointer
+               (sel-register-name (%literal "scrollingDeltaY")) :double))
+      (when
+          (not
+           (%zero-p
+            (%call-pointer
+             (cffi:pointer-address
+              (cffi:foreign-symbol-pointer "objc_msgSend"))
+             nil :pointer event :pointer
+             (sel-register-name (%literal "hasPreciseScrollingDeltas"))
+             :int8)))
+        (setf delta-x (* delta-x 0.1d0)
+              delta-y (* delta-y 0.1d0)))
+      (rgfw-mouse-scroll-callback (%load win :pointer)
+       (coerce delta-x 'single-float) (coerce delta-y 'single-float)))
+    nil)))
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ ;; C2LISP [storage]
+
+ (defun rgfw--osx-update-layer (self -cmd)
+   (%with-native-frame nil
+    (progn
+     (let ((win (%allocate-local +c-size-pointer+)))
+       self
+       -cmd
+       (%store win :pointer 0)
+       (object-get-instance-variable self (%literal "RGFW_window") win)
+       (when (%pointer-equal (%load win :pointer) 0)
+         (return-from rgfw--osx-update-layer nil))
+       (rgfw-window-refresh-callback (%load win :pointer) 0 0
+        (%rgfw-window-w (%load win :pointer))
+        (%rgfw-window-h (%load win :pointer))))
+     nil)))
+ ;; C2LISP [storage]
+)
+#+(:and :darwin :x86-64)
+(defun rgfw--osx-update-tracking-areas (self -cmd)
+  (%with-native-frame nil
+   (progn
+    (let ((tracking-area (%allocate-local 8)) (s (%allocate-local 16)))
+      -cmd
+      (%store tracking-area :pointer 0)
+      (object-get-instance-variable self (%literal "trackingArea")
+       tracking-area)
+      (when (not (%pointer-equal (%load tracking-area :pointer) 0))
+        (%call-pointer
+         (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+         nil :pointer self :pointer
+         (sel-register-name (%literal "removeTrackingArea:")) :pointer
+         (%load tracking-area :pointer) :void)
+        (%call-pointer
+         (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+         nil :pointer (%load tracking-area :pointer) :pointer
+         (sel-register-name (%literal "release")) :void))
+      (%store tracking-area :pointer
+       (%call-pointer
+        (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+        nil :pointer
+        (%call-pointer
+         (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+         nil :pointer (objc-get-class (%literal "NSTrackingArea")) :pointer
+         (sel-register-name (%literal "alloc")) :pointer)
+        :pointer
+        (sel-register-name (%literal "initWithRect:options:owner:userInfo:"))
+        (:struct %abi-struct-2)
+        (%call-pointer
+         (cffi:pointer-address
+          (cffi:foreign-symbol-pointer "objc_msgSend_stret"))
+         nil :pointer self :pointer (sel-register-name (%literal "bounds"))
+         (:struct %abi-struct-2))
+        :unsigned-long
+        (%c-int-to-nsu-integer
+         (logior
+          (logior (logior (logior (logior (logior 1 32) 1024) 4) 512) 256)
+          128))
+        :pointer self :pointer 0 :pointer))
+      (object-set-instance-variable self (%literal "trackingArea")
+       (%load tracking-area :pointer))
+      (%call-pointer
+       (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+       nil :pointer self :pointer
+       (sel-register-name (%literal "addTrackingArea:")) :pointer
+       (%load tracking-area :pointer) :void)
+      (%fill s 0 16)
+      (setf (%objc-super-receiver s) self
+            (%objc-super-super-class s)
+              (class-get-superclass (object-get-class self)))
+      (%call-pointer
+       (cffi:pointer-address
+        (cffi:foreign-symbol-pointer "objc_msgSendSuper"))
+       nil :pointer s :pointer
+       (sel-register-name (%literal "updateTrackingAreas")) :void))
+    nil)))
+#+(:and :darwin :arm64)
+(defun rgfw--osx-update-tracking-areas (self -cmd)
+  (%with-native-frame nil
+   (progn
+    (let ((tracking-area (%allocate-local 8)) (s (%allocate-local 16)))
+      -cmd
+      (%store tracking-area :pointer 0)
+      (object-get-instance-variable self (%literal "trackingArea")
+       tracking-area)
+      (when (not (%pointer-equal (%load tracking-area :pointer) 0))
+        (%call-pointer
+         (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+         nil :pointer self :pointer
+         (sel-register-name (%literal "removeTrackingArea:")) :pointer
+         (%load tracking-area :pointer) :void)
+        (%call-pointer
+         (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+         nil :pointer (%load tracking-area :pointer) :pointer
+         (sel-register-name (%literal "release")) :void))
+      (%store tracking-area :pointer
+       (%call-pointer
+        (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+        nil :pointer
+        (%call-pointer
+         (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+         nil :pointer (objc-get-class (%literal "NSTrackingArea")) :pointer
+         (sel-register-name (%literal "alloc")) :pointer)
+        :pointer
+        (sel-register-name (%literal "initWithRect:options:owner:userInfo:"))
+        (:struct %abi-struct-2)
+        (%call-pointer
+         (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+         nil :pointer self :pointer (sel-register-name (%literal "bounds"))
+         (:struct %abi-struct-2))
+        :unsigned-long
+        (%c-int-to-nsu-integer
+         (logior
+          (logior (logior (logior (logior (logior 1 32) 1024) 4) 512) 256)
+          128))
+        :pointer self :pointer 0 :pointer))
+      (object-set-instance-variable self (%literal "trackingArea")
+       (%load tracking-area :pointer))
+      (%call-pointer
+       (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+       nil :pointer self :pointer
+       (sel-register-name (%literal "addTrackingArea:")) :pointer
+       (%load tracking-area :pointer) :void)
+      (%fill s 0 16)
+      (setf (%objc-super-receiver s) self
+            (%objc-super-super-class s)
+              (class-get-superclass (object-get-class self)))
+      (%call-pointer
+       (cffi:pointer-address
+        (cffi:foreign-symbol-pointer "objc_msgSendSuper"))
+       nil :pointer s :pointer
+       (sel-register-name (%literal "updateTrackingAreas")) :void))
+    nil)))
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ ;; C2LISP [storage]
+
+ (defun rgfw--osx-view-dealloc (self -cmd)
+   (%with-native-frame nil
+    (progn
+     (let ((super (%allocate-local 16))
+           (tracking-area (%allocate-local 8))
+           (marked-text (%allocate-local 8)))
+       -cmd
+       (%fill super 0 16)
+       (setf (%objc-super-receiver super) self
+             (%objc-super-super-class super)
+               (class-get-superclass (object-get-class self)))
+       (%store tracking-area :pointer 0)
+       (%store marked-text :pointer 0)
+       (object-get-instance-variable self (%literal "trackingArea")
+        tracking-area)
+       (object-get-instance-variable self (%literal "markedText")
+        marked-text)
+       (when (not (%pointer-equal (%load tracking-area :pointer) 0))
+         (%call-pointer
+          (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+          nil :pointer (%load tracking-area :pointer) :pointer
+          (sel-register-name (%literal "release")) :void))
+       (when (not (%pointer-equal (%load marked-text :pointer) 0))
+         (%call-pointer
+          (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+          nil :pointer (%load marked-text :pointer) :pointer
+          (sel-register-name (%literal "release")) :void))
+       (%call-pointer
+        (cffi:pointer-address
+         (cffi:foreign-symbol-pointer "objc_msgSendSuper"))
+        nil :pointer super :pointer (sel-register-name (%literal "dealloc"))
+        :void))
+     nil)))
+ ;; C2LISP [storage]
+
+ (defun rgfw--osx-view-did-change-backing-properties (self -cmd)
+   (%with-native-frame nil
+    (progn
+     (let ((win (%allocate-local +c-size-pointer+)) (mon 0))
+       -cmd
+       (%store win :pointer 0)
+       (object-get-instance-variable self (%literal "RGFW_window") win)
+       (when (%pointer-equal (%load win :pointer) 0)
+         (return-from rgfw--osx-view-did-change-backing-properties nil))
+       (setf mon (rgfw-window-get-monitor (%load win :pointer)))
+       (when (%pointer-equal mon 0)
+         (return-from rgfw--osx-view-did-change-backing-properties nil))
+       (rgfw-scale-updated-callback (%load win :pointer)
+        (%rgfw-monitor-scale-x mon) (%rgfw-monitor-scale-y mon)))
+     nil)))
+ (defun rgfw--osx-wants-update-layer (self -cmd) self -cmd 1)
+ ;; C2LISP [storage]
+
+ (defun rgfw--osx-window-became-key (self sel notification)
+   (%with-native-frame nil
+    (progn
+     (let ((win (%allocate-local +c-size-pointer+)))
+       sel
+       notification
+       (%store win :pointer 0)
+       (object-get-instance-variable self (%literal "RGFW_window") win)
+       (when (%pointer-equal (%load win :pointer) 0)
+         (return-from rgfw--osx-window-became-key nil))
+       (rgfw-window-focus-callback (%load win :pointer) 1))
+     nil)))
+ ;; C2LISP [storage]
+
+ (defun rgfw--osx-window-deminiaturize (self sel notification)
+   (%with-native-frame nil
+    (progn
+     (let ((win (%allocate-local +c-size-pointer+)))
+       sel
+       notification
+       (%store win :pointer 0)
+       (object-get-instance-variable self (%literal "RGFW_window") win)
+       (when (%pointer-equal (%load win :pointer) 0)
+         (return-from rgfw--osx-window-deminiaturize nil))
+       (rgfw-window-restored-callback (%load win :pointer)
+        (%rgfw-window-x (%load win :pointer))
+        (%rgfw-window-y (%load win :pointer))
+        (%rgfw-window-w (%load win :pointer))
+        (%rgfw-window-h (%load win :pointer))))
+     nil)))
+ ;; C2LISP [storage]
+
+ (defun rgfw--osx-window-miniaturize (self sel notification)
+   (%with-native-frame nil
+    (progn
+     (let ((win (%allocate-local +c-size-pointer+)))
+       sel
+       notification
+       (%store win :pointer 0)
+       (object-get-instance-variable self (%literal "RGFW_window") win)
+       (when (%pointer-equal (%load win :pointer) 0)
+         (return-from rgfw--osx-window-miniaturize nil))
+       (rgfw-window-minimized-callback (%load win :pointer)))
+     nil)))
+ ;; C2LISP [storage]
+)
+#+(:and :darwin :x86-64)
+(defun rgfw--osx-window-move (self sel notification)
+  (%with-native-frame nil
+   (progn
+    (let* ((win (%allocate-local +c-size-pointer+))
+           (frame (%allocate-local 32))
+           (content (%allocate-local 32))
+           (y 0.0)
+           (%origin (%address-cg-rect-origin content)))
+      sel
+      notification
+      (%store win :pointer 0)
+      (object-get-instance-variable self (%literal "RGFW_window") win)
+      (when (%pointer-equal (%load win :pointer) 0)
+        (return-from rgfw--osx-window-move nil))
+      (%copy frame
+       (%call-pointer
+        (cffi:pointer-address
+         (cffi:foreign-symbol-pointer "objc_msgSend_stret"))
+        nil :pointer
+        (%rgfw-window-src-window
+         (%address-rgfw-window-src (%load win :pointer)))
+        :pointer (sel-register-name (%literal "frame"))
+        (:struct %abi-struct-2))
+       32)
+      (%copy content
+       (%call-pointer
+        (cffi:pointer-address
+         (cffi:foreign-symbol-pointer "objc_msgSend_stret"))
+        nil :pointer
+        (%rgfw-window-src-window
+         (%address-rgfw-window-src (%load win :pointer)))
+        :pointer (sel-register-name (%literal "contentRectForFrameRect:"))
+        (:struct %abi-struct-2) frame (:struct %abi-struct-2))
+       32)
+      (setf y
+              (rgfw-cocoa-y-transform
+               (coerce
+                (-
+                 (+ (%cg-point-y %origin)
+                    (%cg-size-height (%address-cg-rect-size content)))
+                 1.0d0)
+                'single-float)))
+      (rgfw-window-moved-callback (%load win :pointer)
+       (%c-cg-float-to-i32 (%cg-point-x %origin)) (%c-float-to-i32 y)))
+    nil)))
+#+(:and :darwin :arm64)
+(defun rgfw--osx-window-move (self sel notification)
+  (%with-native-frame nil
+   (progn
+    (let* ((win (%allocate-local +c-size-pointer+))
+           (frame (%allocate-local 32))
+           (content (%allocate-local 32))
+           (y 0.0)
+           (%origin (%address-cg-rect-origin content)))
+      sel
+      notification
+      (%store win :pointer 0)
+      (object-get-instance-variable self (%literal "RGFW_window") win)
+      (when (%pointer-equal (%load win :pointer) 0)
+        (return-from rgfw--osx-window-move nil))
+      (%copy frame
+       (%call-pointer
+        (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+        nil :pointer
+        (%rgfw-window-src-window
+         (%address-rgfw-window-src (%load win :pointer)))
+        :pointer (sel-register-name (%literal "frame"))
+        (:struct %abi-struct-2))
+       32)
+      (%copy content
+       (%call-pointer
+        (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+        nil :pointer
+        (%rgfw-window-src-window
+         (%address-rgfw-window-src (%load win :pointer)))
+        :pointer (sel-register-name (%literal "contentRectForFrameRect:"))
+        (:struct %abi-struct-2) frame (:struct %abi-struct-2))
+       32)
+      (setf y
+              (rgfw-cocoa-y-transform
+               (coerce
+                (-
+                 (+ (%cg-point-y %origin)
+                    (%cg-size-height (%address-cg-rect-size content)))
+                 1.0d0)
+                'single-float)))
+      (rgfw-window-moved-callback (%load win :pointer)
+       (%c-cg-float-to-i32 (%cg-point-x %origin)) (%c-float-to-i32 y)))
+    nil)))
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ ;; C2LISP [storage]
+
+ (defun rgfw--osx-window-resign-key (self sel notification)
+   (%with-native-frame nil
+    (progn
+     (let ((win (%allocate-local +c-size-pointer+)))
+       sel
+       notification
+       (%store win :pointer 0)
+       (object-get-instance-variable self (%literal "RGFW_window") win)
+       (when (%pointer-equal (%load win :pointer) 0)
+         (return-from rgfw--osx-window-resign-key nil))
+       (rgfw-window-focus-callback (%load win :pointer) 0))
+     nil))))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux)))
 (progn
  ;; C source (RGFW.h:1045-1105):
 ;; ! @brief function pointer equivalent of void*
@@ -8009,9 +10507,10 @@
 (defun rgfw-api-key-to-rgfw (keycode)
   (when
       (> keycode
-         (%c-expression-to-size-t
-          (truncate (%c-expression-to-size-t 256)
-                    (%c-expression-to-size-t 1))))
+         (%c-size-t-to-u32
+          (%c-expression-to-size-t
+           (truncate (%c-expression-to-size-t 256)
+                     (%c-expression-to-size-t 1)))))
     (return-from rgfw-api-key-to-rgfw 0))
   (%load
    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer))
@@ -8033,8 +10532,21 @@
 (defun rgfw-api-key-to-rgfw (keycode)
   (when
       (> keycode
+         (%c-size-t-to-u32
+          (%c-expression-to-size-t
+           (truncate (%c-expression-to-size-t 512)
+                     (%c-expression-to-size-t 1)))))
+    (return-from rgfw-api-key-to-rgfw 0))
+  (%load
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer))
+    (* keycode 1))
+   1))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-api-key-to-rgfw (keycode)
+  (when
+      (> (%c-u32-to-size-t keycode)
          (%c-expression-to-size-t
-          (truncate (%c-expression-to-size-t 512)
+          (truncate (%c-expression-to-size-t 128)
                     (%c-expression-to-size-t 1))))
     (return-from rgfw-api-key-to-rgfw 0))
   (%load
@@ -8075,7 +10587,7 @@
 ;; C source (RGFW.h:4458):
 ;; check queued events
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-check-queued-event (event)
   (let ((ev 0))
     (setf (%rgfw-info-queue-events (%load -rgfw :pointer)) 1
@@ -8094,9 +10606,88 @@
       (%copy event ev 24)
       (return-from rgfw-check-queued-event 1))
     0))
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ ;; C2LISP [storage]
+)
+#+(:and :darwin :x86-64)
+(defun rgfw-cocoa-fetch-rect (win)
+  (%with-native-frame nil
+   (let* ((%src (%address-rgfw-window-src win))
+          (frame (%allocate-local 32))
+          (content (%allocate-local 32))
+          (%origin (%address-cg-rect-origin content))
+          (%size (%address-cg-rect-size content)))
+     (%copy frame
+      (%call-pointer
+       (cffi:pointer-address
+        (cffi:foreign-symbol-pointer "objc_msgSend_stret"))
+       nil :pointer (%rgfw-window-src-window %src) :pointer
+       (sel-register-name (%literal "frame")) (:struct %abi-struct-2))
+      32)
+     (%copy content
+      (%call-pointer
+       (cffi:pointer-address
+        (cffi:foreign-symbol-pointer "objc_msgSend_stret"))
+       nil :pointer (%rgfw-window-src-window %src) :pointer
+       (sel-register-name (%literal "contentRectForFrameRect:"))
+       (:struct %abi-struct-2) frame (:struct %abi-struct-2))
+      32)
+     (setf (%rgfw-window-x win) (%c-cg-float-to-i32 (%cg-point-x %origin))
+           (%rgfw-window-y win)
+             (%c-float-to-i32
+              (rgfw-cocoa-y-transform
+               (coerce
+                (- (+ (%cg-point-y %origin) (%cg-size-height %size)) 1.0d0)
+                'single-float)))
+           (%rgfw-window-w win) (%c-cg-float-to-i32 (%cg-size-width %size))
+           (%rgfw-window-h win) (%c-cg-float-to-i32 (%cg-size-height %size)))
+     nil)))
+#+(:and :darwin :arm64)
+(defun rgfw-cocoa-fetch-rect (win)
+  (%with-native-frame nil
+   (let* ((%src (%address-rgfw-window-src win))
+          (frame (%allocate-local 32))
+          (content (%allocate-local 32))
+          (%origin (%address-cg-rect-origin content))
+          (%size (%address-cg-rect-size content)))
+     (%copy frame
+      (%call-pointer
+       (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+       nil :pointer (%rgfw-window-src-window %src) :pointer
+       (sel-register-name (%literal "frame")) (:struct %abi-struct-2))
+      32)
+     (%copy content
+      (%call-pointer
+       (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+       nil :pointer (%rgfw-window-src-window %src) :pointer
+       (sel-register-name (%literal "contentRectForFrameRect:"))
+       (:struct %abi-struct-2) frame (:struct %abi-struct-2))
+      32)
+     (setf (%rgfw-window-x win) (%c-cg-float-to-i32 (%cg-point-x %origin))
+           (%rgfw-window-y win)
+             (%c-float-to-i32
+              (rgfw-cocoa-y-transform
+               (coerce
+                (- (+ (%cg-point-y %origin) (%cg-size-height %size)) 1.0d0)
+                'single-float)))
+           (%rgfw-window-w win) (%c-cg-float-to-i32 (%cg-size-width %size))
+           (%rgfw-window-h win) (%c-cg-float-to-i32 (%cg-size-height %size)))
+     nil)))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-cocoa-y-transform (y)
+  (%with-native-frame nil
+   (coerce
+    (-
+     (-
+      (%cg-size-height
+       (%address-cg-rect-size (cg-display-bounds (cg-main-display-id))))
+      (coerce y 'double-float))
+     1.0d0)
+    'single-float)))
 
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-convert-image-data64
        (dest-data src-data src-layout dest-layout count is64bit)
   (%with-native-frame nil
@@ -8177,7 +10768,7 @@
        (%fill rgba 0 4)
        (%store rgba 1 0)
        (setf i 0)
-       (loop :while (< i count)
+       (loop :while (< i (%c-size-t-to-u32 count))
              :do (let ((src-px 0) (dst-px 0))
                    (setf src-px
                            (%offset src-data
@@ -8247,7 +10838,7 @@
     nil)))
 
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-copy-image-data64
        (dest-data dest-w dest-h dest-format src-data src-format is64bit func)
   (%with-native-frame nil
@@ -8270,18 +10861,9 @@
        (if (or (not (%zero-p is64bit)) (%pointer-equal func 0))
            (rgfw-convert-image-data64 dest-data src-data src-layout
             dest-layout (%c-u32-to-size-t count) is64bit)
-           (let* ((*string-arguments* *string-arguments*)
-                  (%temporary-1 (%translated-function func)))
-             (if %temporary-1
-                 (funcall %temporary-1 dest-data src-data src-layout
-                          dest-layout (%c-u32-to-size-t count))
-                 (cffi:foreign-funcall-pointer
-                  (%native-argument-pointer func) nil :pointer
-                  (%native-argument-pointer dest-data) :pointer
-                  (%native-argument-pointer src-data) :pointer
-                  (%native-argument-pointer src-layout) :pointer
-                  (%native-argument-pointer dest-layout) :uint64
-                  (%c-u32-to-size-t count) :void)))))
+           (%call-pointer func nil :pointer dest-data :pointer src-data
+            :pointer src-layout :pointer dest-layout :size
+            (%c-u32-to-size-t count) :void)))
      nil))))
 #+(:or (:and :arm (:not :arm64) (:or :linux :freebsd))
    (:and :x86 (:not :x86-64) (:or :linux :windows :freebsd)))
@@ -8308,22 +10890,14 @@
                (= (%c-rgfw-convert-image-data-func-to-int func) 0))
            (rgfw-convert-image-data64 dest-data src-data src-layout
             dest-layout (%c-u32-to-size-t count) is64bit)
-           (let* ((*string-arguments* *string-arguments*)
-                  (%temporary-1 (%translated-function func)))
-             (if %temporary-1
-                 (funcall %temporary-1 dest-data src-data src-layout
-                          dest-layout (%c-u32-to-size-t count))
-                 (cffi:foreign-funcall-pointer
-                  (%native-argument-pointer func) nil :pointer
-                  (%native-argument-pointer dest-data) :pointer
-                  (%native-argument-pointer src-data) :pointer
-                  (%native-argument-pointer src-layout) :pointer
-                  (%native-argument-pointer dest-layout) :uint32
-                  (%c-u32-to-size-t count) :void)))))
+           (%call-pointer func nil :pointer dest-data :pointer src-data
+            :pointer src-layout :pointer dest-layout :size
+            (%c-u32-to-size-t count) :void)))
      nil))))
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux)))
 (progn
  ;; C source (RGFW.h:1267-1276):
 ;; @brief create a mouse icon from bitmap data (similar to RGFW_window_setIcon).
@@ -8348,59 +10922,8 @@
 ;;
 ;; @note The icon is not resized by default.
 )
-#+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
-(defun rgfw-create-mouse (data w h format)
-  (%with-native-frame nil
-   (%with-string-inputs (data)
-    (let ((native 0) (cursor 0))
-      (assert
-       (and (not (%zero-p (%load -rgfw :pointer)))
-            (not
-             (%zero-p
-              (%literal
-               "An RGFW context must be initialized using RGFW_init and/or set with RGFW_setInfo")))))
-      (assert (not (%zero-p data)))
-      (setf native
-              (let* ((*string-arguments* *string-arguments*)
-                     (%temporary-1 (%load xcursor-image-create-src :pointer))
-                     (%temporary-2 (%translated-function %temporary-1)))
-                (if %temporary-2
-                    (funcall %temporary-2 w h)
-                    (%string-result
-                     (cffi:pointer-address
-                      (cffi:foreign-funcall-pointer
-                       (%native-argument-pointer %temporary-1) nil :int32 w
-                       :int32 h :pointer)))))
-            (%-xcursor-image-xhot native) 0
-            (%-xcursor-image-yhot native) 0)
-      (%fill (%-xcursor-image-pixels native) 0
-       (%c-u32-to-size-t (%c-i32-to-u32 (ash (* w h) 2))))
-      (rgfw-copy-image-data (%-xcursor-image-pixels native) w h 4 data format
-       0)
-      (setf cursor
-              (let* ((*string-arguments* *string-arguments*)
-                     (%temporary-5
-                      (%load xcursor-image-load-cursor-src :pointer))
-                     (%temporary-6 (%translated-function %temporary-5)))
-                (if %temporary-6
-                    (funcall %temporary-6
-                             (%rgfw-info-display (%load -rgfw :pointer))
-                             native)
-                    (cffi:foreign-funcall-pointer
-                     (%native-argument-pointer %temporary-5) nil :pointer
-                     (%native-argument-pointer
-                      (%rgfw-info-display (%load -rgfw :pointer)))
-                     :pointer (%native-argument-pointer native) :uint64))))
-      (let* ((*string-arguments* *string-arguments*)
-             (%temporary-7 (%load xcursor-image-destroy-src :pointer))
-             (%temporary-8 (%translated-function %temporary-7)))
-        (if %temporary-8
-            (funcall %temporary-8 native)
-            (cffi:foreign-funcall-pointer
-             (%native-argument-pointer %temporary-7) nil :pointer
-             (%native-argument-pointer native) :void)))
-      (%c-cursor-to-pointer cursor)))))
-#+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+#+(:and
+   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
    (:or :freebsd :linux))
 (defun rgfw-create-mouse (data w h format)
   (%with-native-frame nil
@@ -8414,16 +10937,8 @@
                "An RGFW context must be initialized using RGFW_init and/or set with RGFW_setInfo")))))
       (assert (not (%zero-p data)))
       (setf native
-              (let* ((*string-arguments* *string-arguments*)
-                     (%temporary-1 (%load xcursor-image-create-src :pointer))
-                     (%temporary-2 (%translated-function %temporary-1)))
-                (if %temporary-2
-                    (funcall %temporary-2 w h)
-                    (%string-result
-                     (cffi:pointer-address
-                      (cffi:foreign-funcall-pointer
-                       (%native-argument-pointer %temporary-1) nil :int32 w
-                       :int32 h :pointer)))))
+              (%call-pointer (%load xcursor-image-create-src :pointer) nil
+               :int32 w :int32 h :pointer)
             (%-xcursor-image-xhot native) 0
             (%-xcursor-image-yhot native) 0)
       (%fill (%-xcursor-image-pixels native) 0
@@ -8431,33 +10946,105 @@
       (rgfw-copy-image-data (%-xcursor-image-pixels native) w h 4 data format
        0)
       (setf cursor
-              (let* ((*string-arguments* *string-arguments*)
-                     (%temporary-5
-                      (%load xcursor-image-load-cursor-src :pointer))
-                     (%temporary-6 (%translated-function %temporary-5)))
-                (if %temporary-6
-                    (funcall %temporary-6
-                             (%rgfw-info-display (%load -rgfw :pointer))
-                             native)
-                    (cffi:foreign-funcall-pointer
-                     (%native-argument-pointer %temporary-5) nil :pointer
-                     (%native-argument-pointer
-                      (%rgfw-info-display (%load -rgfw :pointer)))
-                     :pointer (%native-argument-pointer native) :uint32))))
-      (let* ((*string-arguments* *string-arguments*)
-             (%temporary-7 (%load xcursor-image-destroy-src :pointer))
-             (%temporary-8 (%translated-function %temporary-7)))
-        (if %temporary-8
-            (funcall %temporary-8 native)
-            (cffi:foreign-funcall-pointer
-             (%native-argument-pointer %temporary-7) nil :pointer
-             (%native-argument-pointer native) :void)))
+              (%call-pointer (%load xcursor-image-load-cursor-src :pointer)
+               nil :pointer (%rgfw-info-display (%load -rgfw :pointer))
+               :pointer native :unsigned-long))
+      (%call-pointer (%load xcursor-image-destroy-src :pointer) nil :pointer
+       native :void)
       (%c-cursor-to-pointer cursor)))))
 #+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
 (defun rgfw-create-mouse (data w h format)
   (%with-string-inputs (data)
    (let ((cursor (rgfw-load-handle-image data w h format 0)))
      cursor)))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-create-mouse (data w h format)
+  (%with-native-frame nil
+   (%with-string-inputs (data)
+    (let ((pool 0) (representation 0) (cursor-image 0) (cursor 0))
+      (setf pool
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer
+               (%call-pointer
+                (cffi:pointer-address
+                 (cffi:foreign-symbol-pointer "objc_msgSend"))
+                nil :pointer (objc-get-class (%literal "NSAutoreleasePool"))
+                :pointer (sel-register-name (%literal "alloc")) :pointer)
+               :pointer (sel-register-name (%literal "init")) :pointer))
+      (when (%pointer-equal data 0)
+        (%call-pointer
+         (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+         nil :pointer (ns-cursor-arrow-str (%literal "arrowCursor")) :pointer
+         (sel-register-name (%literal "set")) :void)
+        (%call-pointer
+         (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+         nil :pointer pool :pointer (sel-register-name (%literal "drain"))
+         :int8)
+        (return-from rgfw-create-mouse 0))
+      (setf representation
+              (ns-bitmap-image-rep-init-with-bitmap-data 0 w h 8 4 1 0
+               (%literal "NSCalibratedRGBColorSpace")
+               (%c-int-to-ns-bitmap-format 2) (ash w 2) 32))
+      (rgfw-copy-image-data (ns-bitmap-image-rep-bitmap-data representation)
+       w h 2 data format 0)
+      (setf cursor-image
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer
+               (%call-pointer
+                (cffi:pointer-address
+                 (cffi:foreign-symbol-pointer "objc_msgSend"))
+                nil :pointer (objc-get-class (%literal "NSImage")) :pointer
+                (sel-register-name (%literal "alloc")) :pointer)
+               :pointer (sel-register-name (%literal "initWithSize:"))
+               (:struct %abi-struct-0)
+               (let ((%temporary-1 (%allocate-local 16)))
+                 (%fill %temporary-1 0 16)
+                 (setf (%cg-size-width %temporary-1) (coerce w 'double-float)
+                       (%cg-size-height %temporary-1)
+                         (coerce h 'double-float))
+                 %temporary-1)
+               :pointer))
+      (%call-pointer
+       (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+       nil :pointer cursor-image :pointer
+       (sel-register-name (%literal "addRepresentation:")) :pointer
+       representation :void)
+      (setf cursor
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer
+               (%call-pointer
+                (cffi:pointer-address
+                 (cffi:foreign-symbol-pointer "objc_msgSend"))
+                nil :pointer (objc-get-class (%literal "NSCursor")) :pointer
+                (sel-register-name (%literal "alloc")) :pointer)
+               :pointer
+               (sel-register-name (%literal "initWithImage:hotSpot:"))
+               :pointer cursor-image (:struct %abi-struct-1)
+               (let ((%temporary-2 (%allocate-local 16)))
+                 (%fill %temporary-2 0 16)
+                 (setf (%cg-point-x %temporary-2) 0.0d0
+                       (%cg-point-y %temporary-2) 0.0d0)
+                 %temporary-2)
+               :pointer))
+      (%call-pointer
+       (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+       nil :pointer cursor-image :pointer
+       (sel-register-name (%literal "release")) :void)
+      (%call-pointer
+       (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+       nil :pointer representation :pointer
+       (sel-register-name (%literal "release")) :void)
+      (%call-pointer
+       (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+       nil :pointer pool :pointer (sel-register-name (%literal "drain"))
+       :int8)
+      cursor))))
 #+(:and
    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
    (:or :freebsd :linux))
@@ -8468,7 +11055,8 @@
 ;; @return A pointer to the newly loaded RGFW_mouse structure.
 ;; C2LISP [storage]
 )
-#+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (progn
  ;; C source (RGFW.h:1279-1283):
 ;; @brief create a standard mouse icon
@@ -8539,6 +11127,80 @@
             (%c-ulong-ptr-to-lpstr
              (%c-word-to-ulong-ptr (%c-u32-to-word mouse-icon))))
     (load-cursor-a 0 icon)))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-create-mouse-standard (mouse)
+  (case mouse
+    (0
+     (return-from rgfw-create-mouse-standard
+       (ns-cursor-arrow-str (%literal "arrowCursor"))))
+    (1
+     (return-from rgfw-create-mouse-standard
+       (ns-cursor-arrow-str (%literal "arrowCursor"))))
+    (2
+     (return-from rgfw-create-mouse-standard
+       (ns-cursor-arrow-str (%literal "IBeamCursor"))))
+    (3
+     (return-from rgfw-create-mouse-standard
+       (ns-cursor-arrow-str (%literal "crosshairCursor"))))
+    (4
+     (return-from rgfw-create-mouse-standard
+       (ns-cursor-arrow-str (%literal "pointingHandCursor"))))
+    (5
+     (return-from rgfw-create-mouse-standard
+       (ns-cursor-arrow-str (%literal "resizeLeftRightCursor"))))
+    (12
+     (return-from rgfw-create-mouse-standard
+       (ns-cursor-arrow-str (%literal "resizeLeftRightCursor"))))
+    (16
+     (return-from rgfw-create-mouse-standard
+       (ns-cursor-arrow-str (%literal "resizeLeftRightCursor"))))
+    (6
+     (return-from rgfw-create-mouse-standard
+       (ns-cursor-arrow-str (%literal "resizeUpDownCursor"))))
+    (10
+     (return-from rgfw-create-mouse-standard
+       (ns-cursor-arrow-str (%literal "resizeUpDownCursor"))))
+    (14
+     (return-from rgfw-create-mouse-standard
+       (ns-cursor-arrow-str (%literal "resizeUpDownCursor"))))
+    (7
+     (return-from rgfw-create-mouse-standard
+       (ns-cursor-arrow-str
+        (%literal "_windowResizeNorthWestSouthEastCursor"))))
+    (9
+     (return-from rgfw-create-mouse-standard
+       (ns-cursor-arrow-str
+        (%literal "_windowResizeNorthWestSouthEastCursor"))))
+    (13
+     (return-from rgfw-create-mouse-standard
+       (ns-cursor-arrow-str
+        (%literal "_windowResizeNorthWestSouthEastCursor"))))
+    (8
+     (return-from rgfw-create-mouse-standard
+       (ns-cursor-arrow-str
+        (%literal "_windowResizeNorthEastSouthWestCursor"))))
+    (11
+     (return-from rgfw-create-mouse-standard
+       (ns-cursor-arrow-str
+        (%literal "_windowResizeNorthEastSouthWestCursor"))))
+    (15
+     (return-from rgfw-create-mouse-standard
+       (ns-cursor-arrow-str
+        (%literal "_windowResizeNorthEastSouthWestCursor"))))
+    (17
+     (return-from rgfw-create-mouse-standard
+       (ns-cursor-arrow-str (%literal "openHandCursor"))))
+    (18
+     (return-from rgfw-create-mouse-standard
+       (ns-cursor-arrow-str (%literal "operationNotAllowedCursor"))))
+    (19
+     (return-from rgfw-create-mouse-standard
+       (ns-cursor-arrow-str (%literal "arrowCursor"))))
+    (20
+     (return-from rgfw-create-mouse-standard
+       (ns-cursor-arrow-str (%literal "arrowCursor"))))
+    (t (return-from rgfw-create-mouse-standard 0)))
+  0)
 
 ;; C source (RGFW.h:1221-1233):
 ;; @brief Creates a new surface from raw pixel data.
@@ -8665,6 +11327,18 @@
       (select-object (%rgfw-native-image-hdc-mem %native)
        (%rgfw-native-image-bitmap %native))
       1))))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-create-surface-ptr (data w h format surface)
+  (%with-string-inputs (data)
+   (let* ((%native (%address-rgfw-surface-native surface)))
+     (setf (%rgfw-surface-data surface) data
+           (%rgfw-surface-w surface) w
+           (%rgfw-surface-h surface) h
+           (%rgfw-surface-format surface) format
+           (%rgfw-native-image-format %native) 2
+           (%rgfw-native-image-buffer %native)
+             (%allocate (%c-i32-to-size-t (ash (* w h) 2))))
+     1)))
 #+(:and :windows (:or :x86-64 :arm64))
 (defun rgfw-create-utf8from-wide-string-win32 (source output max)
   (%with-string-inputs (output)
@@ -8713,7 +11387,7 @@
 ;;
 ;; NOTE: (windows) if the executable has an icon resource named RGFW_ICON, it will be set as the initial icon for the window
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-create-window (name x y w h flags)
   (%with-string-inputs (name)
    (let ((win (%allocate (%c-expression-to-size-t +c-size-rgfw-window+))))
@@ -8746,6 +11420,16 @@
 ;; for C++ / C89
 ;; C source (RGFW.h:12195):
 ;; so WM_GETMINMAXINFO gets called again
+;; C2LISP [storage]
+)
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ ;; C source (RGFW.h:3442-3456):
+;; RGFW_NATIVE_HEADER
+;; global private API
+;; for C++ / C89
+;; C source (RGFW.h:14710):
+;; RR Create an autorelease pool
 ;; C2LISP [storage]
 )
 #+(:and
@@ -8850,15 +11534,153 @@
       (when
           (not
            (%zero-p (%c-expression-to-rgfw-window-flags (logand flags 4))))
-        (let ((%temporary-10 (%address-rgfw-window-internal win)))
-          (setf (%rgfw-window-internal-flags %temporary-10)
-                  (%c-expression-to-u32
-                   (logior (%rgfw-window-internal-flags %temporary-10) 4))))
+        (with-accessors ((%flags %rgfw-window-internal-flags))
+             (%address-rgfw-window-internal win)
+           (setf %flags (%c-expression-to-u32 (logior %flags 4))))
         (rgfw-window-set-dnd win 1))
       (setf (%rgfw-window-src-hdc %src)
               (get-dc (%rgfw-window-src-window %src)))
       (rgfw-win32-make-window-dark-mode win (rgfw-win32-get-dark-mode-state))
       (rgfw-win32-make-window-transparent win)
+      win))))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-create-window-platform (name flags win)
+  (%with-native-frame nil
+   (%with-string-inputs (name)
+    (let* ((%src (%address-rgfw-window-src win))
+           (pool 0)
+           (window-rect (%allocate-local 32))
+           (mac-args 0)
+           (str 0)
+           (%origin (%address-cg-rect-origin window-rect))
+           (%size (%address-cg-rect-size window-rect)))
+      (setf pool
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer
+               (%call-pointer
+                (cffi:pointer-address
+                 (cffi:foreign-symbol-pointer "objc_msgSend"))
+                nil :pointer (objc-get-class (%literal "NSAutoreleasePool"))
+                :pointer (sel-register-name (%literal "alloc")) :pointer)
+               :pointer (sel-register-name (%literal "init")) :pointer))
+      (rgfw-window-set-mouse-default win)
+      (setf (%cg-point-x %origin) (coerce (%rgfw-window-x win) 'double-float)
+            (%cg-point-y %origin)
+              (coerce
+               (rgfw-cocoa-y-transform
+                (coerce (- (+ (%rgfw-window-y win) (%rgfw-window-h win)) 1)
+                        'single-float))
+               'double-float)
+            (%cg-size-width %size)
+              (coerce (%rgfw-window-w win) 'double-float)
+            (%cg-size-height %size)
+              (coerce (%rgfw-window-h win) 'double-float)
+            mac-args
+              (%c-int-to-ns-window-style-mask (logior (logior 2 4) 2)))
+      (when (%zero-p (%c-expression-to-rgfw-window-flags (logand flags 2)))
+        (setf mac-args
+                (%c-expression-to-ns-window-style-mask (logior mac-args 8))))
+      (if (%zero-p (%c-expression-to-rgfw-window-flags (logand flags 1)))
+          (setf mac-args
+                  (%c-expression-to-ns-window-style-mask
+                   (logior mac-args 1)))
+          (setf mac-args
+                  (%c-expression-to-ns-window-style-mask
+                   (logior mac-args 0))))
+      (let ((nsclass 0) (func 0))
+        (setf nsclass (objc-get-class (%literal "RGFWWindowClass"))
+              func
+                (sel-register-name
+                 (%literal "initWithContentRect:styleMask:backing:defer:"))
+              (%rgfw-window-src-window %src)
+                (%call-pointer
+                 (cffi:pointer-address
+                  (cffi:foreign-symbol-pointer "objc_msgSend"))
+                 nil :pointer
+                 (%call-pointer
+                  (cffi:pointer-address
+                   (cffi:foreign-symbol-pointer "objc_msgSend"))
+                  nil :pointer nsclass :pointer
+                  (sel-register-name (%literal "alloc")) :pointer)
+                 :pointer func (:struct %abi-struct-2) window-rect
+                 :unsigned-long mac-args :unsigned-long 2 :uint8 0
+                 :pointer)))
+      (setf str (ns-string-string-with-utf8string name))
+      (%call-pointer
+       (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+       nil :pointer (%rgfw-window-src-window %src) :pointer
+       (sel-register-name (%literal "setTitle:")) :pointer str :void)
+      (setf (%rgfw-window-src-delegate %src)
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer
+               (%call-pointer
+                (cffi:pointer-address
+                 (cffi:foreign-symbol-pointer "objc_msgSend"))
+                nil :pointer
+                (%rgfw-info-custom-window-delegate-class
+                 (%load -rgfw :pointer))
+                :pointer (sel-register-name (%literal "alloc")) :pointer)
+               :pointer (sel-register-name (%literal "init")) :pointer))
+      (object-set-instance-variable (%rgfw-window-src-delegate %src)
+       (%literal "RGFW_window") win)
+      (%call-pointer
+       (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+       nil :pointer (%rgfw-window-src-window %src) :pointer
+       (sel-register-name (%literal "setDelegate:")) :pointer
+       (%rgfw-window-src-delegate %src) :void)
+      (%call-pointer
+       (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+       nil :pointer (%rgfw-window-src-window %src) :pointer
+       (sel-register-name (%literal "setAcceptsMouseMovedEvents:")) :int8 1
+       :void)
+      (when
+          (not
+           (%zero-p (%c-expression-to-rgfw-window-flags (logand flags 32))))
+        (%call-pointer
+         (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+         nil :pointer (%rgfw-window-src-window %src) :pointer
+         (sel-register-name (%literal "setOpaque:")) :int8 0 :void)
+        (%call-pointer
+         (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+         nil :pointer (%rgfw-window-src-window %src) :pointer
+         (sel-register-name (%literal "setBackgroundColor:")) :pointer
+         (ns-color-color-with-srgb 0.0d0 0.0d0 0.0d0 0.0d0) :void))
+      (when
+          (not
+           (%zero-p (%c-expression-to-rgfw-window-flags (logand flags 4))))
+        (with-accessors ((%flags %rgfw-window-internal-flags))
+             (%address-rgfw-window-internal win)
+           (setf %flags (%c-expression-to-u32 (logior %flags 4)))))
+      (when (%pointer-equal (%rgfw-info-root (%load -rgfw :pointer)) 0)
+        (%call-pointer
+         (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+         nil :pointer (%rgfw-window-src-window %src) :pointer
+         (sel-register-name (%literal "makeMainWindow")) :void))
+      (setf (%rgfw-window-src-view %src)
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer
+               (%call-pointer
+                (cffi:pointer-address
+                 (cffi:foreign-symbol-pointer "objc_msgSend"))
+                nil :pointer
+                (%load
+                 (%address-rgfw-info-custom-view-classes
+                  (%load -rgfw :pointer))
+                 :pointer)
+                :pointer (sel-register-name (%literal "alloc")) :pointer)
+               :pointer (sel-register-name (%literal "initWithRGFWWindow:"))
+               :pointer win :pointer))
+      (rgfw-cocoa-fetch-rect win)
+      (%call-pointer
+       (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+       nil :pointer pool :pointer (sel-register-name (%literal "drain"))
+       :int8)
       win))))
 
 ;; C source (RGFW.h:1660-1670):
@@ -8879,7 +11701,7 @@
 ;; This is required so that way the user can create their own OpenGL context after RGFW_createWindow is used
 ;; if a window is created, CreateContext will delete the window and create a new one
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-create-window-ptr (name x y w h flags win)
   (%with-string-inputs (name)
    (let* ((%internal (%address-rgfw-window-internal win))
@@ -9093,7 +11915,7 @@
      nil)))
 
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-data-drop-callback (win data length data-type)
   (%with-native-frame nil
    (%with-string-inputs (data)
@@ -9135,19 +11957,12 @@
              (%offset (%address-rgfw-info-callbacks (%load -rgfw :pointer))
               (* (%rgfw-event-type event) +c-size-rgfw-generic-func+))
              :pointer)))
-        (let* ((*string-arguments* *string-arguments*)
-               (%temporary-11
-                (%load
-                 (%offset
-                  (%address-rgfw-info-callbacks (%load -rgfw :pointer))
-                  (* (%rgfw-event-type event) +c-size-rgfw-generic-func+))
-                 :pointer))
-               (%temporary-12 (%translated-function %temporary-11)))
-          (if %temporary-12
-              (funcall %temporary-12 event)
-              (cffi:foreign-funcall-pointer
-               (%native-argument-pointer %temporary-11) nil :pointer
-               (%native-argument-pointer event) :void))))
+        (%call-pointer
+         (%load
+          (%offset (%address-rgfw-info-callbacks (%load -rgfw :pointer))
+           (* (%rgfw-event-type event) +c-size-rgfw-generic-func+))
+          :pointer)
+         nil :pointer event :void))
       (when
           (or (= (%rgfw-info-queue-events (%load -rgfw :pointer)) 1)
               (not (%zero-p (%rgfw-info-dnd-build (%load -rgfw :pointer)))))
@@ -9220,19 +12035,12 @@
              (%offset (%address-rgfw-info-callbacks (%load -rgfw :pointer))
               (* (%rgfw-event-type event) +c-size-rgfw-generic-func+))
              :pointer)))
-        (let* ((*string-arguments* *string-arguments*)
-               (%temporary-11
-                (%load
-                 (%offset
-                  (%address-rgfw-info-callbacks (%load -rgfw :pointer))
-                  (* (%rgfw-event-type event) +c-size-rgfw-generic-func+))
-                 :pointer))
-               (%temporary-12 (%translated-function %temporary-11)))
-          (if %temporary-12
-              (funcall %temporary-12 event)
-              (cffi:foreign-funcall-pointer
-               (%native-argument-pointer %temporary-11) nil :pointer
-               (%native-argument-pointer event) :void))))
+        (%call-pointer
+         (%load
+          (%offset (%address-rgfw-info-callbacks (%load -rgfw :pointer))
+           (* (%rgfw-event-type event) +c-size-rgfw-generic-func+))
+          :pointer)
+         nil :pointer event :void))
       (when
           (or (= (%rgfw-info-queue-events (%load -rgfw :pointer)) 1)
               (not (%zero-p (%rgfw-info-dnd-build (%load -rgfw :pointer)))))
@@ -9284,19 +12092,14 @@
                 (not
                  (%zero-p
                   (%rgfw-info-debug-callback-src (%load -rgfw :pointer)))))
-         (let* ((*string-arguments* *string-arguments*)
-                (%temporary-4
-                 (%rgfw-info-debug-callback-src (%load -rgfw :pointer)))
-                (%temporary-5 (%translated-function %temporary-4)))
-           (if %temporary-5
-               (funcall %temporary-5 info)
-               (cffi:foreign-funcall-pointer
-                (%native-argument-pointer %temporary-4) nil :pointer
-                (%native-argument-pointer info) :void)))))
+         (%call-pointer
+          (%rgfw-info-debug-callback-src (%load -rgfw :pointer)) nil :pointer
+          info :void)))
      nil))))
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux)))
 (progn
  ;; C2LISP [storage]
 
@@ -9412,13 +12215,7 @@
    (when (not (%pointer-equal (%load rgfw-shcore-dll :pointer) 0))
      (free-library (%load rgfw-shcore-dll :pointer)))
    (%store rgfw-shcore-dll :pointer 0)
-   (let* ((*string-arguments* *string-arguments*)
-          (%temporary-1 (%load time-end-period-src :pointer))
-          (%temporary-2 (%translated-function %temporary-1)))
-     (if %temporary-2
-         (funcall %temporary-2 1)
-         (cffi:foreign-funcall-pointer
-          (%native-argument-pointer %temporary-1) nil :uint32 1 :uint32)))
+   (%call-pointer (%load time-end-period-src :pointer) nil :uint32 1 :uint32)
    (when (not (%pointer-equal (%load rgfw-winmm-dll :pointer) 0))
      (free-library (%load rgfw-winmm-dll :pointer)))
    (%store rgfw-winmm-dll :pointer 0)
@@ -9438,14 +12235,8 @@
    (when (/= (%c-hmodule-to-int (%load rgfw-shcore-dll :pointer)) 0)
      (free-library (%load rgfw-shcore-dll :pointer)))
    (%store rgfw-shcore-dll :pointer 0)
-   (let* ((*string-arguments* *string-arguments*)
-          (%temporary-1 (%load time-end-period-src :pointer))
-          (%temporary-2 (%translated-function %temporary-1)))
-     (if %temporary-2
-         (funcall %temporary-2 1)
-         (cffi:foreign-funcall-pointer
-          (%native-argument-pointer %temporary-1) (:convention :stdcall)
-          :uint32 1 :uint32)))
+   (%call-pointer (%load time-end-period-src :pointer) (:convention :stdcall)
+    :uint32 1 :uint32)
    (when (/= (%c-hmodule-to-int (%load rgfw-winmm-dll :pointer)) 0)
      (free-library (%load rgfw-winmm-dll :pointer)))
    (%store rgfw-winmm-dll :pointer 0)
@@ -9459,12 +12250,77 @@
    (when (not (%zero-p (%rgfw-info-hidden-mouse (%load -rgfw :pointer))))
      (rgfw-free-mouse (%rgfw-info-hidden-mouse (%load -rgfw :pointer))))
    nil))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-deinit-platform ()
+  (%with-native-frame nil
+   (when (not (%zero-p (%rgfw-info-ns-app (%load -rgfw :pointer))))
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer (%rgfw-info-ns-app (%load -rgfw :pointer)) :pointer
+      (sel-register-name (%literal "setDelegate:")) :pointer 0 :void)
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer (%rgfw-info-custom-ns-app-delegate (%load -rgfw :pointer))
+      :pointer (sel-register-name (%literal "release")) :void)
+     (setf (%rgfw-info-custom-ns-app-delegate (%load -rgfw :pointer)) 0)
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer (%rgfw-info-ns-app (%load -rgfw :pointer)) :pointer
+      (sel-register-name (%literal "stop:")) :pointer 0 :void)
+     (setf (%rgfw-info-ns-app (%load -rgfw :pointer)) 0))
+   (when
+       (not
+        (%pointer-equal
+         (%rgfw-info-custom-ns-app-delegate (%load -rgfw :pointer)) 0))
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer (%rgfw-info-custom-ns-app-delegate (%load -rgfw :pointer))
+      :pointer (sel-register-name (%literal "release")) :void))
+   (setf (%rgfw-info-custom-ns-app-delegate (%load -rgfw :pointer)) 0)
+   (when
+       (not
+        (%pointer-equal
+         (%load
+          (%address-rgfw-info-custom-view-classes (%load -rgfw :pointer))
+          :pointer)
+         0))
+     (objc-dispose-class-pair
+      (%load (%address-rgfw-info-custom-view-classes (%load -rgfw :pointer))
+       :pointer)))
+   (when
+       (not
+        (%pointer-equal
+         (%load
+          (%offset
+           (%address-rgfw-info-custom-view-classes (%load -rgfw :pointer))
+           +c-size-pointer+)
+          :pointer)
+         0))
+     (objc-dispose-class-pair
+      (%load
+       (%offset
+        (%address-rgfw-info-custom-view-classes (%load -rgfw :pointer))
+        +c-size-pointer+)
+       :pointer)))
+   (when
+       (not
+        (%zero-p
+         (%rgfw-info-custom-window-delegate-class (%load -rgfw :pointer))))
+     (objc-dispose-class-pair
+      (%rgfw-info-custom-window-delegate-class (%load -rgfw :pointer))))
+   (when
+       (not
+        (%zero-p
+         (%rgfw-info-custom-ns-app-delegate-class (%load -rgfw :pointer))))
+     (objc-dispose-class-pair
+      (%rgfw-info-custom-ns-app-delegate-class (%load -rgfw :pointer))))
+   nil))
 
 ;; C source (RGFW.h:1140-1143):
 ;; @brief Deinitializes a specific RGFW instance stored in the provided RGFW_info pointer.
 ;; @param info A pointer to the RGFW_info structure representing the instance to deinitialize.
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-deinit-ptr (info)
   (when (%pointer-equal info 0) (return-from rgfw-deinit-ptr nil))
   (rgfw-set-info info)
@@ -9550,9 +12406,9 @@
             (%offset (%address-rgfw-info-events (%load -rgfw :pointer))
              (* (%rgfw-info-event-bottom (%load -rgfw :pointer))
                 +c-size-rgfw-event+)))
-    (let ((%temporary-1 (%load -rgfw :pointer)))
-      (setf (%rgfw-info-event-len %temporary-1)
-              (- (%rgfw-info-event-len %temporary-1) 1)))
+    (with-accessors ((%event-len %rgfw-info-event-len))
+         (%load -rgfw :pointer)
+       (setf %event-len (- %event-len 1)))
     (setf (%rgfw-info-event-bottom (%load -rgfw :pointer))
             (rem (+ (%rgfw-info-event-bottom (%load -rgfw :pointer)) 1) 32))
     ev))
@@ -9561,7 +12417,7 @@
 ;; @brief Pushes an event into the standard RGFW event queue.
 ;; @param event A pointer to the RGFW_event to be added to the queue.
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-event-queue-push (event)
   (let ((event-top 0))
     (when (= (%rgfw-info-queue-events (%load -rgfw :pointer)) 0)
@@ -9578,9 +12434,9 @@
              (+ (%rgfw-info-event-bottom (%load -rgfw :pointer))
                 (%rgfw-info-event-len (%load -rgfw :pointer)))
              32))
-    (let ((%temporary-1 (%load -rgfw :pointer)))
-      (setf (%rgfw-info-event-len %temporary-1)
-              (+ (%rgfw-info-event-len %temporary-1) 1)))
+    (with-accessors ((%event-len %rgfw-info-event-len))
+         (%load -rgfw :pointer)
+       (setf %event-len (+ %event-len 1)))
     (%copy
      (%offset (%address-rgfw-info-events (%load -rgfw :pointer))
       (* event-top +c-size-rgfw-event+))
@@ -9604,9 +12460,9 @@
              (+ (%rgfw-info-event-bottom (%load -rgfw :pointer))
                 (%rgfw-info-event-len (%load -rgfw :pointer)))
              32))
-    (let ((%temporary-1 (%load -rgfw :pointer)))
-      (setf (%rgfw-info-event-len %temporary-1)
-              (+ (%rgfw-info-event-len %temporary-1) 1)))
+    (with-accessors ((%event-len %rgfw-info-event-len))
+         (%load -rgfw :pointer)
+       (setf %event-len (+ %event-len 1)))
     (%copy
      (%offset (%address-rgfw-info-events (%load -rgfw :pointer))
       (* event-top +c-size-rgfw-event+))
@@ -9629,18 +12485,12 @@
            (%offset (%address-rgfw-info-callbacks (%load -rgfw :pointer))
             (* (%rgfw-event-type event) +c-size-rgfw-generic-func+))
            :pointer)))
-      (let* ((*string-arguments* *string-arguments*)
-             (%temporary-1
-              (%load
-               (%offset (%address-rgfw-info-callbacks (%load -rgfw :pointer))
-                (* (%rgfw-event-type event) +c-size-rgfw-generic-func+))
-               :pointer))
-             (%temporary-2 (%translated-function %temporary-1)))
-        (if %temporary-2
-            (funcall %temporary-2 event)
-            (cffi:foreign-funcall-pointer
-             (%native-argument-pointer %temporary-1) nil :pointer
-             (%native-argument-pointer event) :void))))
+      (%call-pointer
+       (%load
+        (%offset (%address-rgfw-info-callbacks (%load -rgfw :pointer))
+         (* (%rgfw-event-type event) +c-size-rgfw-generic-func+))
+        :pointer)
+       nil :pointer event :void))
     (rgfw-event-queue-push event)
     nil)))
 
@@ -9668,7 +12518,7 @@
 ;; C source (RGFW.h:1441-1443):
 ;; @brief free all leftlover monitor data (this is called internally RGFW_deinit)
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-free-monitors ()
   (let ((node
          (%rgfw-monitor-list-head
@@ -9700,7 +12550,8 @@
 ;; @param mouse A pointer to the RGFW_mouse to free.
 ;; C2LISP [storage]
 )
-#+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (progn
  ;; C source (RGFW.h:1286-1289):
 ;; @brief Frees the data associated with an RGFW_mouse structure.
@@ -9719,6 +12570,15 @@
   (assert (not (%zero-p mouse)))
   (destroy-cursor mouse)
   nil)
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-free-mouse (mouse)
+  (%with-native-frame nil
+   (progn
+    (assert (not (%zero-p mouse)))
+    (%call-pointer
+     (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+     :pointer mouse :pointer (sel-register-name (%literal "release")) :void)
+    nil)))
 
 ;; C source (RGFW.h:1189-1192):
 ;; @brief Retrieves the current Wayland display connection.
@@ -9733,7 +12593,8 @@
 ;; @return A pointer to the X11 display, or NULL if the platform is not in use.
 ;; C2LISP [storage]
 )
-#+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (progn
  ;; C source (RGFW.h:1183-1186):
 ;; @brief Retrieves the current X11 display connection.
@@ -9743,7 +12604,8 @@
    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
    (:or :freebsd :linux))
 (defun rgfw-get-display-x11 () (%rgfw-info-display (%load -rgfw :pointer)))
-#+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (defun rgfw-get-display-x11 () 0)
 
 ;; C source (RGFW.h:2281-2286):
@@ -9780,6 +12642,26 @@
      (when (not (%zero-p x)) (%store x -4 (%c-long-to-i32 (%tag-point-x p))))
      (when (not (%zero-p y)) (%store y -4 (%c-long-to-i32 (%tag-point-y p))))
      1)))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-get-global-mouse (x y)
+  (%with-native-frame nil
+   (let ((e 0) (point (make-%value-cg-point)))
+     (declare (common-lisp:type %value-cg-point point)
+              (dynamic-extent point))
+     (assert
+      (not (%pointer-equal (%rgfw-info-root (%load -rgfw :pointer)) 0)))
+     (setf e (cg-event-create 0))
+     (let ((%temporary-1 (cg-event-get-location e)))
+       (setf (%value-cg-point-x point) (%load %temporary-1 :double)
+             (%value-cg-point-y point)
+               (%load (%offset %temporary-1 8) :double))
+       %temporary-1)
+     (cf-release e)
+     (when (not (%zero-p x))
+       (%store x -4 (%c-cg-float-to-i32 (%value-cg-point-x point))))
+     (when (not (%zero-p y))
+       (%store y -4 (%c-cg-float-to-i32 (%value-cg-point-y point))))
+     1)))
 
 ;; C source (RGFW.h:1152-1155):
 ;; @brief Retrieves the global RGFW_info structure pointer.
@@ -9790,14 +12672,26 @@
 ;; C source (RGFW.h:1177-1180):
 ;; @brief Retrieves the current Cocoa layer (macOS only).
 ;; @return A pointer to the Cocoa layer, or NULL if the platform is not in use.
+#+(:or
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (defun rgfw-get-layer-osx () 0)
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-get-layer-osx ()
+  (%with-native-frame nil
+   (%call-pointer
+    (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+    :pointer (objc-get-class (%literal "CAMetalLayer")) :pointer
+    (sel-register-name (%literal "layer")) :pointer)))
 
 ;; C source (RGFW.h:1446-1450):
 ;; @brief Allocates and returns an array of all available monitors.
 ;; @param len [OUTPUT] A pointer to store the number of monitors found.
 ;; @return An allocated array of pointers to RGFW_monitor structures that must be freed.
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-get-monitors (len)
   (%with-native-frame nil
    (let ((count (%allocate-local +c-size-size-t+)) (monitors 0))
@@ -9856,7 +12750,7 @@
 ;; @param len [OUTPUT] A pointer to store the number of monitors found, if max is not zero and monitors is not NULL, length will be set to max.
 ;; @return An array of pointers to RGFW_monitor structures or NULL if the function failed.
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-get-monitors-ptr (max monitors len)
   (let ((i 0) (cur-node 0))
     (assert (not (%pointer-equal monitors 0)))
@@ -9931,7 +12825,7 @@
 ;; @param X [OUTPUT] a pointer for the output X value
 ;; @param Y [OUTPUT] a pointer for the output Y value
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-get-mouse-scroll (x y)
   (assert (not (%pointer-equal (%load -rgfw :pointer) 0)))
   (when (not (%zero-p x))
@@ -9954,7 +12848,7 @@
 ;; @param X [OUTPUT] a pointer for the output X vector value
 ;; @param Y [OUTPUT] a pointer for the output Y vector value
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-get-mouse-vector (x y)
   (assert (not (%pointer-equal (%load -rgfw :pointer) 0)))
   (when (not (%zero-p x))
@@ -9971,12 +12865,76 @@
   (when (not (%zero-p y))
     (%store y :float (%rgfw-info-vector-y (%load -rgfw :pointer))))
   nil)
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-get-ns-screen-for-display-u-int (uint-num)
+  (%with-native-frame nil
+   (let ((ns-screen-class 0) (screens 0) (count 0) (i 0))
+     (setf ns-screen-class (objc-get-class (%literal "NSScreen"))
+           screens
+             (%call-pointer
+              (cffi:pointer-address
+               (cffi:foreign-symbol-pointer "objc_msgSend"))
+              nil :pointer ns-screen-class :pointer
+              (sel-register-name (%literal "screens")) :pointer)
+           count
+             (%call-pointer
+              (cffi:pointer-address
+               (cffi:foreign-symbol-pointer "objc_msgSend"))
+              nil :pointer screens :pointer
+              (sel-register-name (%literal "count")) :unsigned-long)
+           i 0)
+     (loop :while (< i count)
+           :do (let ((screen 0)
+                     (description 0)
+                     (screen-number-key 0)
+                     (screen-number 0))
+                 (setf screen
+                         (%call-pointer
+                          (cffi:pointer-address
+                           (cffi:foreign-symbol-pointer "objc_msgSend"))
+                          nil :pointer screens :pointer
+                          (sel-register-name (%literal "objectAtIndex:"))
+                          :int32 (%c-nsu-integer-to-int i) :pointer)
+                       description
+                         (%call-pointer
+                          (cffi:pointer-address
+                           (cffi:foreign-symbol-pointer "objc_msgSend"))
+                          nil :pointer screen :pointer
+                          (sel-register-name (%literal "deviceDescription"))
+                          :pointer)
+                       screen-number-key
+                         (ns-string-string-with-utf8string
+                          (%literal "NSScreenNumber"))
+                       screen-number
+                         (%call-pointer
+                          (cffi:pointer-address
+                           (cffi:foreign-symbol-pointer "objc_msgSend"))
+                          nil :pointer description :pointer
+                          (sel-register-name (%literal "objectForKey:"))
+                          :pointer screen-number-key :pointer))
+                 (when
+                     (=
+                      (cg-display-unit-number
+                       (%c-nsu-integer-to-cg-direct-display-id
+                        (%call-pointer
+                         (cffi:pointer-address
+                          (cffi:foreign-symbol-pointer "objc_msgSend"))
+                         nil :pointer screen-number :pointer
+                         (sel-register-name (%literal "unsignedIntValue"))
+                         :unsigned-long)))
+                      uint-num)
+                   (return-from rgfw-get-ns-screen-for-display-u-int
+                     screen))) (setf i
+                                       (%c-expression-to-nsu-integer
+                                        (+ (%c-expression-to-nsu-integer i)
+                                           1))))
+     0)))
 
 ;; C source (RGFW.h:1462-1465):
 ;; @brief Retrieves the primary monitor.
 ;; @return A pointer to the RGFW_monitor structure representing the primary monitor.
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-get-primary-monitor ()
   (assert
    (and (not (%zero-p (%load -rgfw :pointer)))
@@ -10078,6 +13036,15 @@
                       (let ((%temporary-1 (%allocate 5656)))
                         %temporary-1)))))
      (rgfw-init-ptr class-name flags -rgfw-global))))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-init (class-name flags)
+  (%with-string-inputs (class-name)
+   (let ((-rgfw-global
+          (or %static-0
+              (setf %static-0
+                      (let ((%temporary-1 (%allocate 4800)))
+                        %temporary-1)))))
+     (rgfw-init-ptr class-name flags -rgfw-global))))
 
 ;; C source (RGFW.h:3599):
 ;; generic RGFW defines
@@ -10172,6 +13139,50 @@
                                                                          1))))
     (rgfw-reset-key))
   nil)
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-init-keycodes ()
+  (let ((i 0) (y 0))
+    (%fill (%address-rgfw-info-keycodes (%load -rgfw :pointer)) 0
+     (%c-expression-to-size-t 128))
+    (rgfw-init-keycodes-platform)
+    (setf i 0)
+    (loop :while (< i 256)
+          :do (setf y 0) (loop :while (< y
+                                         (%c-expression-to-size-t
+                                          (truncate
+                                           (%c-expression-to-size-t 128)
+                                           (%c-expression-to-size-t 1))))
+                               :do (when
+                                       (=
+                                        (%c-rgfw-key-to-size-t
+                                         (%load
+                                          (%offset
+                                           (%address-rgfw-info-keycodes
+                                            (%load -rgfw :pointer))
+                                           (* y 1))
+                                          1))
+                                        i)
+                                     (%store-native
+                                      (%offset
+                                       (%address-rgfw-info-api-keycodes
+                                        (%load -rgfw :pointer))
+                                       (* i 4))
+                                      4
+                                      (%c-rgfw-key-to-u32
+                                       (%c-size-t-to-rgfw-key y)))
+                                     (return)) (setf y
+                                                       (%c-expression-to-size-t
+                                                        (+
+                                                         (%c-expression-to-size-t
+                                                          y)
+                                                         1)))) (setf i
+                                                                       (%c-expression-to-size-t
+                                                                        (+
+                                                                         (%c-expression-to-size-t
+                                                                          i)
+                                                                         1))))
+    (rgfw-reset-key))
+  nil)
 #+(:and
    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
    (:or :freebsd :linux))
@@ -10189,6 +13200,10 @@
  ;; C source (RGFW.h:11995):
 ;; we're doing it with magic numbers because some keys are missing
 ;; C2LISP [storage]
+)
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ ;; C2LISP [storage]
 )
 #+(:and
    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
@@ -10547,363 +13562,708 @@
    194)
   nil)
 #+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
+(defun rgfw-init-keycodes-platform ()
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 11 1)) 1
+   48)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (ash 1 1)) 1
+   49)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 3 1)) 1
+   50)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (ash 1 2)) 1
+   51)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 5 1)) 1
+   52)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 6 1)) 1
+   53)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 7 1)) 1
+   54)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (ash 1 3)) 1
+   55)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 9 1)) 1
+   56)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 10 1)) 1
+   57)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 30 1)) 1
+   97)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 48 1)) 1
+   98)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 46 1)) 1
+   99)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (ash 1 5)) 1
+   100)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 18 1)) 1
+   101)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 33 1)) 1
+   102)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 34 1)) 1
+   103)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 35 1)) 1
+   104)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 23 1)) 1
+   105)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 36 1)) 1
+   106)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 37 1)) 1
+   107)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 38 1)) 1
+   108)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 50 1)) 1
+   109)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 49 1)) 1
+   110)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 24 1)) 1
+   111)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 25 1)) 1
+   112)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (ash 1 4)) 1
+   113)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 19 1)) 1
+   114)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 31 1)) 1
+   115)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 20 1)) 1
+   116)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 22 1)) 1
+   117)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 47 1)) 1
+   118)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 17 1)) 1
+   119)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 45 1)) 1
+   120)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 21 1)) 1
+   121)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 44 1)) 1
+   122)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 40 1)) 1
+   39)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 43 1)) 1
+   92)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 51 1)) 1
+   44)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 13 1)) 1
+   61)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 41 1)) 1
+   96)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 26 1)) 1
+   91)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 12 1)) 1
+   45)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 52 1)) 1
+   46)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 27 1)) 1
+   93)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 39 1)) 1
+   59)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 53 1)) 1
+   47)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 86 1)) 1
+   194)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 14 1)) 1
+   8)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 339 1)) 1
+   127)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 335 1)) 1
+   168)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 28 1)) 1
+   10)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) 1) 1 27)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 327 1)) 1
+   169)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 338 1)) 1
+   166)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 349 1)) 1
+   167)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 337 1)) 1
+   171)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 329 1)) 1
+   170)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 69 1)) 1
+   192)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 57 1)) 1
+   32)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 15 1)) 1
+   9)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 58 1)) 1
+   153)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 325 1)) 1
+   172)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 70 1)) 1
+   190)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 59 1)) 1
+   128)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 60 1)) 1
+   129)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 61 1)) 1
+   130)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 62 1)) 1
+   131)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 63 1)) 1
+   132)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (ash 1 6)) 1
+   133)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 65 1)) 1
+   134)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 66 1)) 1
+   135)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 67 1)) 1
+   136)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 68 1)) 1
+   137)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 87 1)) 1
+   138)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 88 1)) 1
+   139)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 100 1)) 1
+   140)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 101 1)) 1
+   141)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 102 1)) 1
+   142)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 103 1)) 1
+   143)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 104 1)) 1
+   144)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 105 1)) 1
+   145)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 106 1)) 1
+   146)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 107 1)) 1
+   147)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 108 1)) 1
+   148)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 109 1)) 1
+   149)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 110 1)) 1
+   150)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 118 1)) 1
+   151)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 56 1)) 1
+   156)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 29 1)) 1
+   155)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 42 1)) 1
+   154)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 347 1)) 1
+   157)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 311 1)) 1
+   191)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 312 1)) 1
+   160)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 285 1)) 1
+   159)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 54 1)) 1
+   158)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 348 1)) 1
+   161)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 336 1)) 1
+   163)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 331 1)) 1
+   164)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 333 1)) 1
+   165)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 328 1)) 1
+   162)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 82 1)) 1
+   187)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 79 1)) 1
+   178)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 80 1)) 1
+   179)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 81 1)) 1
+   180)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 75 1)) 1
+   181)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 76 1)) 1
+   182)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 77 1)) 1
+   183)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 71 1)) 1
+   184)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 72 1)) 1
+   185)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 73 1)) 1
+   186)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 78 1)) 1
+   175)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 83 1)) 1
+   188)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 309 1)) 1
+   173)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 284 1)) 1
+   189)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 89 1)) 1
+   177)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 55 1)) 1
+   174)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 74 1)) 1
+   176)
+  nil)
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-init-keycodes-platform ()
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 29 1)) 1
+   48)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 18 1)) 1
+   49)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 19 1)) 1
+   50)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 20 1)) 1
+   51)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 21 1)) 1
+   52)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 23 1)) 1
+   53)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 22 1)) 1
+   54)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 26 1)) 1
+   55)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 28 1)) 1
+   56)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 25 1)) 1
+   57)
+  (%store-native (%address-rgfw-info-keycodes (%load -rgfw :pointer)) 1 97)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 11 1)) 1
+   98)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (ash 1 3)) 1
+   99)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (ash 1 1)) 1
+   100)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 14 1)) 1
+   101)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 3 1)) 1
+   102)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 5 1)) 1
+   103)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (ash 1 2)) 1
+   104)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 34 1)) 1
+   105)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 38 1)) 1
+   106)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 40 1)) 1
+   107)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 37 1)) 1
+   108)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 46 1)) 1
+   109)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 45 1)) 1
+   110)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 31 1)) 1
+   111)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 35 1)) 1
+   112)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 12 1)) 1
+   113)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 15 1)) 1
+   114)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) 1) 1 115)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 17 1)) 1
+   116)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (ash 1 5)) 1
+   117)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 9 1)) 1
+   118)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 13 1)) 1
+   119)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 7 1)) 1
+   120)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (ash 1 4)) 1
+   121)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 6 1)) 1
+   122)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 39 1)) 1
+   39)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 42 1)) 1
+   92)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 43 1)) 1
+   44)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 24 1)) 1
+   61)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 50 1)) 1
+   96)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 33 1)) 1
+   91)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 27 1)) 1
+   45)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 47 1)) 1
+   46)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 30 1)) 1
+   93)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 41 1)) 1
+   59)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 44 1)) 1
+   47)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 10 1)) 1
+   193)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 51 1)) 1
+   8)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 57 1)) 1
+   153)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 117 1)) 1
+   127)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 125 1)) 1
+   163)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 119 1)) 1
+   168)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 36 1)) 1
+   10)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 53 1)) 1
+   27)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 122 1)) 1
+   128)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 120 1)) 1
+   129)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 99 1)) 1
+   130)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 118 1)) 1
+   131)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 96 1)) 1
+   132)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 97 1)) 1
+   133)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 98 1)) 1
+   134)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 100 1)) 1
+   135)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 101 1)) 1
+   136)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 109 1)) 1
+   137)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 103 1)) 1
+   138)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 111 1)) 1
+   139)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 105 1)) 1
+   191)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 107 1)) 1
+   141)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 113 1)) 1
+   142)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 106 1)) 1
+   143)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (ash 1 6)) 1
+   144)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 79 1)) 1
+   145)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 80 1)) 1
+   146)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 90 1)) 1
+   147)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 115 1)) 1
+   169)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 114 1)) 1
+   166)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 123 1)) 1
+   164)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 58 1)) 1
+   156)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 59 1)) 1
+   155)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 56 1)) 1
+   154)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 55 1)) 1
+   157)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 110 1)) 1
+   167)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 71 1)) 1
+   172)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 121 1)) 1
+   171)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 116 1)) 1
+   170)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 124 1)) 1
+   165)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 61 1)) 1
+   160)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 62 1)) 1
+   159)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 60 1)) 1
+   158)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 54 1)) 1
+   161)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 49 1)) 1
+   32)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 48 1)) 1
+   9)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 126 1)) 1
+   162)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 82 1)) 1
+   187)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 83 1)) 1
+   178)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 84 1)) 1
+   179)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 85 1)) 1
+   180)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 86 1)) 1
+   181)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 87 1)) 1
+   182)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 88 1)) 1
+   183)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 89 1)) 1
+   184)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 91 1)) 1
+   185)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 92 1)) 1
+   186)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 69 1)) 1
+   173)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 65 1)) 1
+   188)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 75 1)) 1
+   173)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 76 1)) 1
+   189)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 81 1)) 1
+   177)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 67 1)) 1
+   174)
+  (%store-native
+   (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 78 1)) 1
+   176)
+  nil)
+#+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
 (progn
- (defun rgfw-init-keycodes-platform ()
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 11 1)) 1
-    48)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (ash 1 1))
-    1 49)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 3 1)) 1
-    50)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (ash 1 2))
-    1 51)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 5 1)) 1
-    52)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 6 1)) 1
-    53)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 7 1)) 1
-    54)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (ash 1 3))
-    1 55)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 9 1)) 1
-    56)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 10 1)) 1
-    57)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 30 1)) 1
-    97)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 48 1)) 1
-    98)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 46 1)) 1
-    99)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (ash 1 5))
-    1 100)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 18 1)) 1
-    101)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 33 1)) 1
-    102)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 34 1)) 1
-    103)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 35 1)) 1
-    104)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 23 1)) 1
-    105)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 36 1)) 1
-    106)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 37 1)) 1
-    107)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 38 1)) 1
-    108)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 50 1)) 1
-    109)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 49 1)) 1
-    110)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 24 1)) 1
-    111)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 25 1)) 1
-    112)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (ash 1 4))
-    1 113)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 19 1)) 1
-    114)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 31 1)) 1
-    115)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 20 1)) 1
-    116)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 22 1)) 1
-    117)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 47 1)) 1
-    118)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 17 1)) 1
-    119)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 45 1)) 1
-    120)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 21 1)) 1
-    121)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 44 1)) 1
-    122)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 40 1)) 1
-    39)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 43 1)) 1
-    92)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 51 1)) 1
-    44)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 13 1)) 1
-    61)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 41 1)) 1
-    96)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 26 1)) 1
-    91)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 12 1)) 1
-    45)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 52 1)) 1
-    46)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 27 1)) 1
-    93)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 39 1)) 1
-    59)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 53 1)) 1
-    47)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 86 1)) 1
-    194)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 14 1)) 1
-    8)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 339 1))
-    1 127)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 335 1))
-    1 168)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 28 1)) 1
-    10)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) 1) 1 27)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 327 1))
-    1 169)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 338 1))
-    1 166)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 349 1))
-    1 167)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 337 1))
-    1 171)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 329 1))
-    1 170)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 69 1)) 1
-    192)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 57 1)) 1
-    32)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 15 1)) 1
-    9)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 58 1)) 1
-    153)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 325 1))
-    1 172)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 70 1)) 1
-    190)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 59 1)) 1
-    128)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 60 1)) 1
-    129)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 61 1)) 1
-    130)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 62 1)) 1
-    131)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 63 1)) 1
-    132)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (ash 1 6))
-    1 133)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 65 1)) 1
-    134)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 66 1)) 1
-    135)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 67 1)) 1
-    136)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 68 1)) 1
-    137)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 87 1)) 1
-    138)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 88 1)) 1
-    139)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 100 1))
-    1 140)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 101 1))
-    1 141)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 102 1))
-    1 142)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 103 1))
-    1 143)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 104 1))
-    1 144)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 105 1))
-    1 145)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 106 1))
-    1 146)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 107 1))
-    1 147)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 108 1))
-    1 148)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 109 1))
-    1 149)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 110 1))
-    1 150)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 118 1))
-    1 151)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 56 1)) 1
-    156)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 29 1)) 1
-    155)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 42 1)) 1
-    154)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 347 1))
-    1 157)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 311 1))
-    1 191)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 312 1))
-    1 160)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 285 1))
-    1 159)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 54 1)) 1
-    158)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 348 1))
-    1 161)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 336 1))
-    1 163)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 331 1))
-    1 164)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 333 1))
-    1 165)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 328 1))
-    1 162)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 82 1)) 1
-    187)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 79 1)) 1
-    178)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 80 1)) 1
-    179)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 81 1)) 1
-    180)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 75 1)) 1
-    181)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 76 1)) 1
-    182)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 77 1)) 1
-    183)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 71 1)) 1
-    184)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 72 1)) 1
-    185)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 73 1)) 1
-    186)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 78 1)) 1
-    175)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 83 1)) 1
-    188)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 309 1))
-    1 173)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 284 1))
-    1 189)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 89 1)) 1
-    177)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 55 1)) 1
-    174)
-   (%store-native
-    (%offset (%address-rgfw-info-keycodes (%load -rgfw :pointer)) (* 74 1)) 1
-    176)
-   nil)
  ;; C2LISP [storage]
+)
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ ;; C source (RGFW.h:14586-14616):
+;; Note about addMethod strings
+;; @ -> id, : -> SEL, B -> bool
+;; a basic char is a c-type, capital letter = unsigned, ^ = pointer
+;; e.g. i = int, I = unsigned int c = char, C = unsigned char and ^C = unsigned char*
+;; most functions start with v@: because it's `void function(id self, SEL _cmd)
+;; some future where pointers are greater than 8 bytes (64-bit) (I'm pretty sure much more will be broken if this is the case)
+;; C2LISP [storage]
 )
 #+(:and
    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
@@ -10938,13 +14298,8 @@
           (%literal "timeEndPeriod")))
         (assert
          (not (%pointer-equal (%load time-end-period-src :pointer) 0))))
-      (let* ((*string-arguments* *string-arguments*)
-             (%temporary-1 (%load time-begin-period-src :pointer))
-             (%temporary-2 (%translated-function %temporary-1)))
-        (if %temporary-2
-            (funcall %temporary-2 1)
-            (cffi:foreign-funcall-pointer
-             (%native-argument-pointer %temporary-1) nil :uint32 1 :uint32)))
+      (%call-pointer (%load time-begin-period-src :pointer) nil :uint32 1
+       :uint32)
       (when (%pointer-equal (%load rgfw-dwm-dll :pointer) 0)
         (%store rgfw-dwm-dll :pointer
          (load-library-a (%literal "dwmapi.dll")))
@@ -11066,14 +14421,8 @@
           (%c-pfn-time-begin-period-to-int
            (%load time-end-period-src :pointer))
           0)))
-      (let* ((*string-arguments* *string-arguments*)
-             (%temporary-1 (%load time-begin-period-src :pointer))
-             (%temporary-2 (%translated-function %temporary-1)))
-        (if %temporary-2
-            (funcall %temporary-2 1)
-            (cffi:foreign-funcall-pointer
-             (%native-argument-pointer %temporary-1) (:convention :stdcall)
-             :uint32 1 :uint32)))
+      (%call-pointer (%load time-begin-period-src :pointer)
+       (:convention :stdcall) :uint32 1 :uint32)
       (when (= (%c-hmodule-to-int (%load rgfw-dwm-dll :pointer)) 0)
         (%store rgfw-dwm-dll :pointer
          (load-library-a (%literal "dwmapi.dll")))
@@ -11163,13 +14512,910 @@
       (setf (%rgfw-info-hidden-mouse (%load -rgfw :pointer))
               (rgfw-create-mouse rgfw-blk 1 1 2))
       0))))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-init-platform (class-name flags)
+  (declare (ignore flags)
+           (ignorable class-name))
+  (%with-native-frame nil
+   (%with-string-inputs (class-name)
+    (let ((pool 0) (cf-str 0))
+      (setf pool
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer
+               (%call-pointer
+                (cffi:pointer-address
+                 (cffi:foreign-symbol-pointer "objc_msgSend"))
+                nil :pointer (objc-get-class (%literal "NSAutoreleasePool"))
+                :pointer (sel-register-name (%literal "alloc")) :pointer)
+               :pointer (sel-register-name (%literal "init")) :pointer)
+            (%rgfw-info-tis-bundle (%load -rgfw :pointer))
+              (cf-bundle-get-bundle-with-identifier
+               (--cf-string-make-constant-string
+                (%literal "com.apple.HIToolbox"))))
+      (%store tis-get-input-source-property-src :pointer
+       (cf-bundle-get-function-pointer-for-name
+        (%rgfw-info-tis-bundle (%load -rgfw :pointer))
+        (--cf-string-make-constant-string
+         (%literal "TISGetInputSourceProperty"))))
+      (%store tis-copy-current-keyboard-layout-input-source-src :pointer
+       (cf-bundle-get-function-pointer-for-name
+        (%rgfw-info-tis-bundle (%load -rgfw :pointer))
+        (--cf-string-make-constant-string
+         (%literal "TISCopyCurrentKeyboardLayoutInputSource"))))
+      (%store lm-get-kbd-type-src :pointer
+       (cf-bundle-get-function-pointer-for-name
+        (%rgfw-info-tis-bundle (%load -rgfw :pointer))
+        (--cf-string-make-constant-string (%literal "LMGetKbdType"))))
+      (setf cf-str
+              (cf-bundle-get-data-pointer-for-name
+               (%rgfw-info-tis-bundle (%load -rgfw :pointer))
+               (--cf-string-make-constant-string
+                (%literal "kTISPropertyUnicodeKeyLayoutData"))))
+      (when (not (%zero-p cf-str))
+        (%store k-tis-property-unicode-key-layout-data-src :pointer
+         (%load cf-str :pointer)))
+      (setf (%rgfw-info-ns-app (%load -rgfw :pointer))
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer (objc-get-class (%literal "NSApplication"))
+               :pointer (sel-register-name (%literal "sharedApplication"))
+               :pointer))
+      (%call-pointer
+       (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+       nil :pointer (%rgfw-info-ns-app (%load -rgfw :pointer)) :pointer
+       (sel-register-name (%literal "setActivationPolicy:")) :unsigned-long 0
+       :void)
+      (setf (%rgfw-info-custom-ns-app-delegate-class (%load -rgfw :pointer))
+              (objc-allocate-class-pair
+               (objc-get-class (%literal "NSObject"))
+               (%literal "RGFWNSAppDelegate") 0))
+      (when
+          (%pointer-equal
+           (%rgfw-info-custom-ns-app-delegate-class (%load -rgfw :pointer))
+           0)
+        (rgfw-debug-callback 0 12
+         (%literal "failed to create RGFWNSAppDelegate class"))
+        (return-from rgfw-init-platform -1))
+      (class-add-method
+       (%rgfw-info-custom-ns-app-delegate-class (%load -rgfw :pointer))
+       (sel-register-name (%literal "applicationDidChangeScreenParameters:"))
+       (cffi:pointer-address
+        (cffi:callback %callback-rgfw--osx-did-change-screen-parameters))
+       (%literal "v@:@"))
+      (class-add-method
+       (%rgfw-info-custom-ns-app-delegate-class (%load -rgfw :pointer))
+       (sel-register-name (%literal "applicationShouldTerminate:"))
+       (cffi:pointer-address
+        (cffi:callback %callback-rgfw--osx-application-should-terminate))
+       (%literal "@:@"))
+      (objc-register-class-pair
+       (%rgfw-info-custom-ns-app-delegate-class (%load -rgfw :pointer)))
+      (setf (%rgfw-info-custom-ns-app-delegate (%load -rgfw :pointer))
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer
+               (%call-pointer
+                (cffi:pointer-address
+                 (cffi:foreign-symbol-pointer "objc_msgSend"))
+                nil :pointer
+                (%rgfw-info-custom-ns-app-delegate-class
+                 (%load -rgfw :pointer))
+                :pointer (sel-register-name (%literal "alloc")) :pointer)
+               :pointer (sel-register-name (%literal "init")) :pointer))
+      (%call-pointer
+       (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+       nil :pointer (%rgfw-info-ns-app (%load -rgfw :pointer)) :pointer
+       (sel-register-name (%literal "setDelegate:")) :pointer
+       (%rgfw-info-custom-ns-app-delegate (%load -rgfw :pointer)) :void)
+      (%call-pointer
+       (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+       nil :pointer (%rgfw-info-ns-app (%load -rgfw :pointer)) :pointer
+       (sel-register-name (%literal "finishLaunching")) :void)
+      (%store (%address-rgfw-info-custom-view-classes (%load -rgfw :pointer))
+       :pointer
+       (objc-allocate-class-pair (objc-get-class (%literal "NSView"))
+        (%literal "RGFWCustomView") 0))
+      (%store
+       (%offset
+        (%address-rgfw-info-custom-view-classes (%load -rgfw :pointer))
+        +c-size-pointer+)
+       :pointer
+       (objc-allocate-class-pair (objc-get-class (%literal "NSOpenGLView"))
+        (%literal "RGFWOpenGLCustomView") 0))
+      (let ((i 0))
+        (loop :while (< i 2)
+              :do (when
+                      (%pointer-equal
+                       (%load
+                        (%offset
+                         (%address-rgfw-info-custom-view-classes
+                          (%load -rgfw :pointer))
+                         (* i +c-size-pointer+))
+                        :pointer)
+                       0)
+                    (rgfw-debug-callback 0 12
+                     (if (= i 0)
+                         (%literal "failed to create RGFWCustomView class")
+                         (%literal
+                          "failed to create RGFWOpenGLCustomView class")))
+                    (return-from rgfw-init-platform -1)) (assert
+                                                          (<=
+                                                           (%c-expression-to-size-t
+                                                            +c-size-pointer+)
+                                                           8)) (class-add-ivar
+                                                                (%load
+                                                                 (%offset
+                                                                  (%address-rgfw-info-custom-view-classes
+                                                                   (%load
+                                                                    -rgfw
+                                                                    :pointer))
+                                                                  (* i
+                                                                     +c-size-pointer+))
+                                                                 :pointer)
+                                                                (%literal
+                                                                 "RGFW_window")
+                                                                (%c-expression-to-size-t
+                                                                 +c-size-pointer+)
+                                                                (%c-expression-to-uint8-t
+                                                                 (if (=
+                                                                      (%c-expression-to-size-t
+                                                                       +c-size-pointer+)
+                                                                      8)
+                                                                     3
+                                                                     2))
+                                                                (%literal
+                                                                 "^v")) (class-add-ivar
+                                                                         (%load
+                                                                          (%offset
+                                                                           (%address-rgfw-info-custom-view-classes
+                                                                            (%load
+                                                                             -rgfw
+                                                                             :pointer))
+                                                                           (*
+                                                                            i
+                                                                            +c-size-pointer+))
+                                                                          :pointer)
+                                                                         (%literal
+                                                                          "trackingArea")
+                                                                         (%c-expression-to-size-t
+                                                                          8)
+                                                                         (%c-expression-to-uint8-t
+                                                                          (if (=
+                                                                               (%c-expression-to-size-t
+                                                                                8)
+                                                                               8)
+                                                                              3
+                                                                              2))
+                                                                         (%literal
+                                                                          "^v")) (class-add-ivar
+                                                                                  (%load
+                                                                                   (%offset
+                                                                                    (%address-rgfw-info-custom-view-classes
+                                                                                     (%load
+                                                                                      -rgfw
+                                                                                      :pointer))
+                                                                                    (*
+                                                                                     i
+                                                                                     +c-size-pointer+))
+                                                                                   :pointer)
+                                                                                  (%literal
+                                                                                   "markedText")
+                                                                                  (%c-expression-to-size-t
+                                                                                   8)
+                                                                                  (%c-expression-to-uint8-t
+                                                                                   (if (=
+                                                                                        (%c-expression-to-size-t
+                                                                                         8)
+                                                                                        8)
+                                                                                       3
+                                                                                       2))
+                                                                                  (%literal
+                                                                                   "^v")) (class-add-method
+                                                                                           (%load
+                                                                                            (%offset
+                                                                                             (%address-rgfw-info-custom-view-classes
+                                                                                              (%load
+                                                                                               -rgfw
+                                                                                               :pointer))
+                                                                                             (*
+                                                                                              i
+                                                                                              +c-size-pointer+))
+                                                                                            :pointer)
+                                                                                           (sel-register-name
+                                                                                            (%literal
+                                                                                             "acceptsFirstMouse:"))
+                                                                                           (cffi:pointer-address
+                                                                                            (cffi:callback
+                                                                                             %callback-rgfw--osx-accepts-first-mouse))
+                                                                                           (%literal
+                                                                                            "B@:@")) (class-add-method
+                                                                                                      (%load
+                                                                                                       (%offset
+                                                                                                        (%address-rgfw-info-custom-view-classes
+                                                                                                         (%load
+                                                                                                          -rgfw
+                                                                                                          :pointer))
+                                                                                                        (*
+                                                                                                         i
+                                                                                                         +c-size-pointer+))
+                                                                                                       :pointer)
+                                                                                                      (sel-register-name
+                                                                                                       (%literal
+                                                                                                        "drawRect:"))
+                                                                                                      (cffi:pointer-address
+                                                                                                       (%aggregate-callback
+                                                                                                        '%callback-rgfw--osx-draw-rect
+                                                                                                        (cffi:callback
+                                                                                                         %callback-rgfw--osx-draw-rect)
+                                                                                                        ':void
+                                                                                                        '(:pointer
+                                                                                                          :pointer
+                                                                                                          (:struct
+                                                                                                           %abi-struct-3))))
+                                                                                                      (%literal
+                                                                                                       "v@:{CGRect={CGPoint=dd}{CGSize=dd}}")) (class-add-method
+                                                                                                                                                (%load
+                                                                                                                                                 (%offset
+                                                                                                                                                  (%address-rgfw-info-custom-view-classes
+                                                                                                                                                   (%load
+                                                                                                                                                    -rgfw
+                                                                                                                                                    :pointer))
+                                                                                                                                                  (*
+                                                                                                                                                   i
+                                                                                                                                                   +c-size-pointer+))
+                                                                                                                                                 :pointer)
+                                                                                                                                                (sel-register-name
+                                                                                                                                                 (%literal
+                                                                                                                                                  "viewDidChangeBackingProperties"))
+                                                                                                                                                (cffi:pointer-address
+                                                                                                                                                 (cffi:callback
+                                                                                                                                                  %callback-rgfw--osx-view-did-change-backing-properties))
+                                                                                                                                                (%literal
+                                                                                                                                                 "v@:")) (class-add-method
+                                                                                                                                                          (%load
+                                                                                                                                                           (%offset
+                                                                                                                                                            (%address-rgfw-info-custom-view-classes
+                                                                                                                                                             (%load
+                                                                                                                                                              -rgfw
+                                                                                                                                                              :pointer))
+                                                                                                                                                            (*
+                                                                                                                                                             i
+                                                                                                                                                             +c-size-pointer+))
+                                                                                                                                                           :pointer)
+                                                                                                                                                          (sel-register-name
+                                                                                                                                                           (%literal
+                                                                                                                                                            "mouseDown:"))
+                                                                                                                                                          (cffi:pointer-address
+                                                                                                                                                           (cffi:callback
+                                                                                                                                                            %callback-rgfw--osx-mouse-down))
+                                                                                                                                                          (%literal
+                                                                                                                                                           "v@:@")) (class-add-method
+                                                                                                                                                                     (%load
+                                                                                                                                                                      (%offset
+                                                                                                                                                                       (%address-rgfw-info-custom-view-classes
+                                                                                                                                                                        (%load
+                                                                                                                                                                         -rgfw
+                                                                                                                                                                         :pointer))
+                                                                                                                                                                       (*
+                                                                                                                                                                        i
+                                                                                                                                                                        +c-size-pointer+))
+                                                                                                                                                                      :pointer)
+                                                                                                                                                                     (sel-register-name
+                                                                                                                                                                      (%literal
+                                                                                                                                                                       "rightMouseDown:"))
+                                                                                                                                                                     (cffi:pointer-address
+                                                                                                                                                                      (cffi:callback
+                                                                                                                                                                       %callback-rgfw--osx-mouse-down))
+                                                                                                                                                                     (%literal
+                                                                                                                                                                      "v@:@")) (class-add-method
+                                                                                                                                                                                (%load
+                                                                                                                                                                                 (%offset
+                                                                                                                                                                                  (%address-rgfw-info-custom-view-classes
+                                                                                                                                                                                   (%load
+                                                                                                                                                                                    -rgfw
+                                                                                                                                                                                    :pointer))
+                                                                                                                                                                                  (*
+                                                                                                                                                                                   i
+                                                                                                                                                                                   +c-size-pointer+))
+                                                                                                                                                                                 :pointer)
+                                                                                                                                                                                (sel-register-name
+                                                                                                                                                                                 (%literal
+                                                                                                                                                                                  "otherMouseDown:"))
+                                                                                                                                                                                (cffi:pointer-address
+                                                                                                                                                                                 (cffi:callback
+                                                                                                                                                                                  %callback-rgfw--osx-mouse-down))
+                                                                                                                                                                                (%literal
+                                                                                                                                                                                 "v@:@")) (class-add-method
+                                                                                                                                                                                           (%load
+                                                                                                                                                                                            (%offset
+                                                                                                                                                                                             (%address-rgfw-info-custom-view-classes
+                                                                                                                                                                                              (%load
+                                                                                                                                                                                               -rgfw
+                                                                                                                                                                                               :pointer))
+                                                                                                                                                                                             (*
+                                                                                                                                                                                              i
+                                                                                                                                                                                              +c-size-pointer+))
+                                                                                                                                                                                            :pointer)
+                                                                                                                                                                                           (sel-register-name
+                                                                                                                                                                                            (%literal
+                                                                                                                                                                                             "mouseUp:"))
+                                                                                                                                                                                           (cffi:pointer-address
+                                                                                                                                                                                            (cffi:callback
+                                                                                                                                                                                             %callback-rgfw--osx-mouse-up))
+                                                                                                                                                                                           (%literal
+                                                                                                                                                                                            "v@:@")) (class-add-method
+                                                                                                                                                                                                      (%load
+                                                                                                                                                                                                       (%offset
+                                                                                                                                                                                                        (%address-rgfw-info-custom-view-classes
+                                                                                                                                                                                                         (%load
+                                                                                                                                                                                                          -rgfw
+                                                                                                                                                                                                          :pointer))
+                                                                                                                                                                                                        (*
+                                                                                                                                                                                                         i
+                                                                                                                                                                                                         +c-size-pointer+))
+                                                                                                                                                                                                       :pointer)
+                                                                                                                                                                                                      (sel-register-name
+                                                                                                                                                                                                       (%literal
+                                                                                                                                                                                                        "rightMouseUp:"))
+                                                                                                                                                                                                      (cffi:pointer-address
+                                                                                                                                                                                                       (cffi:callback
+                                                                                                                                                                                                        %callback-rgfw--osx-mouse-up))
+                                                                                                                                                                                                      (%literal
+                                                                                                                                                                                                       "v@:@")) (class-add-method
+                                                                                                                                                                                                                 (%load
+                                                                                                                                                                                                                  (%offset
+                                                                                                                                                                                                                   (%address-rgfw-info-custom-view-classes
+                                                                                                                                                                                                                    (%load
+                                                                                                                                                                                                                     -rgfw
+                                                                                                                                                                                                                     :pointer))
+                                                                                                                                                                                                                   (*
+                                                                                                                                                                                                                    i
+                                                                                                                                                                                                                    +c-size-pointer+))
+                                                                                                                                                                                                                  :pointer)
+                                                                                                                                                                                                                 (sel-register-name
+                                                                                                                                                                                                                  (%literal
+                                                                                                                                                                                                                   "otherMouseUp:"))
+                                                                                                                                                                                                                 (cffi:pointer-address
+                                                                                                                                                                                                                  (cffi:callback
+                                                                                                                                                                                                                   %callback-rgfw--osx-mouse-up))
+                                                                                                                                                                                                                 (%literal
+                                                                                                                                                                                                                  "v@:@")) (class-add-method
+                                                                                                                                                                                                                            (%load
+                                                                                                                                                                                                                             (%offset
+                                                                                                                                                                                                                              (%address-rgfw-info-custom-view-classes
+                                                                                                                                                                                                                               (%load
+                                                                                                                                                                                                                                -rgfw
+                                                                                                                                                                                                                                :pointer))
+                                                                                                                                                                                                                              (*
+                                                                                                                                                                                                                               i
+                                                                                                                                                                                                                               +c-size-pointer+))
+                                                                                                                                                                                                                             :pointer)
+                                                                                                                                                                                                                            (sel-register-name
+                                                                                                                                                                                                                             (%literal
+                                                                                                                                                                                                                              "scrollWheel:"))
+                                                                                                                                                                                                                            (cffi:pointer-address
+                                                                                                                                                                                                                             (cffi:callback
+                                                                                                                                                                                                                              %callback-rgfw--osx-scroll-wheel))
+                                                                                                                                                                                                                            (%literal
+                                                                                                                                                                                                                             "v@:@")) (class-add-method
+                                                                                                                                                                                                                                       (%load
+                                                                                                                                                                                                                                        (%offset
+                                                                                                                                                                                                                                         (%address-rgfw-info-custom-view-classes
+                                                                                                                                                                                                                                          (%load
+                                                                                                                                                                                                                                           -rgfw
+                                                                                                                                                                                                                                           :pointer))
+                                                                                                                                                                                                                                         (*
+                                                                                                                                                                                                                                          i
+                                                                                                                                                                                                                                          +c-size-pointer+))
+                                                                                                                                                                                                                                        :pointer)
+                                                                                                                                                                                                                                       (sel-register-name
+                                                                                                                                                                                                                                        (%literal
+                                                                                                                                                                                                                                         "mouseDragged:"))
+                                                                                                                                                                                                                                       (cffi:pointer-address
+                                                                                                                                                                                                                                        (cffi:callback
+                                                                                                                                                                                                                                         %callback-rgfw--osx-mouse-moved))
+                                                                                                                                                                                                                                       (%literal
+                                                                                                                                                                                                                                        "v@:@")) (class-add-method
+                                                                                                                                                                                                                                                  (%load
+                                                                                                                                                                                                                                                   (%offset
+                                                                                                                                                                                                                                                    (%address-rgfw-info-custom-view-classes
+                                                                                                                                                                                                                                                     (%load
+                                                                                                                                                                                                                                                      -rgfw
+                                                                                                                                                                                                                                                      :pointer))
+                                                                                                                                                                                                                                                    (*
+                                                                                                                                                                                                                                                     i
+                                                                                                                                                                                                                                                     +c-size-pointer+))
+                                                                                                                                                                                                                                                   :pointer)
+                                                                                                                                                                                                                                                  (sel-register-name
+                                                                                                                                                                                                                                                   (%literal
+                                                                                                                                                                                                                                                    "rightMouseDragged:"))
+                                                                                                                                                                                                                                                  (cffi:pointer-address
+                                                                                                                                                                                                                                                   (cffi:callback
+                                                                                                                                                                                                                                                    %callback-rgfw--osx-mouse-moved))
+                                                                                                                                                                                                                                                  (%literal
+                                                                                                                                                                                                                                                   "v@:@")) (class-add-method
+                                                                                                                                                                                                                                                             (%load
+                                                                                                                                                                                                                                                              (%offset
+                                                                                                                                                                                                                                                               (%address-rgfw-info-custom-view-classes
+                                                                                                                                                                                                                                                                (%load
+                                                                                                                                                                                                                                                                 -rgfw
+                                                                                                                                                                                                                                                                 :pointer))
+                                                                                                                                                                                                                                                               (*
+                                                                                                                                                                                                                                                                i
+                                                                                                                                                                                                                                                                +c-size-pointer+))
+                                                                                                                                                                                                                                                              :pointer)
+                                                                                                                                                                                                                                                             (sel-register-name
+                                                                                                                                                                                                                                                              (%literal
+                                                                                                                                                                                                                                                               "otherMouseDragged:"))
+                                                                                                                                                                                                                                                             (cffi:pointer-address
+                                                                                                                                                                                                                                                              (cffi:callback
+                                                                                                                                                                                                                                                               %callback-rgfw--osx-mouse-moved))
+                                                                                                                                                                                                                                                             (%literal
+                                                                                                                                                                                                                                                              "v@:@")) (class-add-method
+                                                                                                                                                                                                                                                                        (%load
+                                                                                                                                                                                                                                                                         (%offset
+                                                                                                                                                                                                                                                                          (%address-rgfw-info-custom-view-classes
+                                                                                                                                                                                                                                                                           (%load
+                                                                                                                                                                                                                                                                            -rgfw
+                                                                                                                                                                                                                                                                            :pointer))
+                                                                                                                                                                                                                                                                          (*
+                                                                                                                                                                                                                                                                           i
+                                                                                                                                                                                                                                                                           +c-size-pointer+))
+                                                                                                                                                                                                                                                                         :pointer)
+                                                                                                                                                                                                                                                                        (sel-register-name
+                                                                                                                                                                                                                                                                         (%literal
+                                                                                                                                                                                                                                                                          "keyDown:"))
+                                                                                                                                                                                                                                                                        (cffi:pointer-address
+                                                                                                                                                                                                                                                                         (cffi:callback
+                                                                                                                                                                                                                                                                          %callback-rgfw--osx-key-down))
+                                                                                                                                                                                                                                                                        (%literal
+                                                                                                                                                                                                                                                                         "v@:@")) (class-add-method
+                                                                                                                                                                                                                                                                                   (%load
+                                                                                                                                                                                                                                                                                    (%offset
+                                                                                                                                                                                                                                                                                     (%address-rgfw-info-custom-view-classes
+                                                                                                                                                                                                                                                                                      (%load
+                                                                                                                                                                                                                                                                                       -rgfw
+                                                                                                                                                                                                                                                                                       :pointer))
+                                                                                                                                                                                                                                                                                     (*
+                                                                                                                                                                                                                                                                                      i
+                                                                                                                                                                                                                                                                                      +c-size-pointer+))
+                                                                                                                                                                                                                                                                                    :pointer)
+                                                                                                                                                                                                                                                                                   (sel-register-name
+                                                                                                                                                                                                                                                                                    (%literal
+                                                                                                                                                                                                                                                                                     "keyUp:"))
+                                                                                                                                                                                                                                                                                   (cffi:pointer-address
+                                                                                                                                                                                                                                                                                    (cffi:callback
+                                                                                                                                                                                                                                                                                     %callback-rgfw--osx-key-up))
+                                                                                                                                                                                                                                                                                   (%literal
+                                                                                                                                                                                                                                                                                    "v@:@")) (class-add-method
+                                                                                                                                                                                                                                                                                              (%load
+                                                                                                                                                                                                                                                                                               (%offset
+                                                                                                                                                                                                                                                                                                (%address-rgfw-info-custom-view-classes
+                                                                                                                                                                                                                                                                                                 (%load
+                                                                                                                                                                                                                                                                                                  -rgfw
+                                                                                                                                                                                                                                                                                                  :pointer))
+                                                                                                                                                                                                                                                                                                (*
+                                                                                                                                                                                                                                                                                                 i
+                                                                                                                                                                                                                                                                                                 +c-size-pointer+))
+                                                                                                                                                                                                                                                                                               :pointer)
+                                                                                                                                                                                                                                                                                              (sel-register-name
+                                                                                                                                                                                                                                                                                               (%literal
+                                                                                                                                                                                                                                                                                                "mouseMoved:"))
+                                                                                                                                                                                                                                                                                              (cffi:pointer-address
+                                                                                                                                                                                                                                                                                               (cffi:callback
+                                                                                                                                                                                                                                                                                                %callback-rgfw--osx-mouse-moved))
+                                                                                                                                                                                                                                                                                              (%literal
+                                                                                                                                                                                                                                                                                               "v@:@")) (class-add-method
+                                                                                                                                                                                                                                                                                                         (%load
+                                                                                                                                                                                                                                                                                                          (%offset
+                                                                                                                                                                                                                                                                                                           (%address-rgfw-info-custom-view-classes
+                                                                                                                                                                                                                                                                                                            (%load
+                                                                                                                                                                                                                                                                                                             -rgfw
+                                                                                                                                                                                                                                                                                                             :pointer))
+                                                                                                                                                                                                                                                                                                           (*
+                                                                                                                                                                                                                                                                                                            i
+                                                                                                                                                                                                                                                                                                            +c-size-pointer+))
+                                                                                                                                                                                                                                                                                                          :pointer)
+                                                                                                                                                                                                                                                                                                         (sel-register-name
+                                                                                                                                                                                                                                                                                                          (%literal
+                                                                                                                                                                                                                                                                                                           "mouseEntered:"))
+                                                                                                                                                                                                                                                                                                         (cffi:pointer-address
+                                                                                                                                                                                                                                                                                                          (cffi:callback
+                                                                                                                                                                                                                                                                                                           %callback-rgfw--osx-mouse-entered))
+                                                                                                                                                                                                                                                                                                         (%literal
+                                                                                                                                                                                                                                                                                                          "v@:@")) (class-add-method
+                                                                                                                                                                                                                                                                                                                    (%load
+                                                                                                                                                                                                                                                                                                                     (%offset
+                                                                                                                                                                                                                                                                                                                      (%address-rgfw-info-custom-view-classes
+                                                                                                                                                                                                                                                                                                                       (%load
+                                                                                                                                                                                                                                                                                                                        -rgfw
+                                                                                                                                                                                                                                                                                                                        :pointer))
+                                                                                                                                                                                                                                                                                                                      (*
+                                                                                                                                                                                                                                                                                                                       i
+                                                                                                                                                                                                                                                                                                                       +c-size-pointer+))
+                                                                                                                                                                                                                                                                                                                     :pointer)
+                                                                                                                                                                                                                                                                                                                    (sel-register-name
+                                                                                                                                                                                                                                                                                                                     (%literal
+                                                                                                                                                                                                                                                                                                                      "mouseExited:"))
+                                                                                                                                                                                                                                                                                                                    (cffi:pointer-address
+                                                                                                                                                                                                                                                                                                                     (cffi:callback
+                                                                                                                                                                                                                                                                                                                      %callback-rgfw--osx-mouse-exited))
+                                                                                                                                                                                                                                                                                                                    (%literal
+                                                                                                                                                                                                                                                                                                                     "v@:@")) (class-add-method
+                                                                                                                                                                                                                                                                                                                               (%load
+                                                                                                                                                                                                                                                                                                                                (%offset
+                                                                                                                                                                                                                                                                                                                                 (%address-rgfw-info-custom-view-classes
+                                                                                                                                                                                                                                                                                                                                  (%load
+                                                                                                                                                                                                                                                                                                                                   -rgfw
+                                                                                                                                                                                                                                                                                                                                   :pointer))
+                                                                                                                                                                                                                                                                                                                                 (*
+                                                                                                                                                                                                                                                                                                                                  i
+                                                                                                                                                                                                                                                                                                                                  +c-size-pointer+))
+                                                                                                                                                                                                                                                                                                                                :pointer)
+                                                                                                                                                                                                                                                                                                                               (sel-register-name
+                                                                                                                                                                                                                                                                                                                                (%literal
+                                                                                                                                                                                                                                                                                                                                 "flagsChanged:"))
+                                                                                                                                                                                                                                                                                                                               (cffi:pointer-address
+                                                                                                                                                                                                                                                                                                                                (cffi:callback
+                                                                                                                                                                                                                                                                                                                                 %callback-rgfw--osx-flags-changed))
+                                                                                                                                                                                                                                                                                                                               (%literal
+                                                                                                                                                                                                                                                                                                                                "v@:@")) (class-add-method
+                                                                                                                                                                                                                                                                                                                                          (%load
+                                                                                                                                                                                                                                                                                                                                           (%offset
+                                                                                                                                                                                                                                                                                                                                            (%address-rgfw-info-custom-view-classes
+                                                                                                                                                                                                                                                                                                                                             (%load
+                                                                                                                                                                                                                                                                                                                                              -rgfw
+                                                                                                                                                                                                                                                                                                                                              :pointer))
+                                                                                                                                                                                                                                                                                                                                            (*
+                                                                                                                                                                                                                                                                                                                                             i
+                                                                                                                                                                                                                                                                                                                                             +c-size-pointer+))
+                                                                                                                                                                                                                                                                                                                                           :pointer)
+                                                                                                                                                                                                                                                                                                                                          (sel-get-uid
+                                                                                                                                                                                                                                                                                                                                           (%literal
+                                                                                                                                                                                                                                                                                                                                            "acceptsFirstResponder"))
+                                                                                                                                                                                                                                                                                                                                          (cffi:pointer-address
+                                                                                                                                                                                                                                                                                                                                           (cffi:callback
+                                                                                                                                                                                                                                                                                                                                            %callback-rgfw--osx-accepts-first-responder))
+                                                                                                                                                                                                                                                                                                                                          (%literal
+                                                                                                                                                                                                                                                                                                                                           "B@:")) (class-add-method
+                                                                                                                                                                                                                                                                                                                                                    (%load
+                                                                                                                                                                                                                                                                                                                                                     (%offset
+                                                                                                                                                                                                                                                                                                                                                      (%address-rgfw-info-custom-view-classes
+                                                                                                                                                                                                                                                                                                                                                       (%load
+                                                                                                                                                                                                                                                                                                                                                        -rgfw
+                                                                                                                                                                                                                                                                                                                                                        :pointer))
+                                                                                                                                                                                                                                                                                                                                                      (*
+                                                                                                                                                                                                                                                                                                                                                       i
+                                                                                                                                                                                                                                                                                                                                                       +c-size-pointer+))
+                                                                                                                                                                                                                                                                                                                                                     :pointer)
+                                                                                                                                                                                                                                                                                                                                                    (sel-register-name
+                                                                                                                                                                                                                                                                                                                                                     (%literal
+                                                                                                                                                                                                                                                                                                                                                      "initWithRGFWWindow:"))
+                                                                                                                                                                                                                                                                                                                                                    (cffi:pointer-address
+                                                                                                                                                                                                                                                                                                                                                     (cffi:callback
+                                                                                                                                                                                                                                                                                                                                                      %callback-rgfw--osx-custom-init-with-rgfw-window))
+                                                                                                                                                                                                                                                                                                                                                    (%literal
+                                                                                                                                                                                                                                                                                                                                                     "@@:^v")) (class-add-method
+                                                                                                                                                                                                                                                                                                                                                                (%load
+                                                                                                                                                                                                                                                                                                                                                                 (%offset
+                                                                                                                                                                                                                                                                                                                                                                  (%address-rgfw-info-custom-view-classes
+                                                                                                                                                                                                                                                                                                                                                                   (%load
+                                                                                                                                                                                                                                                                                                                                                                    -rgfw
+                                                                                                                                                                                                                                                                                                                                                                    :pointer))
+                                                                                                                                                                                                                                                                                                                                                                  (*
+                                                                                                                                                                                                                                                                                                                                                                   i
+                                                                                                                                                                                                                                                                                                                                                                   +c-size-pointer+))
+                                                                                                                                                                                                                                                                                                                                                                 :pointer)
+                                                                                                                                                                                                                                                                                                                                                                (sel-register-name
+                                                                                                                                                                                                                                                                                                                                                                 (%literal
+                                                                                                                                                                                                                                                                                                                                                                  "wantsUpdateLayer"))
+                                                                                                                                                                                                                                                                                                                                                                (cffi:pointer-address
+                                                                                                                                                                                                                                                                                                                                                                 (cffi:callback
+                                                                                                                                                                                                                                                                                                                                                                  %callback-rgfw--osx-wants-update-layer))
+                                                                                                                                                                                                                                                                                                                                                                (%literal
+                                                                                                                                                                                                                                                                                                                                                                 "B@:")) (class-add-method
+                                                                                                                                                                                                                                                                                                                                                                          (%load
+                                                                                                                                                                                                                                                                                                                                                                           (%offset
+                                                                                                                                                                                                                                                                                                                                                                            (%address-rgfw-info-custom-view-classes
+                                                                                                                                                                                                                                                                                                                                                                             (%load
+                                                                                                                                                                                                                                                                                                                                                                              -rgfw
+                                                                                                                                                                                                                                                                                                                                                                              :pointer))
+                                                                                                                                                                                                                                                                                                                                                                            (*
+                                                                                                                                                                                                                                                                                                                                                                             i
+                                                                                                                                                                                                                                                                                                                                                                             +c-size-pointer+))
+                                                                                                                                                                                                                                                                                                                                                                           :pointer)
+                                                                                                                                                                                                                                                                                                                                                                          (sel-register-name
+                                                                                                                                                                                                                                                                                                                                                                           (%literal
+                                                                                                                                                                                                                                                                                                                                                                            "updateLayer"))
+                                                                                                                                                                                                                                                                                                                                                                          (cffi:pointer-address
+                                                                                                                                                                                                                                                                                                                                                                           (cffi:callback
+                                                                                                                                                                                                                                                                                                                                                                            %callback-rgfw--osx-update-layer))
+                                                                                                                                                                                                                                                                                                                                                                          (%literal
+                                                                                                                                                                                                                                                                                                                                                                           "v@:")) (class-add-method
+                                                                                                                                                                                                                                                                                                                                                                                    (%load
+                                                                                                                                                                                                                                                                                                                                                                                     (%offset
+                                                                                                                                                                                                                                                                                                                                                                                      (%address-rgfw-info-custom-view-classes
+                                                                                                                                                                                                                                                                                                                                                                                       (%load
+                                                                                                                                                                                                                                                                                                                                                                                        -rgfw
+                                                                                                                                                                                                                                                                                                                                                                                        :pointer))
+                                                                                                                                                                                                                                                                                                                                                                                      (*
+                                                                                                                                                                                                                                                                                                                                                                                       i
+                                                                                                                                                                                                                                                                                                                                                                                       +c-size-pointer+))
+                                                                                                                                                                                                                                                                                                                                                                                     :pointer)
+                                                                                                                                                                                                                                                                                                                                                                                    (sel-register-name
+                                                                                                                                                                                                                                                                                                                                                                                     (%literal
+                                                                                                                                                                                                                                                                                                                                                                                      "draggingEntered:"))
+                                                                                                                                                                                                                                                                                                                                                                                    (cffi:pointer-address
+                                                                                                                                                                                                                                                                                                                                                                                     (cffi:callback
+                                                                                                                                                                                                                                                                                                                                                                                      %callback-rgfw--osx-dragging-entered))
+                                                                                                                                                                                                                                                                                                                                                                                    (%literal
+                                                                                                                                                                                                                                                                                                                                                                                     "L@:@")) (class-add-method
+                                                                                                                                                                                                                                                                                                                                                                                               (%load
+                                                                                                                                                                                                                                                                                                                                                                                                (%offset
+                                                                                                                                                                                                                                                                                                                                                                                                 (%address-rgfw-info-custom-view-classes
+                                                                                                                                                                                                                                                                                                                                                                                                  (%load
+                                                                                                                                                                                                                                                                                                                                                                                                   -rgfw
+                                                                                                                                                                                                                                                                                                                                                                                                   :pointer))
+                                                                                                                                                                                                                                                                                                                                                                                                 (*
+                                                                                                                                                                                                                                                                                                                                                                                                  i
+                                                                                                                                                                                                                                                                                                                                                                                                  +c-size-pointer+))
+                                                                                                                                                                                                                                                                                                                                                                                                :pointer)
+                                                                                                                                                                                                                                                                                                                                                                                               (sel-register-name
+                                                                                                                                                                                                                                                                                                                                                                                                (%literal
+                                                                                                                                                                                                                                                                                                                                                                                                 "draggingUpdated:"))
+                                                                                                                                                                                                                                                                                                                                                                                               (cffi:pointer-address
+                                                                                                                                                                                                                                                                                                                                                                                                (cffi:callback
+                                                                                                                                                                                                                                                                                                                                                                                                 %callback-rgfw--osx-dragging-updated))
+                                                                                                                                                                                                                                                                                                                                                                                               (%literal
+                                                                                                                                                                                                                                                                                                                                                                                                "L@:@")) (class-add-method
+                                                                                                                                                                                                                                                                                                                                                                                                          (%load
+                                                                                                                                                                                                                                                                                                                                                                                                           (%offset
+                                                                                                                                                                                                                                                                                                                                                                                                            (%address-rgfw-info-custom-view-classes
+                                                                                                                                                                                                                                                                                                                                                                                                             (%load
+                                                                                                                                                                                                                                                                                                                                                                                                              -rgfw
+                                                                                                                                                                                                                                                                                                                                                                                                              :pointer))
+                                                                                                                                                                                                                                                                                                                                                                                                            (*
+                                                                                                                                                                                                                                                                                                                                                                                                             i
+                                                                                                                                                                                                                                                                                                                                                                                                             +c-size-pointer+))
+                                                                                                                                                                                                                                                                                                                                                                                                           :pointer)
+                                                                                                                                                                                                                                                                                                                                                                                                          (sel-register-name
+                                                                                                                                                                                                                                                                                                                                                                                                           (%literal
+                                                                                                                                                                                                                                                                                                                                                                                                            "draggingExited:"))
+                                                                                                                                                                                                                                                                                                                                                                                                          (cffi:pointer-address
+                                                                                                                                                                                                                                                                                                                                                                                                           (cffi:callback
+                                                                                                                                                                                                                                                                                                                                                                                                            %callback-rgfw--osx-dragging-ended))
+                                                                                                                                                                                                                                                                                                                                                                                                          (%literal
+                                                                                                                                                                                                                                                                                                                                                                                                           "v@:@")) (class-add-method
+                                                                                                                                                                                                                                                                                                                                                                                                                     (%load
+                                                                                                                                                                                                                                                                                                                                                                                                                      (%offset
+                                                                                                                                                                                                                                                                                                                                                                                                                       (%address-rgfw-info-custom-view-classes
+                                                                                                                                                                                                                                                                                                                                                                                                                        (%load
+                                                                                                                                                                                                                                                                                                                                                                                                                         -rgfw
+                                                                                                                                                                                                                                                                                                                                                                                                                         :pointer))
+                                                                                                                                                                                                                                                                                                                                                                                                                       (*
+                                                                                                                                                                                                                                                                                                                                                                                                                        i
+                                                                                                                                                                                                                                                                                                                                                                                                                        +c-size-pointer+))
+                                                                                                                                                                                                                                                                                                                                                                                                                      :pointer)
+                                                                                                                                                                                                                                                                                                                                                                                                                     (sel-register-name
+                                                                                                                                                                                                                                                                                                                                                                                                                      (%literal
+                                                                                                                                                                                                                                                                                                                                                                                                                       "draggingEnded:"))
+                                                                                                                                                                                                                                                                                                                                                                                                                     (cffi:pointer-address
+                                                                                                                                                                                                                                                                                                                                                                                                                      (cffi:callback
+                                                                                                                                                                                                                                                                                                                                                                                                                       %callback-rgfw--osx-dragging-ended))
+                                                                                                                                                                                                                                                                                                                                                                                                                     (%literal
+                                                                                                                                                                                                                                                                                                                                                                                                                      "v@:@")) (class-add-method
+                                                                                                                                                                                                                                                                                                                                                                                                                                (%load
+                                                                                                                                                                                                                                                                                                                                                                                                                                 (%offset
+                                                                                                                                                                                                                                                                                                                                                                                                                                  (%address-rgfw-info-custom-view-classes
+                                                                                                                                                                                                                                                                                                                                                                                                                                   (%load
+                                                                                                                                                                                                                                                                                                                                                                                                                                    -rgfw
+                                                                                                                                                                                                                                                                                                                                                                                                                                    :pointer))
+                                                                                                                                                                                                                                                                                                                                                                                                                                  (*
+                                                                                                                                                                                                                                                                                                                                                                                                                                   i
+                                                                                                                                                                                                                                                                                                                                                                                                                                   +c-size-pointer+))
+                                                                                                                                                                                                                                                                                                                                                                                                                                 :pointer)
+                                                                                                                                                                                                                                                                                                                                                                                                                                (sel-register-name
+                                                                                                                                                                                                                                                                                                                                                                                                                                 (%literal
+                                                                                                                                                                                                                                                                                                                                                                                                                                  "prepareForDragOperation:"))
+                                                                                                                                                                                                                                                                                                                                                                                                                                (cffi:pointer-address
+                                                                                                                                                                                                                                                                                                                                                                                                                                 (cffi:callback
+                                                                                                                                                                                                                                                                                                                                                                                                                                  %callback-rgfw--osx-prepare-for-drag-operation))
+                                                                                                                                                                                                                                                                                                                                                                                                                                (%literal
+                                                                                                                                                                                                                                                                                                                                                                                                                                 "B@:@")) (class-add-method
+                                                                                                                                                                                                                                                                                                                                                                                                                                           (%load
+                                                                                                                                                                                                                                                                                                                                                                                                                                            (%offset
+                                                                                                                                                                                                                                                                                                                                                                                                                                             (%address-rgfw-info-custom-view-classes
+                                                                                                                                                                                                                                                                                                                                                                                                                                              (%load
+                                                                                                                                                                                                                                                                                                                                                                                                                                               -rgfw
+                                                                                                                                                                                                                                                                                                                                                                                                                                               :pointer))
+                                                                                                                                                                                                                                                                                                                                                                                                                                             (*
+                                                                                                                                                                                                                                                                                                                                                                                                                                              i
+                                                                                                                                                                                                                                                                                                                                                                                                                                              +c-size-pointer+))
+                                                                                                                                                                                                                                                                                                                                                                                                                                            :pointer)
+                                                                                                                                                                                                                                                                                                                                                                                                                                           (sel-register-name
+                                                                                                                                                                                                                                                                                                                                                                                                                                            (%literal
+                                                                                                                                                                                                                                                                                                                                                                                                                                             "performDragOperation:"))
+                                                                                                                                                                                                                                                                                                                                                                                                                                           (cffi:pointer-address
+                                                                                                                                                                                                                                                                                                                                                                                                                                            (cffi:callback
+                                                                                                                                                                                                                                                                                                                                                                                                                                             %callback-rgfw--osx-perform-drag-operation))
+                                                                                                                                                                                                                                                                                                                                                                                                                                           (%literal
+                                                                                                                                                                                                                                                                                                                                                                                                                                            "B@:@")) (class-add-method
+                                                                                                                                                                                                                                                                                                                                                                                                                                                      (%load
+                                                                                                                                                                                                                                                                                                                                                                                                                                                       (%offset
+                                                                                                                                                                                                                                                                                                                                                                                                                                                        (%address-rgfw-info-custom-view-classes
+                                                                                                                                                                                                                                                                                                                                                                                                                                                         (%load
+                                                                                                                                                                                                                                                                                                                                                                                                                                                          -rgfw
+                                                                                                                                                                                                                                                                                                                                                                                                                                                          :pointer))
+                                                                                                                                                                                                                                                                                                                                                                                                                                                        (*
+                                                                                                                                                                                                                                                                                                                                                                                                                                                         i
+                                                                                                                                                                                                                                                                                                                                                                                                                                                         +c-size-pointer+))
+                                                                                                                                                                                                                                                                                                                                                                                                                                                       :pointer)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                      (sel-register-name
+                                                                                                                                                                                                                                                                                                                                                                                                                                                       (%literal
+                                                                                                                                                                                                                                                                                                                                                                                                                                                        "performKeyEquivalent:"))
+                                                                                                                                                                                                                                                                                                                                                                                                                                                      (cffi:pointer-address
+                                                                                                                                                                                                                                                                                                                                                                                                                                                       (cffi:callback
+                                                                                                                                                                                                                                                                                                                                                                                                                                                        %callback-rgfw--osx-perform-key-equivalent))
+                                                                                                                                                                                                                                                                                                                                                                                                                                                      (%literal
+                                                                                                                                                                                                                                                                                                                                                                                                                                                       "B@:@")) (class-add-method
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                 (%load
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                  (%offset
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                   (%address-rgfw-info-custom-view-classes
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                    (%load
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                     -rgfw
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                     :pointer))
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                   (*
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                    i
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                    +c-size-pointer+))
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                  :pointer)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                 (sel-register-name
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                  (%literal
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                   "updateTrackingAreas"))
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                 (cffi:pointer-address
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                  (cffi:callback
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                   %callback-rgfw--osx-update-tracking-areas))
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                 (%literal
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                  "v@:")) (class-add-method
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                           (%load
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            (%offset
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                             (%address-rgfw-info-custom-view-classes
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                              (%load
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                               -rgfw
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                               :pointer))
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                             (*
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                              i
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                              +c-size-pointer+))
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            :pointer)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                           (sel-register-name
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            (%literal
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                             "dealloc"))
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                           (cffi:pointer-address
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            (cffi:callback
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                             %callback-rgfw--osx-view-dealloc))
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                           (%literal
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            "v@:")) (objc-register-class-pair
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     (%load
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      (%offset
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       (%address-rgfw-info-custom-view-classes
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        (%load
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         -rgfw
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         :pointer))
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       (*
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        i
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        +c-size-pointer+))
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      :pointer)) (setf i
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         (%c-expression-to-size-t
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          (+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           (%c-expression-to-size-t
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            i)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           1)))))
+      (setf (%rgfw-info-custom-window-delegate-class (%load -rgfw :pointer))
+              (objc-allocate-class-pair
+               (objc-get-class (%literal "NSObject"))
+               (%literal "RGFWWindowDelegate") 0))
+      (when
+          (%pointer-equal
+           (%rgfw-info-custom-window-delegate-class (%load -rgfw :pointer))
+           0)
+        (rgfw-debug-callback 0 12
+         (%literal "failed to create RGFWWindowDelegate class"))
+        (return-from rgfw-init-platform -1))
+      (class-add-ivar
+       (%rgfw-info-custom-window-delegate-class (%load -rgfw :pointer))
+       (%literal "RGFW_window") (%c-expression-to-size-t +c-size-pointer+)
+       (%c-expression-to-uint8-t
+        (if (= (%c-expression-to-size-t +c-size-pointer+) 8)
+            3
+            2))
+       (%literal "^v"))
+      (class-add-method
+       (%rgfw-info-custom-window-delegate-class (%load -rgfw :pointer))
+       (sel-register-name (%literal "windowDidResize:"))
+       (cffi:pointer-address
+        (cffi:callback %callback-rgfw--osx-did-window-resize))
+       (%literal "v@:@"))
+      (class-add-method
+       (%rgfw-info-custom-window-delegate-class (%load -rgfw :pointer))
+       (sel-register-name (%literal "windowDidMove:"))
+       (cffi:pointer-address (cffi:callback %callback-rgfw--osx-window-move))
+       (%literal "v@:@"))
+      (class-add-method
+       (%rgfw-info-custom-window-delegate-class (%load -rgfw :pointer))
+       (sel-register-name (%literal "windowDidMiniaturize:"))
+       (cffi:pointer-address
+        (cffi:callback %callback-rgfw--osx-window-miniaturize))
+       (%literal "v@:@"))
+      (class-add-method
+       (%rgfw-info-custom-window-delegate-class (%load -rgfw :pointer))
+       (sel-register-name (%literal "windowDidDeminiaturize:"))
+       (cffi:pointer-address
+        (cffi:callback %callback-rgfw--osx-window-deminiaturize))
+       (%literal "v@:@"))
+      (class-add-method
+       (%rgfw-info-custom-window-delegate-class (%load -rgfw :pointer))
+       (sel-register-name (%literal "windowDidBecomeKey:"))
+       (cffi:pointer-address
+        (cffi:callback %callback-rgfw--osx-window-became-key))
+       (%literal "v@:@"))
+      (class-add-method
+       (%rgfw-info-custom-window-delegate-class (%load -rgfw :pointer))
+       (sel-register-name (%literal "windowDidResignKey:"))
+       (cffi:pointer-address
+        (cffi:callback %callback-rgfw--osx-window-resign-key))
+       (%literal "v@:@"))
+      (class-add-method
+       (%rgfw-info-custom-window-delegate-class (%load -rgfw :pointer))
+       (sel-register-name (%literal "windowShouldClose:"))
+       (cffi:pointer-address
+        (cffi:callback %callback-rgfw-osx-window-should-close))
+       (%literal "B@:@"))
+      (objc-register-class-pair
+       (%rgfw-info-custom-window-delegate-class (%load -rgfw :pointer)))
+      (setf (%rgfw-info-custom-window-class (%load -rgfw :pointer))
+              (objc-get-class (%literal "RGFWWindowClass")))
+      (when
+          (%pointer-equal
+           (%rgfw-info-custom-window-class (%load -rgfw :pointer)) 0)
+        (setf (%rgfw-info-custom-window-class (%load -rgfw :pointer))
+                (objc-allocate-class-pair
+                 (objc-get-class (%literal "NSWindow"))
+                 (%literal "RGFWWindowClass") 0))
+        (when
+            (%pointer-equal
+             (%rgfw-info-custom-window-class (%load -rgfw :pointer)) 0)
+          (rgfw-debug-callback 0 12
+           (%literal "failed to create RGFWWindowClass class"))
+          (return-from rgfw-init-platform -1))
+        (class-add-method
+         (%rgfw-info-custom-window-class (%load -rgfw :pointer))
+         (sel-register-name (%literal "canBecomeKeyWindow"))
+         (cffi:pointer-address
+          (cffi:callback %callback-rgfw--osx-can-become-key-window))
+         (%literal "B@:"))
+        (class-add-method
+         (%rgfw-info-custom-window-class (%load -rgfw :pointer))
+         (sel-register-name (%literal "canBecomeMainWindow"))
+         (cffi:pointer-address
+          (cffi:callback %callback-rgfw--osx-can-become-main-window))
+         (%literal "B@:"))
+        (objc-register-class-pair
+         (%rgfw-info-custom-window-class (%load -rgfw :pointer))))
+      (%call-pointer
+       (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+       nil :pointer pool :pointer (sel-register-name (%literal "drain"))
+       :int8)
+      (return-from rgfw-init-platform 0)))))
 
 ;; C source (RGFW.h:1133-1137):
 ;; @brief Initializes RGFW using a user-provided RGFW_info structure.
 ;; @param info A pointer to an RGFW_info structure to be used for initialization.
 ;; @return  0 on success, a negative number error error on failure and a positive number for a warning.
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-init-ptr (class-name flags info)
   (%with-string-inputs (class-name)
    (let ((out 0))
@@ -11370,7 +15616,7 @@
 ;; @param key the key code of the key you want to check
 ;; @return The boolean value if the key is down or not
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-is-key-down (key)
   (assert (not (%pointer-equal (%load -rgfw :pointer) 0)))
   (%rgfw-key-state-current
@@ -11389,7 +15635,7 @@
 ;; @param key the key code of the key you want to check
 ;; @return The boolean value if the key is pressed or not
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-is-key-pressed (key)
   (assert (not (%pointer-equal (%load -rgfw :pointer) 0)))
   (%c-expression-to-rgfw-bool
@@ -11428,7 +15674,7 @@
 ;; @param key the key code of the key you want to check
 ;; @return The boolean value if the key is released or not
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-is-key-released (key)
   (assert (not (%pointer-equal (%load -rgfw :pointer) 0)))
   (%c-expression-to-rgfw-bool
@@ -11467,7 +15713,7 @@
 ;; @param button the mouse button code of the button you want to check
 ;; @return The boolean value if the button is down or not
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-is-mouse-down (button)
   (assert (not (%pointer-equal (%load -rgfw :pointer) 0)))
   (%rgfw-key-state-current
@@ -11486,7 +15732,7 @@
 ;; @param button the mouse button code of the button you want to check
 ;; @return The boolean value if the button is pressed or not
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-is-mouse-pressed (button)
   (assert (not (%pointer-equal (%load -rgfw :pointer) 0)))
   (%c-expression-to-rgfw-bool
@@ -11525,7 +15771,7 @@
 ;; @param button the mouse button code of the button you want to check
 ;; @return The boolean value if the button is released or not
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-is-mouse-released (button)
   (assert (not (%pointer-equal (%load -rgfw :pointer) 0)))
   (%c-expression-to-rgfw-bool
@@ -11620,16 +15866,17 @@
 (defun rgfw-key-update-key-mod (win mod value)
   (let* ((%internal (%address-rgfw-window-internal win)))
     (if (not (%zero-p value))
-        (let ((%temporary-1 %internal))
-          (setf (%rgfw-window-internal-mod %temporary-1)
-                  (%c-int-to-rgfw-keymod
-                   (logior (%rgfw-window-internal-mod %temporary-1) mod))))
-        (let ((%temporary-2 %internal))
-          (setf (%rgfw-window-internal-mod %temporary-2)
-                  (%c-int-to-rgfw-keymod
-                   (logand (%rgfw-window-internal-mod %temporary-2)
-                           (lognot mod))))))
+        (with-accessors ((%mod %rgfw-window-internal-mod)) %internal
+           (setf %mod (%c-int-to-rgfw-keymod (logior %mod mod))))
+        (with-accessors ((%mod-2 %rgfw-window-internal-mod)) %internal
+           (setf %mod-2
+                   (%c-int-to-rgfw-keymod (logand %mod-2 (lognot mod))))))
     nil))
+#+(:or
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (defun rgfw-key-update-key-mods (win capital numlock scroll)
   (rgfw-key-update-key-mods-ex win capital numlock
    (%c-expression-to-rgfw-bool
@@ -11747,7 +15994,7 @@
 ;; @param modes [OUTPUT] a pointer to be filled with the output closest monitor
 ;; @return returns true if a suitable monitor was found and false if no suitable monitor was found at all
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-monitor-find-closest-mode (monitor mode closest)
   (%with-native-frame nil
    (let ((count 0)
@@ -12059,7 +16306,7 @@
 ;; @brief Get the allocated gamma ramp
 ;; @param monitor the source monitor object
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-monitor-get-gamma-ramp (monitor)
   (let ((ramp 0))
     (assert (not (%pointer-equal monitor 0)))
@@ -12200,13 +16447,90 @@
         (%c-expression-to-size-t 512)))
      (%c-expression-to-size-t
       (truncate (%c-expression-to-size-t 512) (%c-expression-to-size-t 2))))))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-monitor-get-gamma-ramp-ptr (monitor ramp)
+  (%with-native-frame nil
+   (let ((pool 0) (size (%allocate-local 4)) (values 0))
+     (assert (not (%pointer-equal monitor 0)))
+     (setf pool
+             (%call-pointer
+              (cffi:pointer-address
+               (cffi:foreign-symbol-pointer "objc_msgSend"))
+              nil :pointer
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer (objc-get-class (%literal "NSAutoreleasePool"))
+               :pointer (sel-register-name (%literal "alloc")) :pointer)
+              :pointer (sel-register-name (%literal "init")) :pointer))
+     (%store size 4
+      (cg-display-gamma-table-capacity
+       (%rgfw-monitor-node-display (%rgfw-monitor-node monitor))))
+     (setf values
+             (%allocate
+              (%c-expression-to-size-t
+               (*
+                (%c-u32-to-size-t
+                 (%c-expression-to-u32 (* (%load size 4) 3)))
+                (%c-expression-to-size-t 4)))))
+     (cg-get-display-transfer-by-table
+      (%rgfw-monitor-node-display (%rgfw-monitor-node monitor))
+      (%load size 4) values (%offset values (* (%load size 4) 4))
+      (%offset values (* (%c-expression-to-u32 (ash (%load size 4) 1)) 4))
+      size)
+     (let ((i 0))
+       (loop :while (and (not (%zero-p ramp)) (< i (%load size 4)))
+             :do (%store (%offset (%rgfw-gamma-ramp-red ramp) (* i 2)) 2
+                  (%c-cg-gamma-value-to-u16
+                   (* (%load (%offset values (* i 4)) :float)
+                      65535.0))) (%store
+                                  (%offset (%rgfw-gamma-ramp-green ramp)
+                                   (* i 2))
+                                  2
+                                  (%c-cg-gamma-value-to-u16
+                                   (*
+                                    (%load
+                                     (%offset values
+                                      (*
+                                       (%c-expression-to-u32
+                                        (+ i (%load size 4)))
+                                       4))
+                                     :float)
+                                    65535.0))) (%store
+                                                (%offset
+                                                 (%rgfw-gamma-ramp-blue ramp)
+                                                 (* i 2))
+                                                2
+                                                (%c-cg-gamma-value-to-u16
+                                                 (*
+                                                  (%load
+                                                   (%offset values
+                                                    (*
+                                                     (%c-expression-to-u32
+                                                      (+ i
+                                                         (%c-expression-to-u32
+                                                          (ash (%load size 4)
+                                                               1))))
+                                                     4))
+                                                   :float)
+                                                  65535.0))) (setf i
+                                                                     (%c-expression-to-u32
+                                                                      (+
+                                                                       (%c-expression-to-u32
+                                                                        i)
+                                                                       1)))))
+     (%free values)
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer pool :pointer (sel-register-name (%literal "drain")) :int8)
+     (%c-u32-to-size-t (%load size 4)))))
 
 ;; C source (RGFW.h:1428-1433):
 ;; @brief Get the mode of a monitor (the same as monitor.mode)
 ;; @param monitor the source monitor object
 ;; @param mode [OUTPUT] current mode the monitor
 ;; @return a bool if the function was successful
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-monitor-get-mode (monitor mode)
   (assert (not (%pointer-equal monitor 0)))
   (when (not (%zero-p mode))
@@ -12226,7 +16550,7 @@
 ;; @param count [OUTPUT] the count of the array
 ;; @return the allocated array of supported modes
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-monitor-get-modes (monitor count)
   (%with-native-frame nil
    (let ((num 0) (modes (%allocate-local +c-size-pointer+)))
@@ -12508,6 +16832,45 @@
                             (%release-frame *frame*)))))
                  (%temporary-2)))
      count)))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-monitor-get-modes-ptr (mon modes)
+  (%with-native-frame nil
+   (let ((display 0) (all-modes 0) (count 0) (i 0))
+     (assert (not (%pointer-equal mon 0)))
+     (setf display (%rgfw-monitor-node-display (%rgfw-monitor-node mon))
+           all-modes (%rgfw-monitor-node-all-modes (%rgfw-monitor-node mon)))
+     (when (%pointer-equal all-modes 0)
+       (return-from rgfw-monitor-get-modes-ptr 0))
+     (setf count (%c-cf-index-to-size-t (cf-array-get-count all-modes))
+           i 0)
+     (loop :while (and (< i (%c-size-t-to-cf-index count))
+                       (not (%zero-p modes)))
+           :do (let ((*frame* (common-lisp:list nil)))
+                 (declare (dynamic-extent *frame*))
+                 (unwind-protect
+                     (let ((cmode 0)
+                           (found-mode
+                            (%allocate-local +c-size-rgfw-monitor-mode+)))
+                       (setf cmode (cf-array-get-value-at-index all-modes i)
+                             (%rgfw-monitor-mode-w found-mode)
+                               (%c-size-t-to-i32
+                                (cg-display-mode-get-width cmode))
+                             (%rgfw-monitor-mode-h found-mode)
+                               (%c-size-t-to-i32
+                                (cg-display-mode-get-height cmode))
+                             (%rgfw-monitor-mode-refresh-rate found-mode)
+                               (rgfw-osx-get-refresh-rate display cmode)
+                             (%rgfw-monitor-mode-red found-mode) 8
+                             (%rgfw-monitor-mode-green found-mode) 8
+                             (%rgfw-monitor-mode-blue found-mode) 8
+                             (%rgfw-monitor-mode-src found-mode)
+                               (%c-cf-index-to-pointer i))
+                       (%copy
+                        (%offset (%load modes :pointer)
+                         (* i +c-size-rgfw-monitor-mode+))
+                        found-mode 24))
+                   (%release-frame *frame*))) (setf i (+ i 1)))
+     count)))
 
 ;; C source (RGFW.h:1390-1393):
 ;; @brief Get the name of a monitor (the same as monitor.name)
@@ -12521,7 +16884,7 @@
 ;; @param h [OUTPUT] the physical height of the monitor
 ;; @return a bool if the function was successful
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-monitor-get-physical-size (monitor w h)
   (assert (not (%pointer-equal monitor 0)))
   (when (not (%zero-p w)) (%store w :float (%rgfw-monitor-phys-w monitor)))
@@ -12541,7 +16904,7 @@
 ;; @param y [OUTPUT] the y position of the monitor
 ;; @return a bool if the function was successful
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-monitor-get-position (monitor x y)
   (assert (not (%pointer-equal monitor 0)))
   (when (not (%zero-p x)) (%store x -4 (%rgfw-monitor-x monitor)))
@@ -12562,7 +16925,7 @@
 ;; @param y [OUTPUT] the y scale of the monitor
 ;; @return a bool if the function was successful
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-monitor-get-scale (monitor x y)
   (assert (not (%pointer-equal monitor 0)))
   (when (not (%zero-p x)) (%store x :float (%rgfw-monitor-scale-x monitor)))
@@ -12580,7 +16943,7 @@
 ;; @brief Get the user pointer of a monitor (the same as monitor.userPtr)
 ;; @param monitor the source monitor object
 ;; @return the user pointer of the monitor
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-monitor-get-user-ptr (monitor)
   (assert (not (%pointer-equal monitor 0)))
   (%rgfw-monitor-user-ptr monitor))
@@ -12905,13 +17268,85 @@
        (%store height -4
         (%c-long-to-i32 (- (%tag-rect-bottom %work) (%tag-rect-top %work)))))
      1)))
-
-;; C source (RGFW.h:1486-1492):
+#+(:and :darwin :x86-64)
+(defun rgfw-monitor-get-workarea (monitor x y width height)
+  (%with-native-frame nil
+   (let* ((frame-rect (%allocate-local 32))
+          (%origin (%address-cg-rect-origin frame-rect))
+          (%size (%address-cg-rect-size frame-rect)))
+     (assert (not (%pointer-equal monitor 0)))
+     (%copy frame-rect
+      (%call-pointer
+       (cffi:pointer-address
+        (cffi:foreign-symbol-pointer "objc_msgSend_stret"))
+       nil :pointer (%rgfw-monitor-node-screen (%rgfw-monitor-node monitor))
+       :pointer (sel-register-name (%literal "visibleFrame"))
+       (:struct %abi-struct-2))
+      32)
+     (when (not (%zero-p x))
+       (%store x -4 (%c-cg-float-to-i32 (%cg-point-x %origin))))
+     (when (not (%zero-p y))
+       (%store y -4
+        (%c-float-to-i32
+         (rgfw-cocoa-y-transform
+          (coerce (- (+ (%cg-point-y %origin) (%cg-size-height %size)) 1.0d0)
+                  'single-float)))))
+     (when (not (%zero-p width))
+       (%store width -4 (%c-cg-float-to-i32 (%cg-size-width %size))))
+     (when (not (%zero-p height))
+       (%store height -4 (%c-cg-float-to-i32 (%cg-size-height %size))))
+     1)))
+#+(:and :darwin :arm64)
+(defun rgfw-monitor-get-workarea (monitor x y width height)
+  (%with-native-frame nil
+   (let* ((frame-rect (%allocate-local 32))
+          (%origin (%address-cg-rect-origin frame-rect))
+          (%size (%address-cg-rect-size frame-rect)))
+     (assert (not (%pointer-equal monitor 0)))
+     (%copy frame-rect
+      (%call-pointer
+       (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+       nil :pointer (%rgfw-monitor-node-screen (%rgfw-monitor-node monitor))
+       :pointer (sel-register-name (%literal "visibleFrame"))
+       (:struct %abi-struct-2))
+      32)
+     (when (not (%zero-p x))
+       (%store x -4 (%c-cg-float-to-i32 (%cg-point-x %origin))))
+     (when (not (%zero-p y))
+       (%store y -4
+        (%c-float-to-i32
+         (rgfw-cocoa-y-transform
+          (coerce (- (+ (%cg-point-y %origin) (%cg-size-height %size)) 1.0d0)
+                  'single-float)))))
+     (when (not (%zero-p width))
+       (%store width -4 (%c-cg-float-to-i32 (%cg-size-width %size))))
+     (when (not (%zero-p height))
+       (%store height -4 (%c-cg-float-to-i32 (%cg-size-height %size))))
+     1)))
+#+(:or
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
+(progn
+ ;; C source (RGFW.h:1486-1492):
 ;; @brief Compares two monitor modes to check if they are equivalent.
 ;; @param mon The first monitor mode.
 ;; @param mon2 The second monitor mode.
 ;; @param request The RGFW_modeRequest that defines the comparison parameters.
 ;; @return RGFW_TRUE if both modes are equivalent, otherwise RGFW_FALSE.
+)
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ ;; C source (RGFW.h:1486-1492):
+;; @brief Compares two monitor modes to check if they are equivalent.
+;; @param mon The first monitor mode.
+;; @param mon2 The second monitor mode.
+;; @param request The RGFW_modeRequest that defines the comparison parameters.
+;; @return RGFW_TRUE if both modes are equivalent, otherwise RGFW_FALSE.
+;; C source (RGFW.h:4721):
+;; handle leftovers
+)
 (defun rgfw-monitor-mode-compare (mon mon2 request)
   (assert (not (%zero-p mon)))
   (assert (not (%zero-p mon2)))
@@ -12934,7 +17369,17 @@
          (%zero-p (logand request 4))))
        1
        0)))
+#+(:or
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (defun rgfw-monitor-node-free (node) (assert (not (%zero-p node))) nil)
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-monitor-node-free (node)
+  (assert (not (%zero-p node)))
+  (cf-release (%rgfw-monitor-node-all-modes node))
+  nil)
 
 ;; C source (RGFW.h:1468-1474):
 ;; @brief Requests the display mode for a monitor (based on what attributes are directly requested).
@@ -12945,7 +17390,6 @@
 ;; C2LISP [storage]
 #+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
 (defun rgfw-monitor-request-mode (mon mode request)
-  (declare (ignorable mode request))
   (%with-native-frame nil
    (let ((output 0) (res 0) (ci 0) (oi 0) (native 0) (i 0))
      (assert (not (%pointer-equal mon 0)))
@@ -12976,38 +17420,32 @@
               res (%rgfw-monitor-node-rr-output (%rgfw-monitor-node mon)))
            native 0
            i 0)
-     (loop :named %temporary-1
-           :while (< i (%-xrr-output-info-nmode oi))
-           :do (flet ((%temporary-2 ()
-                        (let ((*frame* (common-lisp:list nil)))
-                          (declare (dynamic-extent *frame*))
-                          (unwind-protect
-                              (let ((found-mode
-                                     (%allocate-local
-                                      +c-size-rgfw-monitor-mode+))
-                                    (mi 0))
-                                (setf mi
-                                        (rgfw-x-get-mode ci res
-                                         (%load
-                                          (%offset
-                                           (%-xrr-output-info-modes oi)
-                                           (* i +c-size-rr-mode+))
-                                          +c-code-rr-mode+)
-                                         found-mode))
-                                (when (%pointer-equal mi 0)
-                                  (return-from %temporary-2))
-                                (when
-                                    (not
-                                     (%zero-p
-                                      (rgfw-monitor-mode-compare mode
-                                       found-mode request)))
-                                  (setf native (%-xrr-mode-info-id mi)
-                                        output 1)
-                                  (%copy (%address-rgfw-monitor-mode mon)
-                                   found-mode 24)
-                                  (return-from %temporary-1)))
-                            (%release-frame *frame*)))))
-                 (%temporary-2)) (incf i))
+     (loop :while (< i (%-xrr-output-info-nmode oi))
+           :do (let ((*frame* (common-lisp:list nil)))
+                 (declare (dynamic-extent *frame*))
+                 (unwind-protect
+                     (let ((found-mode
+                            (%allocate-local +c-size-rgfw-monitor-mode+))
+                           (mi 0))
+                       (setf mi
+                               (rgfw-x-get-mode ci res
+                                (%load
+                                 (%offset (%-xrr-output-info-modes oi)
+                                  (* i +c-size-rr-mode+))
+                                 +c-code-rr-mode+)
+                                found-mode))
+                       (unless (%pointer-equal mi 0)
+                         (when
+                             (not
+                              (%zero-p
+                               (rgfw-monitor-mode-compare mode found-mode
+                                request)))
+                           (setf native (%-xrr-mode-info-id mi)
+                                 output 1)
+                           (%copy (%address-rgfw-monitor-mode mon) found-mode
+                            24)
+                           (return))))
+                   (%release-frame *frame*))) (incf i))
      (when (not (%zero-p native))
        (xrr-set-crtc-config (%rgfw-info-display (%load -rgfw :pointer)) res
         (%rgfw-monitor-node-crtc (%rgfw-monitor-node mon)) 0
@@ -13021,7 +17459,6 @@
 #+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
    (:or :freebsd :linux))
 (defun rgfw-monitor-request-mode (mon mode request)
-  (declare (ignorable mode request))
   (%with-native-frame nil
    (let ((output 0) (res 0) (ci 0) (oi 0) (native 0) (i 0))
      (assert (/= (%c-pointer-to-int mon) 0))
@@ -13053,38 +17490,32 @@
               res (%rgfw-monitor-node-rr-output (%rgfw-monitor-node mon)))
            native 0
            i 0)
-     (loop :named %temporary-1
-           :while (< i (%-xrr-output-info-nmode oi))
-           :do (flet ((%temporary-2 ()
-                        (let ((*frame* (common-lisp:list nil)))
-                          (declare (dynamic-extent *frame*))
-                          (unwind-protect
-                              (let ((found-mode
-                                     (%allocate-local
-                                      +c-size-rgfw-monitor-mode+))
-                                    (mi 0))
-                                (setf mi
-                                        (rgfw-x-get-mode ci res
-                                         (%load
-                                          (%offset
-                                           (%-xrr-output-info-modes oi)
-                                           (* i +c-size-rr-mode+))
-                                          +c-code-rr-mode+)
-                                         found-mode))
-                                (when (= (%c-pointer-to-int mi) 0)
-                                  (return-from %temporary-2))
-                                (when
-                                    (not
-                                     (%zero-p
-                                      (rgfw-monitor-mode-compare mode
-                                       found-mode request)))
-                                  (setf native (%-xrr-mode-info-id mi)
-                                        output 1)
-                                  (%copy (%address-rgfw-monitor-mode mon)
-                                   found-mode 20)
-                                  (return-from %temporary-1)))
-                            (%release-frame *frame*)))))
-                 (%temporary-2)) (incf i))
+     (loop :while (< i (%-xrr-output-info-nmode oi))
+           :do (let ((*frame* (common-lisp:list nil)))
+                 (declare (dynamic-extent *frame*))
+                 (unwind-protect
+                     (let ((found-mode
+                            (%allocate-local +c-size-rgfw-monitor-mode+))
+                           (mi 0))
+                       (setf mi
+                               (rgfw-x-get-mode ci res
+                                (%load
+                                 (%offset (%-xrr-output-info-modes oi)
+                                  (* i +c-size-rr-mode+))
+                                 +c-code-rr-mode+)
+                                found-mode))
+                       (unless (= (%c-pointer-to-int mi) 0)
+                         (when
+                             (not
+                              (%zero-p
+                               (rgfw-monitor-mode-compare mode found-mode
+                                request)))
+                           (setf native (%-xrr-mode-info-id mi)
+                                 output 1)
+                           (%copy (%address-rgfw-monitor-mode mon) found-mode
+                            20)
+                           (return))))
+                   (%release-frame *frame*))) (incf i))
      (when (not (%zero-p native))
        (xrr-set-crtc-config (%rgfw-info-display (%load -rgfw :pointer)) res
         (%rgfw-monitor-node-crtc (%rgfw-monitor-node mon)) 0
@@ -13123,17 +17554,17 @@
                                                       (not
                                                        (%zero-p
                                                         (logand request 1)))
-                                                    (let ((%temporary-5 dm))
-                                                      (setf (%-devicemode-w-dm-fields
-                                                             %temporary-5)
-                                                              (%c-expression-to-dword
-                                                               (logior
-                                                                (%-devicemode-w-dm-fields
-                                                                 %temporary-5)
-                                                                (%c-long-to-dword
-                                                                 (logior
-                                                                  524288
-                                                                  1048576))))))
+                                                    (with-accessors ((%dm-fields
+                                                                      %-devicemode-w-dm-fields))
+                                                         dm
+                                                       (setf %dm-fields
+                                                               (%c-expression-to-dword
+                                                                (logior
+                                                                 %dm-fields
+                                                                 (%c-long-to-dword
+                                                                  (logior
+                                                                   524288
+                                                                   1048576))))))
                                                     (setf (%-devicemode-w-dm-pels-width
                                                            dm)
                                                             (%c-i32-to-u32
@@ -13149,15 +17580,14 @@
                                                                              (logand
                                                                               request
                                                                               2)))
-                                                                         (let ((%temporary-8
-                                                                                dm))
-                                                                           (setf (%-devicemode-w-dm-fields
-                                                                                  %temporary-8)
-                                                                                   (%c-expression-to-dword
-                                                                                    (logior
-                                                                                     (%-devicemode-w-dm-fields
-                                                                                      %temporary-8)
-                                                                                     4194304))))
+                                                                         (with-accessors ((%dm-fields-2
+                                                                                           %-devicemode-w-dm-fields))
+                                                                              dm
+                                                                            (setf %dm-fields-2
+                                                                                    (%c-expression-to-dword
+                                                                                     (logior
+                                                                                      %dm-fields-2
+                                                                                      4194304))))
                                                                          (setf (%-devicemode-w-dm-display-frequency
                                                                                 dm)
                                                                                  (%c-float-to-dword
@@ -13168,15 +17598,14 @@
                                                                                                   (logand
                                                                                                    request
                                                                                                    4)))
-                                                                                              (let ((%temporary-10
-                                                                                                     dm))
-                                                                                                (setf (%-devicemode-w-dm-fields
-                                                                                                       %temporary-10)
-                                                                                                        (%c-expression-to-dword
-                                                                                                         (logior
-                                                                                                          (%-devicemode-w-dm-fields
-                                                                                                           %temporary-10)
-                                                                                                          262144))))
+                                                                                              (with-accessors ((%dm-fields-3
+                                                                                                                %-devicemode-w-dm-fields))
+                                                                                                   dm
+                                                                                                 (setf %dm-fields-3
+                                                                                                         (%c-expression-to-dword
+                                                                                                          (logior
+                                                                                                           %dm-fields-3
+                                                                                                           262144))))
                                                                                               (setf (%-devicemode-w-dm-bits-per-pel
                                                                                                      dm)
                                                                                                       (%c-int-to-dword
@@ -13248,17 +17677,17 @@
                                                       (not
                                                        (%zero-p
                                                         (logand request 1)))
-                                                    (let ((%temporary-5 dm))
-                                                      (setf (%-devicemode-w-dm-fields
-                                                             %temporary-5)
-                                                              (%c-expression-to-dword
-                                                               (logior
-                                                                (%-devicemode-w-dm-fields
-                                                                 %temporary-5)
-                                                                (%c-long-to-dword
-                                                                 (logior
-                                                                  524288
-                                                                  1048576))))))
+                                                    (with-accessors ((%dm-fields
+                                                                      %-devicemode-w-dm-fields))
+                                                         dm
+                                                       (setf %dm-fields
+                                                               (%c-expression-to-dword
+                                                                (logior
+                                                                 %dm-fields
+                                                                 (%c-long-to-dword
+                                                                  (logior
+                                                                   524288
+                                                                   1048576))))))
                                                     (setf (%-devicemode-w-dm-pels-width
                                                            dm)
                                                             (%c-i32-to-u32
@@ -13274,15 +17703,14 @@
                                                                              (logand
                                                                               request
                                                                               2)))
-                                                                         (let ((%temporary-8
-                                                                                dm))
-                                                                           (setf (%-devicemode-w-dm-fields
-                                                                                  %temporary-8)
-                                                                                   (%c-expression-to-dword
-                                                                                    (logior
-                                                                                     (%-devicemode-w-dm-fields
-                                                                                      %temporary-8)
-                                                                                     4194304))))
+                                                                         (with-accessors ((%dm-fields-2
+                                                                                           %-devicemode-w-dm-fields))
+                                                                              dm
+                                                                            (setf %dm-fields-2
+                                                                                    (%c-expression-to-dword
+                                                                                     (logior
+                                                                                      %dm-fields-2
+                                                                                      4194304))))
                                                                          (setf (%-devicemode-w-dm-display-frequency
                                                                                 dm)
                                                                                  (%c-float-to-dword
@@ -13293,15 +17721,14 @@
                                                                                                   (logand
                                                                                                    request
                                                                                                    4)))
-                                                                                              (let ((%temporary-10
-                                                                                                     dm))
-                                                                                                (setf (%-devicemode-w-dm-fields
-                                                                                                       %temporary-10)
-                                                                                                        (%c-expression-to-dword
-                                                                                                         (logior
-                                                                                                          (%-devicemode-w-dm-fields
-                                                                                                           %temporary-10)
-                                                                                                          262144))))
+                                                                                              (with-accessors ((%dm-fields-3
+                                                                                                                %-devicemode-w-dm-fields))
+                                                                                                   dm
+                                                                                                 (setf %dm-fields-3
+                                                                                                         (%c-expression-to-dword
+                                                                                                          (logior
+                                                                                                           %dm-fields-3
+                                                                                                           262144))))
                                                                                               (setf (%-devicemode-w-dm-bits-per-pel
                                                                                                      dm)
                                                                                                       (%c-int-to-dword
@@ -13345,6 +17772,52 @@
                                                                                                                          rgfw-monitor-request-mode
                                                                                                                        0)))
      0)))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-monitor-request-mode (mon mode request)
+  (%with-native-frame nil
+   (let ((display 0) (all-modes 0) (native 0) (i 0))
+     (assert (not (%pointer-equal mon 0)))
+     (setf display (%rgfw-monitor-node-display (%rgfw-monitor-node mon))
+           all-modes (%rgfw-monitor-node-all-modes (%rgfw-monitor-node mon)))
+     (when (%pointer-equal all-modes 0)
+       (return-from rgfw-monitor-request-mode 0))
+     (setf native 0
+           i 0)
+     (loop :while (< i (cf-array-get-count all-modes))
+           :do (let ((*frame* (common-lisp:list nil)))
+                 (declare (dynamic-extent *frame*))
+                 (unwind-protect
+                     (let ((cmode 0)
+                           (found-mode
+                            (%allocate-local +c-size-rgfw-monitor-mode+)))
+                       (setf cmode (cf-array-get-value-at-index all-modes i)
+                             (%rgfw-monitor-mode-w found-mode)
+                               (%c-size-t-to-i32
+                                (cg-display-mode-get-width cmode))
+                             (%rgfw-monitor-mode-h found-mode)
+                               (%c-size-t-to-i32
+                                (cg-display-mode-get-height cmode))
+                             (%rgfw-monitor-mode-refresh-rate found-mode)
+                               (rgfw-osx-get-refresh-rate display cmode)
+                             (%rgfw-monitor-mode-red found-mode) 8
+                             (%rgfw-monitor-mode-green found-mode) 8
+                             (%rgfw-monitor-mode-blue found-mode) 8
+                             (%rgfw-monitor-mode-src found-mode)
+                               (%c-cf-index-to-pointer i))
+                       (when
+                           (not
+                            (%zero-p
+                             (rgfw-monitor-mode-compare mode found-mode
+                              request)))
+                         (setf native cmode)
+                         (%copy (%address-rgfw-monitor-mode mon) found-mode
+                          24)
+                         (return)))
+                   (%release-frame *frame*))) (setf i (+ i 1)))
+     (when (not (%zero-p native))
+       (when (= (cg-display-set-display-mode display native 0) 0)
+         (return-from rgfw-monitor-request-mode 1)))
+     0)))
 
 ;; C source (RGFW.h:1495-1500):
 ;; @brief Scales a monitor’s mode to match a window’s size.
@@ -13354,7 +17827,7 @@
 ;; C source (RGFW.h:4711):
 ;; move window to monitor origin so it doesn't move to the next monitor
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-monitor-scale-to-window (mon win)
   (%with-native-frame nil
    (let ((mode (%allocate-local +c-size-rgfw-monitor-mode+)) (ret 0))
@@ -13396,7 +17869,7 @@
 ;; @param the gamma exponent
 ;; @return a bool if the function was successful
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-monitor-set-gamma (monitor gamma)
   (let ((count 0) (ptr 0) (ret 0))
     (assert (not (%pointer-equal monitor 0)))
@@ -13437,17 +17910,14 @@
      (loop :while (< i count)
            :do (let ((value 0.0))
                  (setf value
-                         (coerce
-                          (/ (coerce i 'single-float)
-                             (coerce (%c-expression-to-size-t (- count 1))
-                                     'single-float))
-                          'single-float)
+                         (/ (coerce i 'single-float)
+                            (coerce (%c-expression-to-size-t (- count 1))
+                                    'single-float))
                        value
                          (+
                           (*
                            (let* ((%temporary-3 value)
-                                  (%temporary-4
-                                   (coerce (/ 1.0 gamma) 'single-float))
+                                  (%temporary-4 (/ 1.0 gamma))
                                   (%temporary-5
                                    (expt %temporary-3 %temporary-4)))
                              (unless (realp %temporary-5)
@@ -13590,14 +18060,111 @@
      (set-device-gamma-ramp dc values)
      (delete-dc dc)
      1)))
-
-;; C source (RGFW.h:1477-1483):
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-monitor-set-gamma-ramp (monitor ramp)
+  (%with-native-frame nil
+   (let ((pool 0) (values 0))
+     (assert (not (%pointer-equal monitor 0)))
+     (setf pool
+             (%call-pointer
+              (cffi:pointer-address
+               (cffi:foreign-symbol-pointer "objc_msgSend"))
+              nil :pointer
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer (objc-get-class (%literal "NSAutoreleasePool"))
+               :pointer (sel-register-name (%literal "alloc")) :pointer)
+              :pointer (sel-register-name (%literal "init")) :pointer)
+           values
+             (%allocate
+              (%c-expression-to-size-t
+               (*
+                (%c-expression-to-size-t (* (%rgfw-gamma-ramp-count ramp) 3))
+                (%c-expression-to-size-t 4)))))
+     (let ((i 0))
+       (loop :while (< (%c-u32-to-size-t i) (%rgfw-gamma-ramp-count ramp))
+             :do (%store (%offset values (* i 4)) :float
+                  (/
+                   (coerce
+                    (%load (%offset (%rgfw-gamma-ramp-red ramp) (* i 2)) 2)
+                    'single-float)
+                   65535.0)) (%store
+                              (%offset values
+                               (*
+                                (%c-expression-to-size-t
+                                 (+ (%c-u32-to-size-t i)
+                                    (%rgfw-gamma-ramp-count ramp)))
+                                4))
+                              :float
+                              (/
+                               (coerce
+                                (%load
+                                 (%offset (%rgfw-gamma-ramp-green ramp)
+                                  (* i 2))
+                                 2)
+                                'single-float)
+                               65535.0)) (%store
+                                          (%offset values
+                                           (*
+                                            (%c-expression-to-size-t
+                                             (+ (%c-u32-to-size-t i)
+                                                (%c-expression-to-size-t
+                                                 (ash
+                                                  (%rgfw-gamma-ramp-count
+                                                   ramp)
+                                                  1))))
+                                            4))
+                                          :float
+                                          (/
+                                           (coerce
+                                            (%load
+                                             (%offset
+                                              (%rgfw-gamma-ramp-blue ramp)
+                                              (* i 2))
+                                             2)
+                                            'single-float)
+                                           65535.0)) (setf i
+                                                             (%c-expression-to-u32
+                                                              (+
+                                                               (%c-expression-to-u32
+                                                                i)
+                                                               1)))))
+     (cg-set-display-transfer-by-table
+      (%rgfw-monitor-node-display (%rgfw-monitor-node monitor))
+      (%c-size-t-to-u32 (%rgfw-gamma-ramp-count ramp)) values
+      (%offset values (* (%rgfw-gamma-ramp-count ramp) 4))
+      (%offset values
+       (* (%c-expression-to-size-t (ash (%rgfw-gamma-ramp-count ramp) 1))
+          4)))
+     (%free values)
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer pool :pointer (sel-register-name (%literal "drain")) :int8)
+     1)))
+#+(:or
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
+(progn
+ ;; C source (RGFW.h:1477-1483):
 ;; @brief Sets a specific display mode for a monitor directly.
 ;; @param mon The monitor to apply the mode change to.
 ;; @param mode The desired RGFW_monitorMode.
 ;; @param request The RGFW_modeRequest describing how to handle the mode change.
 ;; @return RGFW_TRUE if the mode was successfully applied, otherwise RGFW_FALSE.
 ;; C2LISP [storage]
+)
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ ;; C source (RGFW.h:1477-1483):
+;; @brief Sets a specific display mode for a monitor directly.
+;; @param mon The monitor to apply the mode change to.
+;; @param mode The desired RGFW_monitorMode.
+;; @param request The RGFW_modeRequest describing how to handle the mode change.
+;; @return RGFW_TRUE if the mode was successfully applied, otherwise RGFW_FALSE.
+)
 #+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
 (defun rgfw-monitor-set-mode (mon mode)
   (let ((out 0) (res 0) (ci 0))
@@ -13673,25 +18240,23 @@
       (assert (not (%pointer-equal mon 0)))
       (%fill dm 0 (%c-expression-to-size-t 220))
       (setf (%-devicemode-w-dm-size dm) (%c-expression-to-word 220))
-      (let ((%temporary-2 dm))
-        (setf (%-devicemode-w-dm-fields %temporary-2)
-                (%c-expression-to-dword
-                 (logior (%-devicemode-w-dm-fields %temporary-2)
-                         (%c-long-to-dword (logior 524288 1048576))))))
+      (with-accessors ((%dm-fields %-devicemode-w-dm-fields)) dm
+         (setf %dm-fields
+                 (%c-expression-to-dword
+                  (logior %dm-fields
+                          (%c-long-to-dword (logior 524288 1048576))))))
       (setf (%-devicemode-w-dm-pels-width dm)
               (%c-i32-to-u32 (%rgfw-monitor-mode-w mode))
             (%-devicemode-w-dm-pels-height dm)
               (%c-i32-to-u32 (%rgfw-monitor-mode-h mode)))
-      (let ((%temporary-5 dm))
-        (setf (%-devicemode-w-dm-fields %temporary-5)
-                (%c-expression-to-dword
-                 (logior (%-devicemode-w-dm-fields %temporary-5) 4194304))))
+      (with-accessors ((%dm-fields-2 %-devicemode-w-dm-fields)) dm
+         (setf %dm-fields-2
+                 (%c-expression-to-dword (logior %dm-fields-2 4194304))))
       (setf (%-devicemode-w-dm-display-frequency dm)
               (%c-float-to-dword (%rgfw-monitor-mode-refresh-rate mode)))
-      (let ((%temporary-7 dm))
-        (setf (%-devicemode-w-dm-fields %temporary-7)
-                (%c-expression-to-dword
-                 (logior (%-devicemode-w-dm-fields %temporary-7) 262144))))
+      (with-accessors ((%dm-fields-3 %-devicemode-w-dm-fields)) dm
+         (setf %dm-fields-3
+                 (%c-expression-to-dword (logior %dm-fields-3 262144))))
       (setf (%-devicemode-w-dm-bits-per-pel dm)
               (%c-int-to-dword
                (+
@@ -13726,25 +18291,23 @@
       (assert (/= (%c-pointer-to-int mon) 0))
       (%fill dm 0 (%c-expression-to-size-t 220))
       (setf (%-devicemode-w-dm-size dm) (%c-expression-to-word 220))
-      (let ((%temporary-2 dm))
-        (setf (%-devicemode-w-dm-fields %temporary-2)
-                (%c-expression-to-dword
-                 (logior (%-devicemode-w-dm-fields %temporary-2)
-                         (%c-long-to-dword (logior 524288 1048576))))))
+      (with-accessors ((%dm-fields %-devicemode-w-dm-fields)) dm
+         (setf %dm-fields
+                 (%c-expression-to-dword
+                  (logior %dm-fields
+                          (%c-long-to-dword (logior 524288 1048576))))))
       (setf (%-devicemode-w-dm-pels-width dm)
               (%c-i32-to-u32 (%rgfw-monitor-mode-w mode))
             (%-devicemode-w-dm-pels-height dm)
               (%c-i32-to-u32 (%rgfw-monitor-mode-h mode)))
-      (let ((%temporary-5 dm))
-        (setf (%-devicemode-w-dm-fields %temporary-5)
-                (%c-expression-to-dword
-                 (logior (%-devicemode-w-dm-fields %temporary-5) 4194304))))
+      (with-accessors ((%dm-fields-2 %-devicemode-w-dm-fields)) dm
+         (setf %dm-fields-2
+                 (%c-expression-to-dword (logior %dm-fields-2 4194304))))
       (setf (%-devicemode-w-dm-display-frequency dm)
               (%c-float-to-dword (%rgfw-monitor-mode-refresh-rate mode)))
-      (let ((%temporary-7 dm))
-        (setf (%-devicemode-w-dm-fields %temporary-7)
-                (%c-expression-to-dword
-                 (logior (%-devicemode-w-dm-fields %temporary-7) 262144))))
+      (with-accessors ((%dm-fields-3 %-devicemode-w-dm-fields)) dm
+         (setf %dm-fields-3
+                 (%c-expression-to-dword (logior %dm-fields-3 262144))))
       (setf (%-devicemode-w-dm-bits-per-pel dm)
               (%c-int-to-dword
                (+
@@ -13771,12 +18334,28 @@
            (return-from rgfw-monitor-set-mode 0))
           (return-from rgfw-monitor-set-mode 0)))
     (error "C function fell through without return"))))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-monitor-set-mode (mon mode)
+  (let ((cmode 0))
+    (assert (not (%pointer-equal mon 0)))
+    (setf cmode
+            (cf-array-get-value-at-index
+             (%rgfw-monitor-node-all-modes (%rgfw-monitor-node mon))
+             (%c-pointer-to-cf-index (%rgfw-monitor-mode-src mode))))
+    (when
+        (=
+         (cg-display-set-display-mode
+          (%rgfw-monitor-node-display (%rgfw-monitor-node mon)) cmode 0)
+         0)
+      (%copy (%address-rgfw-monitor-mode mon) mode 24)
+      (return-from rgfw-monitor-set-mode 1))
+    0))
 
 ;; C source (RGFW.h:1414-1418):
 ;; @brief Set the user pointer of a monitor (the same as monitor.userPtr = userPtr)
 ;; @param monitor the source monitor object
 ;; @param userPtr the new user pointer for the monitor
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-monitor-set-user-ptr (monitor user-ptr)
   (assert (not (%pointer-equal monitor 0)))
   (setf (%rgfw-monitor-user-ptr monitor) user-ptr)
@@ -13789,7 +18368,7 @@
   nil)
 
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-monitors-add (mon)
   (let ((node 0))
     (setf node 0
@@ -13837,11 +18416,9 @@
       (%copy (%address-rgfw-monitor-node-mon node) mon 200))
     (setf (%rgfw-monitor-node (%address-rgfw-monitor-node-mon node)) node
           (%rgfw-monitor-node-disconnected node) 0)
-    (let ((%temporary-10
-           (%address-rgfw-info-monitors (%load -rgfw :pointer))))
-      (setf (%rgfw-monitors-count %temporary-10)
-              (%c-expression-to-size-t
-               (+ (%rgfw-monitors-count %temporary-10) 1))))
+    (with-accessors ((%count %rgfw-monitors-count))
+         (%address-rgfw-info-monitors (%load -rgfw :pointer))
+       (setf %count (%c-expression-to-size-t (+ %count 1))))
     node))
 #+(:or (:and :arm (:not :arm64) (:or :linux :freebsd))
    (:and :x86 (:not :x86-64) (:or :linux :windows :freebsd)))
@@ -13894,11 +18471,9 @@
       (%copy (%address-rgfw-monitor-node-mon node) mon 184))
     (setf (%rgfw-monitor-node (%address-rgfw-monitor-node-mon node)) node
           (%rgfw-monitor-node-disconnected node) 0)
-    (let ((%temporary-10
-           (%address-rgfw-info-monitors (%load -rgfw :pointer))))
-      (setf (%rgfw-monitors-count %temporary-10)
-              (%c-expression-to-size-t
-               (+ (%rgfw-monitors-count %temporary-10) 1))))
+    (with-accessors ((%count %rgfw-monitors-count))
+         (%address-rgfw-info-monitors (%load -rgfw :pointer))
+       (setf %count (%c-expression-to-size-t (+ %count 1))))
     node))
 
 ;; C2LISP [storage]
@@ -13911,18 +18486,14 @@
          (%rgfw-monitor-list-head
           (%address-rgfw-monitors-list
            (%address-rgfw-info-monitors (%load -rgfw :pointer))))))
-    (declare (ignorable prev))
     (loop :until (%zero-p node)
-          :do (flet ((%temporary-1 ()
-                       (progn
-                        (when (= (%rgfw-monitor-node-disconnected node) 0)
-                          (return-from %temporary-1))
-                        (rgfw-monitor-callback
-                         (%rgfw-info-root (%load -rgfw :pointer))
-                         (%address-rgfw-monitor-node-mon node) 0)
-                        (rgfw-monitors-remove node prev)
-                        (setf prev node))))
-                (%temporary-1)) (setf node (%rgfw-monitor-node-next node))))
+          :do (unless (= (%rgfw-monitor-node-disconnected node) 0)
+                (rgfw-monitor-callback
+                 (%rgfw-info-root (%load -rgfw :pointer))
+                 (%address-rgfw-monitor-node-mon node) 0)
+                (rgfw-monitors-remove node prev)
+                (setf prev node)) (setf node
+                                          (%rgfw-monitor-node-next node))))
   nil)
 
 ;; C source (RGFW.h:4894-4906):
@@ -13931,12 +18502,11 @@
 ;; check if the monitor was allocated in the heap or not
 ;; move node to the free list
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-monitors-remove (node prev)
-  (let ((%temporary-1 (%address-rgfw-info-monitors (%load -rgfw :pointer))))
-    (setf (%rgfw-monitors-count %temporary-1)
-            (%c-expression-to-size-t
-             (- (%rgfw-monitors-count %temporary-1) 1))))
+  (with-accessors ((%count %rgfw-monitors-count))
+       (%address-rgfw-info-monitors (%load -rgfw :pointer))
+     (setf %count (%c-expression-to-size-t (- %count 1))))
   (rgfw-monitor-node-free node)
   (if (not (%pointer-equal prev node))
       (setf (%rgfw-monitor-node-next prev) (%rgfw-monitor-node-next node))
@@ -13983,10 +18553,9 @@
 #+(:or (:and :arm (:not :arm64) (:or :linux :freebsd))
    (:and :x86 (:not :x86-64) (:or :linux :windows :freebsd)))
 (defun rgfw-monitors-remove (node prev)
-  (let ((%temporary-1 (%address-rgfw-info-monitors (%load -rgfw :pointer))))
-    (setf (%rgfw-monitors-count %temporary-1)
-            (%c-expression-to-size-t
-             (- (%rgfw-monitors-count %temporary-1) 1))))
+  (with-accessors ((%count %rgfw-monitors-count))
+       (%address-rgfw-info-monitors (%load -rgfw :pointer))
+     (setf %count (%c-expression-to-size-t (- %count 1))))
   (rgfw-monitor-node-free node)
   (if (not (%pointer-equal prev node))
       (setf (%rgfw-monitor-node-next prev) (%rgfw-monitor-node-next node))
@@ -14167,18 +18736,218 @@
             (%rgfw-common-event-win (%address-rgfw-event-common event)) win)
       (rgfw-event-queue-push-and-call event))
     nil)))
-
-;; C source (RGFW.h:1195-1197):
+#+(:or
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
+(progn
+ ;; C source (RGFW.h:1195-1197):
 ;; @brief (macOS only) Changes the current working directory to the application’s resource folder.
+)
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ ;; C source (RGFW.h:1195-1197):
+;; @brief (macOS only) Changes the current working directory to the application’s resource folder.
+;; C2LISP [storage]
+)
+#+(:or
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (defun rgfw-move-to-mac-os-resource-dir () nil)
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-move-to-mac-os-resource-dir ()
+  (%with-native-frame nil
+   (let ((resources-path (%allocate-local 256))
+         (bundle 0)
+         (resources-url 0)
+         (last 0))
+     (setf bundle (cf-bundle-get-main-bundle))
+     (when (%zero-p bundle)
+       (return-from rgfw-move-to-mac-os-resource-dir nil))
+     (setf resources-url (cf-bundle-copy-resources-directory-url bundle)
+           last (cfurl-copy-last-path-component resources-url))
+     (when
+         (or
+          (/=
+           (cf-string-compare
+            (--cf-string-make-constant-string (%literal "Resources")) last 0)
+           0)
+          (=
+           (cfurl-get-file-system-representation resources-url 1
+            resources-path 255)
+           0))
+       (cf-release last)
+       (cf-release resources-url)
+       (return-from rgfw-move-to-mac-os-resource-dir nil))
+     (cf-release last)
+     (cf-release resources-url)
+     (chdir resources-path))
+   nil))
 
 ;; C source (RGFW.h:1215-1218):
 ;; @brief Returns the native format type for the system
 ;; @return the native format type for the system as a RGFW_format enum value
+#+(:or
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (defun rgfw-native-format () 4)
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ (defun rgfw-native-format () 2)
+ ;; C2LISP [storage]
+
+ (defun rgfw-osx-get-fallback-refresh-rate (display-id)
+   (%with-native-frame nil
+    (let ((refresh-rate 0.0)
+          (it 0)
+          (service 0)
+          (index-ref 0)
+          (clock-ref 0)
+          (count-ref 0)
+          (clock (%allocate-local 4))
+          (count (%allocate-local 4)))
+      (setf refresh-rate 0.0)
+      (return-from rgfw-osx-get-fallback-refresh-rate 0.0)
+      (loop :while (/=
+                    (%c-expression-to-io-service-t
+                     (setf service (io-iterator-next it)))
+                    0)
+            :do (let ((*frame* (common-lisp:list nil)))
+                  (declare (dynamic-extent *frame*))
+                  (unwind-protect
+                      (let ((index (%allocate-local 4)))
+                        (setf index-ref
+                                (io-registry-entry-create-cf-property service
+                                 (--cf-string-make-constant-string
+                                  (%literal "IOFramebufferOpenGLIndex"))
+                                 (%load
+                                  (cffi:pointer-address
+                                   (cffi:foreign-symbol-pointer
+                                    "kCFAllocatorDefault"))
+                                  :pointer)
+                                 0))
+                        (unless (%pointer-equal index-ref 0)
+                          (when
+                              (and
+                               (not
+                                (%zero-p
+                                 (cf-number-get-value index-ref 9 index)))
+                               (=
+                                (cg-open-gl-display-mask-to-display-id
+                                 (%c-int-to-cg-open-gl-display-mask
+                                  (ash 1 (%c-u32-to-int (%load index 4)))))
+                                display-id))
+                            (cf-release index-ref)
+                            (return))
+                          (cf-release index-ref)))
+                    (%release-frame *frame*))))
+      (when (not (%zero-p service))
+        (setf clock-ref
+                (io-registry-entry-create-cf-property service
+                 (--cf-string-make-constant-string
+                  (%literal "IOFBCurrentPixelClock"))
+                 (%load
+                  (cffi:pointer-address
+                   (cffi:foreign-symbol-pointer "kCFAllocatorDefault"))
+                  :pointer)
+                 0))
+        (when (not (%zero-p clock-ref))
+          (when
+              (and (not (%zero-p (cf-number-get-value clock-ref 9 clock)))
+                   (not (%zero-p (%load clock 4))))
+            (setf count-ref
+                    (io-registry-entry-create-cf-property service
+                     (--cf-string-make-constant-string
+                      (%literal "IOFBCurrentPixelCount"))
+                     (%load
+                      (cffi:pointer-address
+                       (cffi:foreign-symbol-pointer "kCFAllocatorDefault"))
+                      :pointer)
+                     0))
+            (when
+                (and (not (%zero-p count-ref))
+                     (not (%zero-p (cf-number-get-value count-ref 9 count)))
+                     (not (%zero-p (%load count 4))))
+              (setf refresh-rate
+                      (coerce
+                       (/ (coerce (%load clock 4) 'double-float)
+                          (coerce (%load count 4) 'double-float))
+                       'single-float))
+              (cf-release count-ref)))
+          (cf-release clock-ref)))
+      (io-object-release it)
+      refresh-rate)))
+ (defun rgfw-osx-get-refresh-rate (display mode)
+   (let ((res 0.0))
+     (when (not (%zero-p mode))
+       (let ((refresh-rate
+              (coerce (cg-display-mode-get-refresh-rate mode) 'single-float)))
+         (when (/= refresh-rate 0.0)
+           (return-from rgfw-osx-get-refresh-rate refresh-rate))))
+     (setf res (rgfw-osx-get-fallback-refresh-rate display))
+     (when (/= res 0.0) (return-from rgfw-osx-get-refresh-rate res))
+     60.0))
+ ;; C2LISP [storage]
+
+ (defun rgfw-osx-init-view (win view)
+   (%with-native-frame nil
+    (progn
+     (let ((types (%allocate-local 24)))
+       (object-set-instance-variable view (%literal "markedText")
+        (%call-pointer
+         (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+         nil :pointer
+         (%call-pointer
+          (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+          nil :pointer
+          (objc-get-class (%literal "NSMutableAttributedString")) :pointer
+          (sel-register-name (%literal "alloc")) :pointer)
+         :pointer (sel-register-name (%literal "init")) :pointer))
+       (object-set-instance-variable view (%literal "RGFW_window") win)
+       (object-set-instance-variable view (%literal "trackingArea") 0)
+       (%call-pointer
+        (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+        nil :pointer view :pointer
+        (sel-register-name (%literal "updateTrackingAreas")) :void)
+       (%fill types 0 24)
+       (%store types :string-pointer (%literal "public.url"))
+       (%store (%offset types +c-size-pointer+) :string-pointer
+        (%literal "public.file-url"))
+       (%store (%offset types (ash +c-size-pointer+ 1)) :string-pointer
+        (%literal "public.utf8-plain-text"))
+       (n-sregister-for-dragged-types view types 3)
+       (%call-pointer
+        (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+        nil :pointer (%rgfw-window-src-window (%address-rgfw-window-src win))
+        :pointer (sel-register-name (%literal "setContentView:")) :pointer
+        view :void)
+       (%call-pointer
+        (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+        nil :pointer view :pointer
+        (sel-register-name (%literal "setWantsLayer:")) :int8 1 :void))
+     nil)))
+ ;; C2LISP [storage]
+
+ (defun rgfw-osx-window-should-close (self -cmd sender)
+   (%with-native-frame nil
+    (let ((win (%allocate-local +c-size-pointer+)))
+      -cmd
+      sender
+      (%store win :pointer 0)
+      (object-get-instance-variable self (%literal "RGFW_window") win)
+      (when (%pointer-equal (%load win :pointer) 0)
+        (return-from rgfw-osx-window-should-close 1))
+      (rgfw-window-close-callback (%load win :pointer))
+      0))))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux)))
 (progn
  ;; C source (RGFW.h:2939-2943):
 ;; @brief Converts an physical RGFW keycode to a mapped RGFW keycode.
@@ -14378,6 +19147,50 @@
        (19 (return-from rgfw-physical-to-mapped-key 192))
        (t))
      0)))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-physical-to-mapped-key (key)
+  (%with-native-frame nil
+   (let ((keycode 0)
+         (source 0)
+         (layout-data 0)
+         (layout 0)
+         (dead-key-state (%allocate-local 4))
+         (chars (%allocate-local 8))
+         (len (%allocate-local 8))
+         (type 0)
+         (status 0))
+     (setf keycode (%c-u32-to-u16 (rgfw-rgfw-to-api-key key))
+           source
+             (%call-pointer
+              (%load tis-copy-current-keyboard-layout-input-source-src
+               :pointer)
+              nil :pointer))
+     (when (%pointer-equal source 0)
+       (return-from rgfw-physical-to-mapped-key key))
+     (setf layout-data
+             (%call-pointer
+              (%load tis-get-input-source-property-src :pointer) nil :pointer
+              source :pointer
+              (%load k-tis-property-unicode-key-layout-data-src :pointer)
+              :pointer))
+     (when (%pointer-equal layout-data 0)
+       (cf-release source)
+       (return-from rgfw-physical-to-mapped-key key))
+     (setf layout (cf-data-get-byte-ptr layout-data))
+     (%store dead-key-state 4 0)
+     (%store len 8 0)
+     (setf type
+             (%c-u8-to-u32
+              (%call-pointer (%load lm-get-kbd-type-src :pointer) nil
+               :uint8))
+           status
+             (uc-key-translate layout keycode 0 0 type 0 dead-key-state 4 len
+              chars))
+     (cf-release source)
+     (when (and (= status 0) (= (%load len 8) 1) (< (%load chars 2) 256))
+       (return-from rgfw-physical-to-mapped-key
+         (%c-uni-char-to-rgfw-key (%load chars 2))))
+     key)))
 #+(:and
    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
    (:or :freebsd :linux))
@@ -14388,7 +19201,8 @@
 ;; if there is no unread queued events, get a new one
 ;; C2LISP [storage]
 )
-#+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (progn
  ;; C source (RGFW.h:1552-1554):
 ;; @brief check all the events until there are none left and updates window structure attributes
@@ -14420,9 +19234,54 @@
                                                     msg) (dispatch-message-a
                                                           msg)))
    nil))
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-poll-events ()
+  (%with-native-frame nil
+   (let ((event-pool 0) (event-func 0))
+     (rgfw-reset-prev-state)
+     (setf event-pool
+             (%call-pointer
+              (cffi:pointer-address
+               (cffi:foreign-symbol-pointer "objc_msgSend"))
+              nil :pointer
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer (objc-get-class (%literal "NSAutoreleasePool"))
+               :pointer (sel-register-name (%literal "alloc")) :pointer)
+              :pointer (sel-register-name (%literal "init")) :pointer)
+           event-func
+             (sel-register-name
+              (%literal "nextEventMatchingMask:untilDate:inMode:dequeue:")))
+     (loop :do (let ((date 0) (e 0))
+                 (setf date 0
+                       e
+                         (%call-pointer
+                          (cffi:pointer-address
+                           (cffi:foreign-symbol-pointer "objc_msgSend"))
+                          nil :pointer
+                          (%rgfw-info-ns-app (%load -rgfw :pointer)) :pointer
+                          event-func :unsigned-long 18446744073709551615
+                          :pointer date :pointer
+                          (ns-string-string-with-utf8string
+                           (%literal "kCFRunLoopDefaultMode"))
+                          :uint8 1 :pointer))
+                 (when (%pointer-equal e 0) (return))
+                 (%call-pointer
+                  (cffi:pointer-address
+                   (cffi:foreign-symbol-pointer "objc_msgSend"))
+                  nil :pointer (%rgfw-info-ns-app (%load -rgfw :pointer))
+                  :pointer (sel-register-name (%literal "sendEvent:"))
+                  :pointer e :void)))
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer event-pool :pointer (sel-register-name (%literal "drain"))
+      :int8))
+   nil))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux)))
 (progn
  ;; C source (RGFW.h:1436-1438):
 ;; @brief Poll and check for monitor updates (this is called internally on monitor update events and RGFW_init)
@@ -14468,7 +19327,7 @@
                                                                          (%rgfw-monitor-node-next
                                                                           node))))
      (let ((i 0))
-       (loop :named %temporary-5
+       (loop :named %temporary-4
              :while (< i (%-xrr-screen-resources-noutput res))
              :do (flet ((%temporary-1 ()
                           (let ((*frame* (common-lisp:list nil)))
@@ -14538,23 +19397,18 @@
                                   (when (%pointer-equal ci 0)
                                     (return-from %temporary-1))
                                   (setf phys-w
-                                          (coerce
-                                           (/
-                                            (coerce
-                                             (%-xrr-output-info-mm-width
-                                              info)
-                                             'single-float)
-                                            25.4)
-                                           'single-float)
+                                          (/
+                                           (coerce
+                                            (%-xrr-output-info-mm-width info)
+                                            'single-float)
+                                           25.4)
                                         phys-h
-                                          (coerce
-                                           (/
-                                            (coerce
-                                             (%-xrr-output-info-mm-height
-                                              info)
-                                             'single-float)
-                                            25.4)
-                                           'single-float))
+                                          (/
+                                           (coerce
+                                            (%-xrr-output-info-mm-height
+                                             info)
+                                            'single-float)
+                                           25.4))
                                   (%strncpy %name
                                    (%-xrr-output-info-name info)
                                    (%c-expression-to-size-t
@@ -14572,21 +19426,17 @@
                                             (%rgfw-monitor-phys-h monitor)
                                               phys-h)
                                       (setf (%rgfw-monitor-phys-w monitor)
-                                              (coerce
-                                               (/
-                                                (coerce
-                                                 (%-xrr-crtc-info-width ci)
-                                                 'single-float)
-                                                96.0)
-                                               'single-float)
+                                              (/
+                                               (coerce
+                                                (%-xrr-crtc-info-width ci)
+                                                'single-float)
+                                               96.0)
                                             (%rgfw-monitor-phys-h monitor)
-                                              (coerce
-                                               (/
-                                                (coerce
-                                                 (%-xrr-crtc-info-height ci)
-                                                 'single-float)
-                                                96.0)
-                                               'single-float)))
+                                              (/
+                                               (coerce
+                                                (%-xrr-crtc-info-height ci)
+                                                'single-float)
+                                               96.0)))
                                   (setf (%rgfw-monitor-x monitor)
                                           (%-xrr-crtc-info-x ci)
                                         (%rgfw-monitor-y monitor)
@@ -14594,11 +19444,9 @@
                                   (%store dpi :float 96.0)
                                   (rgfw-x-get-system-content-dpi dpi)
                                   (setf (%rgfw-monitor-scale-x monitor)
-                                          (coerce (/ (%load dpi :float) 96.0)
-                                                  'single-float)
+                                          (/ (%load dpi :float) 96.0)
                                         (%rgfw-monitor-scale-y monitor)
-                                          (coerce (/ (%load dpi :float) 96.0)
-                                                  'single-float)
+                                          (/ (%load dpi :float) 96.0)
                                         (%rgfw-monitor-pixel-ratio monitor)
                                           (if (>= (%load dpi :float) 192.0)
                                               2.0
@@ -14609,7 +19457,7 @@
                                            (%address-rgfw-monitor-mode
                                             monitor)))
                                   (when (%pointer-equal mi 0)
-                                    (return-from %temporary-5))
+                                    (return-from %temporary-4))
                                   (xrr-free-crtc-info ci)
                                   (setf rr-output
                                           (%load
@@ -14640,7 +19488,7 @@
                                        (setf node-2
                                                (rgfw-monitors-add monitor))
                                        (when (%pointer-equal node-2 0)
-                                         (return-from %temporary-5))
+                                         (return-from %temporary-4))
                                        (setf (%rgfw-monitor-node-rr-output
                                               node-2)
                                                rr-output
@@ -14698,7 +19546,7 @@
                                                                          (%rgfw-monitor-node-next
                                                                           node))))
      (let ((i 0))
-       (loop :named %temporary-5
+       (loop :named %temporary-4
              :while (< i (%-xrr-screen-resources-noutput res))
              :do (flet ((%temporary-1 ()
                           (let ((*frame* (common-lisp:list nil)))
@@ -14768,23 +19616,18 @@
                                   (when (= (%c-pointer-to-int ci) 0)
                                     (return-from %temporary-1))
                                   (setf phys-w
-                                          (coerce
-                                           (/
-                                            (coerce
-                                             (%-xrr-output-info-mm-width
-                                              info)
-                                             'single-float)
-                                            25.4)
-                                           'single-float)
+                                          (/
+                                           (coerce
+                                            (%-xrr-output-info-mm-width info)
+                                            'single-float)
+                                           25.4)
                                         phys-h
-                                          (coerce
-                                           (/
-                                            (coerce
-                                             (%-xrr-output-info-mm-height
-                                              info)
-                                             'single-float)
-                                            25.4)
-                                           'single-float))
+                                          (/
+                                           (coerce
+                                            (%-xrr-output-info-mm-height
+                                             info)
+                                            'single-float)
+                                           25.4))
                                   (%strncpy %name
                                    (%-xrr-output-info-name info)
                                    (%c-expression-to-size-t
@@ -14802,21 +19645,17 @@
                                             (%rgfw-monitor-phys-h monitor)
                                               phys-h)
                                       (setf (%rgfw-monitor-phys-w monitor)
-                                              (coerce
-                                               (/
-                                                (coerce
-                                                 (%-xrr-crtc-info-width ci)
-                                                 'single-float)
-                                                96.0)
-                                               'single-float)
+                                              (/
+                                               (coerce
+                                                (%-xrr-crtc-info-width ci)
+                                                'single-float)
+                                               96.0)
                                             (%rgfw-monitor-phys-h monitor)
-                                              (coerce
-                                               (/
-                                                (coerce
-                                                 (%-xrr-crtc-info-height ci)
-                                                 'single-float)
-                                                96.0)
-                                               'single-float)))
+                                              (/
+                                               (coerce
+                                                (%-xrr-crtc-info-height ci)
+                                                'single-float)
+                                               96.0)))
                                   (setf (%rgfw-monitor-x monitor)
                                           (%-xrr-crtc-info-x ci)
                                         (%rgfw-monitor-y monitor)
@@ -14824,11 +19663,9 @@
                                   (%store dpi :float 96.0)
                                   (rgfw-x-get-system-content-dpi dpi)
                                   (setf (%rgfw-monitor-scale-x monitor)
-                                          (coerce (/ (%load dpi :float) 96.0)
-                                                  'single-float)
+                                          (/ (%load dpi :float) 96.0)
                                         (%rgfw-monitor-scale-y monitor)
-                                          (coerce (/ (%load dpi :float) 96.0)
-                                                  'single-float)
+                                          (/ (%load dpi :float) 96.0)
                                         (%rgfw-monitor-pixel-ratio monitor)
                                           (if (>= (%load dpi :float) 192.0)
                                               2.0
@@ -14839,7 +19676,7 @@
                                            (%address-rgfw-monitor-mode
                                             monitor)))
                                   (when (= (%c-pointer-to-int mi) 0)
-                                    (return-from %temporary-5))
+                                    (return-from %temporary-4))
                                   (xrr-free-crtc-info ci)
                                   (setf rr-output
                                           (%load
@@ -14870,7 +19707,7 @@
                                        (setf node-2
                                                (rgfw-monitors-add monitor))
                                        (when (= (%c-pointer-to-int node-2) 0)
-                                         (return-from %temporary-5))
+                                         (return-from %temporary-4))
                                        (setf (%rgfw-monitor-node-rr-output
                                               node-2)
                                                rr-output
@@ -14912,7 +19749,7 @@
                                                                        (%rgfw-monitor-node-next
                                                                         node)))
      (setf adapter-num 0)
-     (loop :named %temporary-5
+     (loop :named %temporary-4
            :do (flet ((%temporary-1 ()
                         (let ((*frame* (common-lisp:list nil)))
                           (declare (dynamic-extent *frame*))
@@ -14926,7 +19763,7 @@
                                     (%zero-p
                                      (enum-display-devices-w 0 adapter-num
                                       adapter 0))
-                                  (return-from %temporary-5))
+                                  (return-from %temporary-4))
                                 (when
                                     (%zero-p
                                      (%c-expression-to-dword
@@ -14938,75 +19775,60 @@
                                 (setf (%-display-devicew-cb dd)
                                         (%c-expression-to-dword 840)
                                       device-num 0)
-                                (loop :named %temporary-10
-                                      :do (flet ((%temporary-2 ()
-                                                   (let ((node-2 0))
-                                                     (%fill dd 0
-                                                      (%c-expression-to-size-t
-                                                       840))
-                                                     (setf (%-display-devicew-cb
-                                                            dd)
-                                                             (%c-expression-to-dword
-                                                              840))
-                                                     (when
-                                                         (%zero-p
-                                                          (enum-display-devices-w
-                                                           %name device-num
-                                                           dd 0))
-                                                       (return-from
-                                                           %temporary-10))
-                                                     (when
-                                                         (%zero-p
-                                                          (%c-expression-to-dword
-                                                           (logand
-                                                            (%-display-devicew-state-flags
-                                                             dd)
-                                                            1)))
-                                                       (return-from
-                                                           %temporary-2))
-                                                     (setf node-2
-                                                             (%rgfw-monitor-list-head
-                                                              (%address-rgfw-monitors-list
-                                                               (%address-rgfw-info-monitors
-                                                                (%load -rgfw
-                                                                 :pointer)))))
-                                                     (loop :until (%zero-p
-                                                                   node-2)
-                                                           :do (when
-                                                                   (and
-                                                                    (=
-                                                                     (%rgfw-monitor-node-disconnected
-                                                                      node-2)
-                                                                     1)
-                                                                    (=
-                                                                     (wcscmp
-                                                                      (%address-rgfw-monitor-node-device-name
-                                                                       node-2)
-                                                                      (%address--display-devicew-device-name
-                                                                       dd))
-                                                                     0))
-                                                                 (setf (%rgfw-monitor-node-disconnected
-                                                                        node-2)
-                                                                         0)
-                                                                 (rgfw-win32-init-monitor
-                                                                  adapter
-                                                                  node-2)
-                                                                 (return)) (setf node-2
-                                                                                   (%rgfw-monitor-node-next
-                                                                                    node-2)))
-                                                     (when
-                                                         (not
-                                                          (%zero-p node-2))
-                                                       (return-from
-                                                           %temporary-2))
-                                                     (rgfw-win32-create-monitor
-                                                      adapter dd))))
-                                            (%temporary-2)) (setf device-num
-                                                                    (%c-expression-to-dword
-                                                                     (+
-                                                                      (%c-expression-to-dword
-                                                                       device-num)
-                                                                      1))))
+                                (loop :do (let ((node-2 0))
+                                            (%fill dd 0
+                                             (%c-expression-to-size-t 840))
+                                            (setf (%-display-devicew-cb dd)
+                                                    (%c-expression-to-dword
+                                                     840))
+                                            (when
+                                                (%zero-p
+                                                 (enum-display-devices-w
+                                                  %name device-num dd 0))
+                                              (return))
+                                            (unless
+                                                (%zero-p
+                                                 (%c-expression-to-dword
+                                                  (logand
+                                                   (%-display-devicew-state-flags
+                                                    dd)
+                                                   1)))
+                                              (setf node-2
+                                                      (%rgfw-monitor-list-head
+                                                       (%address-rgfw-monitors-list
+                                                        (%address-rgfw-info-monitors
+                                                         (%load -rgfw
+                                                          :pointer)))))
+                                              (loop :until (%zero-p node-2)
+                                                    :do (when
+                                                            (and
+                                                             (=
+                                                              (%rgfw-monitor-node-disconnected
+                                                               node-2)
+                                                              1)
+                                                             (=
+                                                              (wcscmp
+                                                               (%address-rgfw-monitor-node-device-name
+                                                                node-2)
+                                                               (%address--display-devicew-device-name
+                                                                dd))
+                                                              0))
+                                                          (setf (%rgfw-monitor-node-disconnected
+                                                                 node-2)
+                                                                  0)
+                                                          (rgfw-win32-init-monitor
+                                                           adapter node-2)
+                                                          (return)) (setf node-2
+                                                                            (%rgfw-monitor-node-next
+                                                                             node-2)))
+                                              (unless (not (%zero-p node-2))
+                                                (rgfw-win32-create-monitor
+                                                 adapter dd)))) (setf device-num
+                                                                        (%c-expression-to-dword
+                                                                         (+
+                                                                          (%c-expression-to-dword
+                                                                           device-num)
+                                                                          1))))
                                 (when (= device-num 0)
                                   (let ((node-3
                                          (%rgfw-monitor-list-head
@@ -15045,6 +19867,518 @@
                                            1))))
      (rgfw-monitors-refresh))
    nil))
+#+(:and :darwin :x86-64)
+(defun rgfw-poll-monitors ()
+  (%with-native-frame nil
+   (let ((count (%allocate-local 4)) (displays 0) (primary 0) (i 0))
+     (declare (ignorable primary))
+     (when (/= (cg-get-active-display-list 0 0 count) 0)
+       (return-from rgfw-poll-monitors nil))
+     (setf displays
+             (%allocate
+              (%c-expression-to-size-t
+               (* (%c-expression-to-size-t 4)
+                  (%c-u32-to-size-t (%load count 4))))))
+     (when (/= (cg-get-active-display-list (%load count 4) displays count) 0)
+       (return-from rgfw-poll-monitors nil))
+     (let ((node
+            (%rgfw-monitor-list-head
+             (%address-rgfw-monitors-list
+              (%address-rgfw-info-monitors (%load -rgfw :pointer))))))
+       (loop :until (%zero-p node)
+             :do (setf (%rgfw-monitor-node-disconnected node) 1) (setf node
+                                                                         (%rgfw-monitor-node-next
+                                                                          node))))
+     (setf primary (cg-main-display-id)
+           i 0)
+     (loop :while (< i (%load count 4))
+           :do (flet ((%temporary-1 ()
+                        (let ((*frame* (common-lisp:list nil)))
+                          (declare (dynamic-extent *frame*))
+                          (unwind-protect
+                              (let ((monitor
+                                     (%allocate-local +c-size-rgfw-monitor+))
+                                    (uint-num 0)
+                                    (screen 0)
+                                    (node-2 0)
+                                    (name (%allocate-local 7))
+                                    (bounds (%allocate-local 32))
+                                    (mode 0)
+                                    (all-modes 0)
+                                    (mode-count 0)
+                                    (mode-index 0)
+                                    (screen-size-mm (make-%value-cg-size))
+                                    (ppi-width 0.0)
+                                    (ppi-height 0.0)
+                                    (dpi 0.0))
+                                (declare
+                                 (common-lisp:type %value-cg-size
+                                  screen-size-mm)
+                                 (dynamic-extent screen-size-mm))
+                                (let* ((%origin
+                                        (%address-cg-rect-origin bounds))
+                                       (%mode
+                                        (%address-rgfw-monitor-mode monitor)))
+                                  (setf uint-num
+                                          (cg-display-unit-number
+                                           (%load (%offset displays (* i 4))
+                                            4))
+                                        screen
+                                          (rgfw-get-ns-screen-for-display-u-int
+                                           uint-num)
+                                        node-2
+                                          (%rgfw-monitor-list-head
+                                           (%address-rgfw-monitors-list
+                                            (%address-rgfw-info-monitors
+                                             (%load -rgfw :pointer)))))
+                                  (loop :until (%zero-p node-2)
+                                        :do (when
+                                                (=
+                                                 (%rgfw-monitor-node-uint-num
+                                                  node-2)
+                                                 uint-num)
+                                              (return)) (setf node-2
+                                                                (%rgfw-monitor-node-next
+                                                                 node-2)))
+                                  (%fill name 0 7)
+                                  (%store name 1 77)
+                                  (%store (%offset name 1) 1 97)
+                                  (%store (%offset name 2) 1 99)
+                                  (%store (%offset name 3) 1 79)
+                                  (%store (%offset name 4) 1 83)
+                                  (%store (%offset name 5) 1 0)
+                                  (%store (%offset name 6) 1 0)
+                                  (%copy (%address-rgfw-monitor-name monitor)
+                                   name 6)
+                                  (%copy bounds
+                                   (cg-display-bounds
+                                    (%load (%offset displays (* i 4)) 4))
+                                   32)
+                                  (setf (%rgfw-monitor-x monitor)
+                                          (%c-cg-float-to-i32
+                                           (%cg-point-x %origin))
+                                        (%rgfw-monitor-y monitor)
+                                          (%c-cg-float-to-i32
+                                           (%cg-point-y %origin))
+                                        mode
+                                          (cg-display-copy-display-mode
+                                           (%load (%offset displays (* i 4))
+                                            4))
+                                        all-modes
+                                          (cg-display-copy-all-display-modes
+                                           (%load (%offset displays (* i 4))
+                                            4)
+                                           0)
+                                        mode-count
+                                          (cf-array-get-count all-modes)
+                                        mode-index 0)
+                                  (loop :while (and (< mode-index mode-count)
+                                                    (not
+                                                     (%zero-p all-modes)))
+                                        :do (let ((cmode
+                                                   (cf-array-get-value-at-index
+                                                    all-modes mode-index)))
+                                              (when
+                                                  (%pointer-equal cmode mode)
+                                                (setf (%rgfw-monitor-mode-src
+                                                       %mode)
+                                                        (%c-cf-index-to-pointer
+                                                         mode-index))
+                                                (return))) (setf mode-index
+                                                                   (+
+                                                                    mode-index
+                                                                    1)))
+                                  (setf (%rgfw-monitor-mode-w %mode)
+                                          (%c-size-t-to-i32
+                                           (cg-display-mode-get-width mode))
+                                        (%rgfw-monitor-mode-h %mode)
+                                          (%c-size-t-to-i32
+                                           (cg-display-mode-get-height mode))
+                                        (%rgfw-monitor-mode-red %mode) 8
+                                        (%rgfw-monitor-mode-green %mode) 8
+                                        (%rgfw-monitor-mode-blue %mode) 8
+                                        (%rgfw-monitor-mode-refresh-rate
+                                         %mode)
+                                          (rgfw-osx-get-refresh-rate
+                                           (%load (%offset displays (* i 4))
+                                            4)
+                                           mode))
+                                  (cf-release mode)
+                                  (let ((%temporary-13
+                                         (cg-display-screen-size
+                                          (%load (%offset displays (* i 4))
+                                           4))))
+                                    (setf (%value-cg-size-width
+                                           screen-size-mm)
+                                            (%load %temporary-13 :double)
+                                          (%value-cg-size-height
+                                           screen-size-mm)
+                                            (%load (%offset %temporary-13 8)
+                                             :double))
+                                    %temporary-13)
+                                  (setf (%rgfw-monitor-phys-w monitor)
+                                          (/
+                                           (coerce
+                                            (%value-cg-size-width
+                                             screen-size-mm)
+                                            'single-float)
+                                           25.4)
+                                        (%rgfw-monitor-phys-h monitor)
+                                          (/
+                                           (coerce
+                                            (%value-cg-size-height
+                                             screen-size-mm)
+                                            'single-float)
+                                           25.4)
+                                        ppi-width
+                                          (/
+                                           (coerce
+                                            (%rgfw-monitor-mode-w %mode)
+                                            'single-float)
+                                           (%rgfw-monitor-phys-w monitor))
+                                        ppi-height
+                                          (/
+                                           (coerce
+                                            (%rgfw-monitor-mode-h %mode)
+                                            'single-float)
+                                           (%rgfw-monitor-phys-h monitor))
+                                        (%rgfw-monitor-pixel-ratio monitor)
+                                          (coerce
+                                           (%call-pointer
+                                            (cffi:pointer-address
+                                             (cffi:foreign-symbol-pointer
+                                              "objc_msgSend_fpret"))
+                                            nil :pointer screen :pointer
+                                            (sel-register-name
+                                             (%literal "backingScaleFactor"))
+                                            :double)
+                                           'single-float)
+                                        dpi
+                                          (* 96.0
+                                             (%rgfw-monitor-pixel-ratio
+                                              monitor))
+                                        (%rgfw-monitor-scale-x monitor)
+                                          (/ (* (/ ppi-width dpi) 10.0) 10.0)
+                                        (%rgfw-monitor-scale-y monitor)
+                                          (/ (* (/ ppi-height dpi) 10.0)
+                                             10.0))
+                                  (if (not (%zero-p node-2))
+                                      (progn
+                                       (setf (%rgfw-monitor-node-screen
+                                              node-2)
+                                               screen
+                                             (%rgfw-monitor-node-display
+                                              node-2)
+                                               (%load
+                                                (%offset displays (* i 4)) 4)
+                                             (%rgfw-monitor-node-disconnected
+                                              node-2)
+                                               0)
+                                       (when
+                                           (=
+                                            (%load (%offset displays (* i 4))
+                                             4)
+                                            primary)
+                                         (setf (%rgfw-monitors-primary
+                                                (%address-rgfw-info-monitors
+                                                 (%load -rgfw :pointer)))
+                                                 node-2))
+                                       (return-from %temporary-1))
+                                      (progn
+                                       (setf node-2
+                                               (rgfw-monitors-add monitor)
+                                             (%rgfw-monitor-node-all-modes
+                                              node-2)
+                                               all-modes
+                                             (%rgfw-monitor-node-screen
+                                              node-2)
+                                               screen
+                                             (%rgfw-monitor-node-uint-num
+                                              node-2)
+                                               uint-num
+                                             (%rgfw-monitor-node-display
+                                              node-2)
+                                               (%load
+                                                (%offset displays (* i 4))
+                                                4))
+                                       (when
+                                           (=
+                                            (%load (%offset displays (* i 4))
+                                             4)
+                                            primary)
+                                         (setf (%rgfw-monitors-primary
+                                                (%address-rgfw-info-monitors
+                                                 (%load -rgfw :pointer)))
+                                                 node-2))
+                                       (rgfw-monitor-callback
+                                        (%rgfw-info-root
+                                         (%load -rgfw :pointer))
+                                        (%address-rgfw-monitor-node-mon
+                                         node-2)
+                                        1)))))
+                            (%release-frame *frame*)))))
+                 (%temporary-1)) (setf i
+                                         (%c-expression-to-u32
+                                          (+ (%c-expression-to-u32 i) 1))))
+     (%free displays)
+     (rgfw-monitors-refresh))
+   nil))
+#+(:and :darwin :arm64)
+(defun rgfw-poll-monitors ()
+  (%with-native-frame nil
+   (let ((count (%allocate-local 4)) (displays 0) (primary 0) (i 0))
+     (declare (ignorable primary))
+     (when (/= (cg-get-active-display-list 0 0 count) 0)
+       (return-from rgfw-poll-monitors nil))
+     (setf displays
+             (%allocate
+              (%c-expression-to-size-t
+               (* (%c-expression-to-size-t 4)
+                  (%c-u32-to-size-t (%load count 4))))))
+     (when (/= (cg-get-active-display-list (%load count 4) displays count) 0)
+       (return-from rgfw-poll-monitors nil))
+     (let ((node
+            (%rgfw-monitor-list-head
+             (%address-rgfw-monitors-list
+              (%address-rgfw-info-monitors (%load -rgfw :pointer))))))
+       (loop :until (%zero-p node)
+             :do (setf (%rgfw-monitor-node-disconnected node) 1) (setf node
+                                                                         (%rgfw-monitor-node-next
+                                                                          node))))
+     (setf primary (cg-main-display-id)
+           i 0)
+     (loop :while (< i (%load count 4))
+           :do (flet ((%temporary-1 ()
+                        (let ((*frame* (common-lisp:list nil)))
+                          (declare (dynamic-extent *frame*))
+                          (unwind-protect
+                              (let ((monitor
+                                     (%allocate-local +c-size-rgfw-monitor+))
+                                    (uint-num 0)
+                                    (screen 0)
+                                    (node-2 0)
+                                    (name (%allocate-local 7))
+                                    (bounds (%allocate-local 32))
+                                    (mode 0)
+                                    (all-modes 0)
+                                    (mode-count 0)
+                                    (mode-index 0)
+                                    (screen-size-mm (make-%value-cg-size))
+                                    (ppi-width 0.0)
+                                    (ppi-height 0.0)
+                                    (dpi 0.0))
+                                (declare
+                                 (common-lisp:type %value-cg-size
+                                  screen-size-mm)
+                                 (dynamic-extent screen-size-mm))
+                                (let* ((%origin
+                                        (%address-cg-rect-origin bounds))
+                                       (%mode
+                                        (%address-rgfw-monitor-mode monitor)))
+                                  (setf uint-num
+                                          (cg-display-unit-number
+                                           (%load (%offset displays (* i 4))
+                                            4))
+                                        screen
+                                          (rgfw-get-ns-screen-for-display-u-int
+                                           uint-num)
+                                        node-2
+                                          (%rgfw-monitor-list-head
+                                           (%address-rgfw-monitors-list
+                                            (%address-rgfw-info-monitors
+                                             (%load -rgfw :pointer)))))
+                                  (loop :until (%zero-p node-2)
+                                        :do (when
+                                                (=
+                                                 (%rgfw-monitor-node-uint-num
+                                                  node-2)
+                                                 uint-num)
+                                              (return)) (setf node-2
+                                                                (%rgfw-monitor-node-next
+                                                                 node-2)))
+                                  (%fill name 0 7)
+                                  (%store name 1 77)
+                                  (%store (%offset name 1) 1 97)
+                                  (%store (%offset name 2) 1 99)
+                                  (%store (%offset name 3) 1 79)
+                                  (%store (%offset name 4) 1 83)
+                                  (%store (%offset name 5) 1 0)
+                                  (%store (%offset name 6) 1 0)
+                                  (%copy (%address-rgfw-monitor-name monitor)
+                                   name 6)
+                                  (%copy bounds
+                                   (cg-display-bounds
+                                    (%load (%offset displays (* i 4)) 4))
+                                   32)
+                                  (setf (%rgfw-monitor-x monitor)
+                                          (%c-cg-float-to-i32
+                                           (%cg-point-x %origin))
+                                        (%rgfw-monitor-y monitor)
+                                          (%c-cg-float-to-i32
+                                           (%cg-point-y %origin))
+                                        mode
+                                          (cg-display-copy-display-mode
+                                           (%load (%offset displays (* i 4))
+                                            4))
+                                        all-modes
+                                          (cg-display-copy-all-display-modes
+                                           (%load (%offset displays (* i 4))
+                                            4)
+                                           0)
+                                        mode-count
+                                          (cf-array-get-count all-modes)
+                                        mode-index 0)
+                                  (loop :while (and (< mode-index mode-count)
+                                                    (not
+                                                     (%zero-p all-modes)))
+                                        :do (let ((cmode
+                                                   (cf-array-get-value-at-index
+                                                    all-modes mode-index)))
+                                              (when
+                                                  (%pointer-equal cmode mode)
+                                                (setf (%rgfw-monitor-mode-src
+                                                       %mode)
+                                                        (%c-cf-index-to-pointer
+                                                         mode-index))
+                                                (return))) (setf mode-index
+                                                                   (+
+                                                                    mode-index
+                                                                    1)))
+                                  (setf (%rgfw-monitor-mode-w %mode)
+                                          (%c-size-t-to-i32
+                                           (cg-display-mode-get-width mode))
+                                        (%rgfw-monitor-mode-h %mode)
+                                          (%c-size-t-to-i32
+                                           (cg-display-mode-get-height mode))
+                                        (%rgfw-monitor-mode-red %mode) 8
+                                        (%rgfw-monitor-mode-green %mode) 8
+                                        (%rgfw-monitor-mode-blue %mode) 8
+                                        (%rgfw-monitor-mode-refresh-rate
+                                         %mode)
+                                          (rgfw-osx-get-refresh-rate
+                                           (%load (%offset displays (* i 4))
+                                            4)
+                                           mode))
+                                  (cf-release mode)
+                                  (let ((%temporary-13
+                                         (cg-display-screen-size
+                                          (%load (%offset displays (* i 4))
+                                           4))))
+                                    (setf (%value-cg-size-width
+                                           screen-size-mm)
+                                            (%load %temporary-13 :double)
+                                          (%value-cg-size-height
+                                           screen-size-mm)
+                                            (%load (%offset %temporary-13 8)
+                                             :double))
+                                    %temporary-13)
+                                  (setf (%rgfw-monitor-phys-w monitor)
+                                          (/
+                                           (coerce
+                                            (%value-cg-size-width
+                                             screen-size-mm)
+                                            'single-float)
+                                           25.4)
+                                        (%rgfw-monitor-phys-h monitor)
+                                          (/
+                                           (coerce
+                                            (%value-cg-size-height
+                                             screen-size-mm)
+                                            'single-float)
+                                           25.4)
+                                        ppi-width
+                                          (/
+                                           (coerce
+                                            (%rgfw-monitor-mode-w %mode)
+                                            'single-float)
+                                           (%rgfw-monitor-phys-w monitor))
+                                        ppi-height
+                                          (/
+                                           (coerce
+                                            (%rgfw-monitor-mode-h %mode)
+                                            'single-float)
+                                           (%rgfw-monitor-phys-h monitor))
+                                        (%rgfw-monitor-pixel-ratio monitor)
+                                          (coerce
+                                           (%call-pointer
+                                            (cffi:pointer-address
+                                             (cffi:foreign-symbol-pointer
+                                              "objc_msgSend"))
+                                            nil :pointer screen :pointer
+                                            (sel-register-name
+                                             (%literal "backingScaleFactor"))
+                                            :double)
+                                           'single-float)
+                                        dpi
+                                          (* 96.0
+                                             (%rgfw-monitor-pixel-ratio
+                                              monitor))
+                                        (%rgfw-monitor-scale-x monitor)
+                                          (/ (* (/ ppi-width dpi) 10.0) 10.0)
+                                        (%rgfw-monitor-scale-y monitor)
+                                          (/ (* (/ ppi-height dpi) 10.0)
+                                             10.0))
+                                  (if (not (%zero-p node-2))
+                                      (progn
+                                       (setf (%rgfw-monitor-node-screen
+                                              node-2)
+                                               screen
+                                             (%rgfw-monitor-node-display
+                                              node-2)
+                                               (%load
+                                                (%offset displays (* i 4)) 4)
+                                             (%rgfw-monitor-node-disconnected
+                                              node-2)
+                                               0)
+                                       (when
+                                           (=
+                                            (%load (%offset displays (* i 4))
+                                             4)
+                                            primary)
+                                         (setf (%rgfw-monitors-primary
+                                                (%address-rgfw-info-monitors
+                                                 (%load -rgfw :pointer)))
+                                                 node-2))
+                                       (return-from %temporary-1))
+                                      (progn
+                                       (setf node-2
+                                               (rgfw-monitors-add monitor)
+                                             (%rgfw-monitor-node-all-modes
+                                              node-2)
+                                               all-modes
+                                             (%rgfw-monitor-node-screen
+                                              node-2)
+                                               screen
+                                             (%rgfw-monitor-node-uint-num
+                                              node-2)
+                                               uint-num
+                                             (%rgfw-monitor-node-display
+                                              node-2)
+                                               (%load
+                                                (%offset displays (* i 4))
+                                                4))
+                                       (when
+                                           (=
+                                            (%load (%offset displays (* i 4))
+                                             4)
+                                            primary)
+                                         (setf (%rgfw-monitors-primary
+                                                (%address-rgfw-info-monitors
+                                                 (%load -rgfw :pointer)))
+                                                 node-2))
+                                       (rgfw-monitor-callback
+                                        (%rgfw-info-root
+                                         (%load -rgfw :pointer))
+                                        (%address-rgfw-monitor-node-mon
+                                         node-2)
+                                        1)))))
+                            (%release-frame *frame*)))))
+                 (%temporary-1)) (setf i
+                                         (%c-expression-to-u32
+                                          (+ (%c-expression-to-u32 i) 1))))
+     (%free displays)
+     (rgfw-monitors-refresh))
+   nil))
 
 ;; C2LISP [storage]
 (defun rgfw-raw-motion-callback (win x y)
@@ -15077,7 +20411,7 @@
 ;; @param requestedType the requested clipboard data type to attempt to read
 ;; @return A pointer to the clipboard data object or NULL on failure.
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-read-clipboard (requested-type)
   (%with-native-frame nil
    (let ((data-check (%allocate-local +c-size-rgfw-data-transfer+))
@@ -15144,9 +20478,10 @@
        (%free (%rgfw-info-clipboard (%load -rgfw :pointer)))))
      (setf (%rgfw-info-clipboard (%load -rgfw :pointer)) data)
      (%rgfw-info-clipboard (%load -rgfw :pointer)))))
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux)))
 (progn
  ;; C source (RGFW.h:2408-2415):
 ;; @brief Reads clipboard data into your object pointer using your provided buffer, or returns the required length if the buffer is NULL or bufferCapacity is 0.
@@ -15227,13 +20562,8 @@
        (%rgfw-info-xsel-data (%load -rgfw :pointer))
        (%rgfw-info-helper-window (%load -rgfw :pointer)) 0)
       (x-sync (%rgfw-info-display (%load -rgfw :pointer)) 0)
-      (loop :named %temporary-4
-            :do (flet ((%temporary-1 ()
-                         (progn
-                          (x-next-event
-                           (%rgfw-info-display (%load -rgfw :pointer)) event)
-                          (when (/= (%-x-event-type event) 31)
-                            (return-from %temporary-1))
+      (loop :do (x-next-event (%rgfw-info-display (%load -rgfw :pointer))
+                 event) (unless (/= (%-x-event-type event) 31)
                           (when
                               (or
                                (/= (%x-selection-event-selection %xselection)
@@ -15242,8 +20572,7 @@
                                (= (%x-selection-event-property %xselection)
                                   0))
                             (return-from rgfw-read-clipboard-ptr 0))
-                          (return-from %temporary-4))))
-                  (%temporary-1)))
+                          (return)))
       (x-get-window-property (%x-selection-event-display %xselection)
        (%x-selection-event-requestor %xselection)
        (%x-selection-event-property %xselection) 0 (lognot 0) 0 0 target
@@ -15340,13 +20669,8 @@
        (%rgfw-info-xsel-data (%load -rgfw :pointer))
        (%rgfw-info-helper-window (%load -rgfw :pointer)) 0)
       (x-sync (%rgfw-info-display (%load -rgfw :pointer)) 0)
-      (loop :named %temporary-4
-            :do (flet ((%temporary-1 ()
-                         (progn
-                          (x-next-event
-                           (%rgfw-info-display (%load -rgfw :pointer)) event)
-                          (when (/= (%-x-event-type event) 31)
-                            (return-from %temporary-1))
+      (loop :do (x-next-event (%rgfw-info-display (%load -rgfw :pointer))
+                 event) (unless (/= (%-x-event-type event) 31)
                           (when
                               (or
                                (/= (%x-selection-event-selection %xselection)
@@ -15355,8 +20679,7 @@
                                (= (%x-selection-event-property %xselection)
                                   0))
                             (return-from rgfw-read-clipboard-ptr 0))
-                          (return-from %temporary-4))))
-                  (%temporary-1)))
+                          (return)))
       (x-get-window-property (%x-selection-event-display %xselection)
        (%x-selection-event-requestor %xselection)
        (%x-selection-event-property %xselection) 0 (lognot 0) 0 0 target
@@ -15468,6 +20791,45 @@
      (global-unlock h-data)
      (close-clipboard)
      ret)))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-read-clipboard-ptr (requested-type buffer capacity data)
+  (%with-native-frame nil
+   (%with-string-inputs (buffer)
+    (let ((length (%allocate-local +c-size-size-t+)) (clip 0))
+      (assert (not (%pointer-equal data 0)))
+      (when (/= requested-type 1) (return-from rgfw-read-clipboard-ptr 0))
+      (%store length +c-code-size-t+ 0)
+      (setf clip
+              (ns-pasteboard-string-for-type
+               (ns-pasteboard-general-pasteboard)
+               (%literal "public.utf8-plain-text") length))
+      (when (%pointer-equal clip 0) (return-from rgfw-read-clipboard-ptr 0))
+      (setf (%rgfw-data-transfer-type data) 1
+            (%rgfw-data-transfer-length data) (%load length +c-code-size-t+))
+      (when
+          (/=
+           (%load
+            (%offset clip
+             (*
+              (%c-expression-to-size-t
+               (- (%rgfw-data-transfer-length data) 1))
+              1))
+            +c-code-char+)
+           0)
+        (with-accessors ((%length %rgfw-data-transfer-length)) data
+           (setf %length (%c-expression-to-size-t (+ %length 1)))))
+      (when (%pointer-equal buffer 0)
+        (return-from rgfw-read-clipboard-ptr 1))
+      (when (< capacity (%rgfw-data-transfer-length data))
+        (return-from rgfw-read-clipboard-ptr 0))
+      (%copy buffer clip (%load length +c-code-size-t+))
+      (%store
+       (%offset buffer
+        (* (%c-expression-to-size-t (- (%rgfw-data-transfer-length data) 1))
+           1))
+       1 0)
+      (setf (%rgfw-data-transfer-data data) buffer)
+      1))))
 
 ;; C source (RGFW.h:2418-2422):
 ;; @brief Reads clipboard string data.
@@ -15550,7 +20912,8 @@
    (%offset (%address-rgfw-info-api-keycodes (%load -rgfw :pointer))
     (* keycode 4))
    4))
-#+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (progn
  ;; C2LISP [storage]
 
@@ -15754,29 +21117,35 @@
 ;; @return The size of the RGFW_window_src structure.
 (defun rgfw-sizeof-window-src ()
   (%c-expression-to-size-t +c-size-rgfw-window-src+))
-
-;; C source (RGFW.h:4721):
+#+(:or
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
+(progn
+ ;; C source (RGFW.h:4721):
 ;; handle leftovers
-(defun rgfw-split-bpp (bpp mode)
-  (let ((delta 0))
-    (when (= bpp 32) (setf bpp 24))
-    (setf (%rgfw-monitor-mode-red mode)
-            (%c-expression-to-u8
-             (setf (%rgfw-monitor-mode-green mode)
-                     (%c-expression-to-u8
-                      (setf (%rgfw-monitor-mode-blue mode)
-                              (%c-u32-to-u8
-                               (%c-expression-to-u32 (truncate bpp 3)))))))
-          delta
-            (%c-expression-to-u32
-             (- bpp (%c-int-to-u32 (* (%rgfw-monitor-mode-red mode) 3)))))
-    (when (>= delta 1)
-      (setf (%rgfw-monitor-mode-green mode)
-              (%c-int-to-u8 (+ (%rgfw-monitor-mode-green mode) 1))))
-    (when (= delta 2)
-      (setf (%rgfw-monitor-mode-red mode)
-              (%c-int-to-u8 (+ (%rgfw-monitor-mode-red mode) 1)))))
-  nil)
+
+ (defun rgfw-split-bpp (bpp mode)
+   (let ((delta 0))
+     (when (= bpp 32) (setf bpp 24))
+     (setf (%rgfw-monitor-mode-red mode)
+             (%c-expression-to-u8
+              (setf (%rgfw-monitor-mode-green mode)
+                      (%c-expression-to-u8
+                       (setf (%rgfw-monitor-mode-blue mode)
+                               (%c-u32-to-u8
+                                (%c-expression-to-u32 (truncate bpp 3)))))))
+           delta
+             (%c-expression-to-u32
+              (- bpp (%c-int-to-u32 (* (%rgfw-monitor-mode-red mode) 3)))))
+     (when (>= delta 1)
+       (setf (%rgfw-monitor-mode-green mode)
+               (%c-int-to-u8 (+ (%rgfw-monitor-mode-green mode) 1))))
+     (when (= delta 2)
+       (setf (%rgfw-monitor-mode-red mode)
+               (%c-int-to-u8 (+ (%rgfw-monitor-mode-red mode) 1)))))
+   nil))
 #+(:and
    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
    (:or :freebsd :linux))
@@ -15796,7 +21165,8 @@
 ;; start of unix (wayland or X11 (unix) ) defines
 ;; C2LISP [storage]
 )
-#+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (progn
  ;; C source (RGFW.h:1557-1560):
 ;; @brief check all the events until there are none left and updates window structure attributes
@@ -15834,6 +21204,46 @@
 (defun rgfw-stop-check-events ()
   (post-message-w (%rgfw-info-helper-window (%load -rgfw :pointer)) 0 0 0)
   nil)
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-stop-check-events ()
+  (%with-native-frame nil
+   (let ((pool 0) (e 0))
+     (setf pool
+             (%call-pointer
+              (cffi:pointer-address
+               (cffi:foreign-symbol-pointer "objc_msgSend"))
+              nil :pointer
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer (objc-get-class (%literal "NSAutoreleasePool"))
+               :pointer (sel-register-name (%literal "alloc")) :pointer)
+              :pointer (sel-register-name (%literal "init")) :pointer)
+           e
+             (%call-pointer
+              (cffi:pointer-address
+               (cffi:foreign-symbol-pointer "objc_msgSend"))
+              nil :pointer (objc-get-class (%literal "NSEvent")) :pointer
+              (sel-register-name
+               (%literal
+                "otherEventWithType:location:modifierFlags:timestamp:windowNumber:context:subtype:data1:data2:"))
+              :unsigned-long 15 (:struct %abi-struct-1)
+              (let ((%temporary-1 (%allocate-local 16)))
+                (%fill %temporary-1 0 16)
+                (setf (%cg-point-x %temporary-1) 0.0d0
+                      (%cg-point-y %temporary-1) 0.0d0)
+                %temporary-1)
+              :unsigned-long 0 :pointer 0 :long 0 :pointer 0 :int16 0 :long 0
+              :long 0 :pointer))
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer (%rgfw-info-ns-app (%load -rgfw :pointer)) :pointer
+      (sel-register-name (%literal "postEvent:atStart:")) :pointer e :uint8 1
+      :void)
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer pool :pointer (sel-register-name (%literal "drain")) :int8))
+   nil))
 
 ;; C source (RGFW.h:1254-1257):
 ;; @brief Frees the surface pointer and any buffers used for software rendering.
@@ -15852,17 +21262,10 @@
    (let* ((%native (%address-rgfw-surface-native surface)))
      (assert (not (%pointer-equal surface 0)))
      (%free (%rgfw-native-image-buffer %native))
-     (let* ((*string-arguments* *string-arguments*)
-            (%temporary-1
-             (%funcs-destroy-image
-              (%address--x-image-f (%rgfw-native-image-bitmap %native))))
-            (%temporary-2 (%translated-function %temporary-1)))
-       (if %temporary-2
-           (funcall %temporary-2 (%rgfw-native-image-bitmap %native))
-           (cffi:foreign-funcall-pointer
-            (%native-argument-pointer %temporary-1) nil :pointer
-            (%native-argument-pointer (%rgfw-native-image-bitmap %native))
-            :int32)))
+     (%call-pointer
+      (%funcs-destroy-image
+       (%address--x-image-f (%rgfw-native-image-bitmap %native)))
+      nil :pointer (%rgfw-native-image-bitmap %native) :int32)
      nil)))
 #+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
    (:or :freebsd :linux))
@@ -15871,17 +21274,10 @@
    (let* ((%native (%address-rgfw-surface-native surface)))
      (assert (/= (%c-pointer-to-int surface) 0))
      (%free (%rgfw-native-image-buffer %native))
-     (let* ((*string-arguments* *string-arguments*)
-            (%temporary-1
-             (%funcs-destroy-image
-              (%address--x-image-f (%rgfw-native-image-bitmap %native))))
-            (%temporary-2 (%translated-function %temporary-1)))
-       (if %temporary-2
-           (funcall %temporary-2 (%rgfw-native-image-bitmap %native))
-           (cffi:foreign-funcall-pointer
-            (%native-argument-pointer %temporary-1) nil :pointer
-            (%native-argument-pointer (%rgfw-native-image-bitmap %native))
-            :int32)))
+     (%call-pointer
+      (%funcs-destroy-image
+       (%address--x-image-f (%rgfw-native-image-bitmap %native)))
+      nil :pointer (%rgfw-native-image-bitmap %native) :int32)
      nil)))
 #+(:and :windows (:or :x86-64 :arm64))
 (defun rgfw-surface-free-ptr (surface)
@@ -15897,6 +21293,10 @@
     (delete-dc (%rgfw-native-image-hdc-mem %native))
     (delete-object (%rgfw-native-image-bitmap %native))
     nil))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-surface-free-ptr (surface)
+  (%free (%rgfw-native-image-buffer (%address-rgfw-surface-native surface)))
+  nil)
 
 ;; C source (RGFW.h:1247-1251):
 ;; @brief Retrieves the native image associated with a surface.
@@ -15935,6 +21335,13 @@
  ;; C source (RGFW.h:1517-1520):
 ;; @brief sleep until RGFW gets an event or the timer ends (defined by OS)
 ;; @param waitMS how long to wait for the next event (in miliseconds)
+)
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ ;; C source (RGFW.h:1517-1520):
+;; @brief sleep until RGFW gets an event or the timer ends (defined by OS)
+;; @param waitMS how long to wait for the next event (in miliseconds)
+;; C2LISP [storage]
 )
 #+(:and
    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
@@ -16061,22 +21468,102 @@
            -4 0))))
     nil)))
 #+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
-(progn
- (defun rgfw-wait-for-event (wait-ms)
-   (msg-wait-for-multiple-objects 0 0 0 (%c-i32-to-dword wait-ms)
-    (%c-int-to-dword
+(defun rgfw-wait-for-event (wait-ms)
+  (msg-wait-for-multiple-objects 0 0 0 (%c-i32-to-dword wait-ms)
+   (%c-int-to-dword
+    (logior
      (logior
       (logior
        (logior
         (logior
-         (logior
-          (logior (logior (logior (logior (logior 2 4) 1) 1024) 2048) 4096)
-          8)
-         16)
-        32)
-       128)
-      64)))
-   nil)
+         (logior (logior (logior (logior (logior 2 4) 1) 1024) 2048) 4096) 8)
+        16)
+       32)
+      128)
+     64)))
+  nil)
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-wait-for-event (wait-ms)
+  (%with-native-frame nil
+   (progn
+    (let ((pool 0) (date 0) (event-func 0) (e 0))
+      (setf pool
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer
+               (%call-pointer
+                (cffi:pointer-address
+                 (cffi:foreign-symbol-pointer "objc_msgSend"))
+                nil :pointer (objc-get-class (%literal "NSAutoreleasePool"))
+                :pointer (sel-register-name (%literal "alloc")) :pointer)
+               :pointer (sel-register-name (%literal "init")) :pointer)
+            date
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer (objc-get-class (%literal "NSDate")) :pointer
+               (sel-register-name (%literal "distantFuture")) :pointer))
+      (when (>= wait-ms 0)
+        (let ((seconds 0.0d0))
+          (setf seconds (/ (coerce wait-ms 'double-float) 1000.0d0)
+                date
+                  (%call-pointer
+                   (cffi:pointer-address
+                    (cffi:foreign-symbol-pointer "objc_msgSend"))
+                   nil :pointer (objc-get-class (%literal "NSDate")) :pointer
+                   (sel-register-name
+                    (%literal "dateWithTimeIntervalSinceNow:"))
+                   :double seconds :pointer))))
+      (setf event-func
+              (sel-register-name
+               (%literal "nextEventMatchingMask:untilDate:inMode:dequeue:"))
+            e
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer (%rgfw-info-ns-app (%load -rgfw :pointer))
+               :pointer event-func :unsigned-long 18446744073709551615
+               :pointer date :pointer
+               (ns-string-string-with-utf8string
+                (%literal "kCFRunLoopDefaultMode"))
+               :uint8 1 :pointer))
+      (when (not (%zero-p e))
+        (let ((flags 0))
+          (%call-pointer
+           (cffi:pointer-address
+            (cffi:foreign-symbol-pointer "objc_msgSend"))
+           nil :pointer (%rgfw-info-ns-app (%load -rgfw :pointer)) :pointer
+           (sel-register-name (%literal "postEvent:atStart:")) :pointer e
+           :uint8 1 :void)
+          (setf flags
+                  (%call-pointer
+                   (cffi:pointer-address
+                    (cffi:foreign-symbol-pointer "objc_msgSend"))
+                   nil :pointer e :pointer
+                   (sel-register-name (%literal "modifierFlags")) :uint32))
+          (when (not (%zero-p (%c-expression-to-u32 (logand flags 1048576))))
+            (let ((window
+                   (%call-pointer
+                    (cffi:pointer-address
+                     (cffi:foreign-symbol-pointer "objc_msgSend"))
+                    nil :pointer (%rgfw-info-ns-app (%load -rgfw :pointer))
+                    :pointer (sel-register-name (%literal "keyWindow"))
+                    :pointer)))
+              (when (not (%zero-p window))
+                (%call-pointer
+                 (cffi:pointer-address
+                  (cffi:foreign-symbol-pointer "objc_msgSend"))
+                 nil :pointer window :pointer
+                 (sel-register-name (%literal "sendEvent:")) :pointer e
+                 :void))))))
+      (%call-pointer
+       (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+       nil :pointer pool :pointer (sel-register-name (%literal "drain"))
+       :int8))
+    nil)))
+#+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
+(progn
  ;; C2LISP [storage]
 
  (defun rgfw-win32-create-monitor (adapter dd)
@@ -16142,16 +21629,14 @@
    (case (%-devicemode-w-dm-display-frequency dm)
      ((119 59 29)
       (setf (%rgfw-monitor-mode-refresh-rate mode)
-              (coerce
-               (/
-                (*
-                 (coerce
-                  (%c-expression-to-dword
-                   (+ (%-devicemode-w-dm-display-frequency dm) 1))
-                  'single-float)
-                 1000.0)
-                1001.0)
-               'single-float)))
+              (/
+               (*
+                (coerce
+                 (%c-expression-to-dword
+                  (+ (%-devicemode-w-dm-display-frequency dm) 1))
+                 'single-float)
+                1000.0)
+               1001.0)))
      (t
       (setf (%rgfw-monitor-mode-refresh-rate mode)
               (coerce (%-devicemode-w-dm-display-frequency dm)
@@ -16223,18 +21708,16 @@
               0 0 0)
            dpi-x (coerce (get-device-caps hdc 88) 'single-float)
            dpi-y (coerce (get-device-caps hdc 90) 'single-float)
-           (%rgfw-monitor-scale-x %mon) (coerce (/ dpi-x 96.0) 'single-float)
-           (%rgfw-monitor-scale-y %mon) (coerce (/ dpi-y 96.0) 'single-float)
+           (%rgfw-monitor-scale-x %mon) (/ dpi-x 96.0)
+           (%rgfw-monitor-scale-y %mon) (/ dpi-y 96.0)
            (%rgfw-monitor-pixel-ratio %mon)
              (if (>= dpi-x 192.0)
                  2.0
                  1.0)
            (%rgfw-monitor-phys-w %mon)
-             (coerce (/ (coerce (get-device-caps hdc 4) 'single-float) 25.4)
-                     'single-float)
+             (/ (coerce (get-device-caps hdc 4) 'single-float) 25.4)
            (%rgfw-monitor-phys-h %mon)
-             (coerce (/ (coerce (get-device-caps hdc 6) 'single-float) 25.4)
-                     'single-float))
+             (/ (coerce (get-device-caps hdc 6) 'single-float) 25.4))
      (delete-dc hdc)
      (when (%pointer-equal (%load rgfw-shcore-dll :pointer) 0)
        (%store rgfw-shcore-dll :pointer
@@ -16249,25 +21732,14 @@
        (assert
         (not (%pointer-equal (%load get-dpi-for-monitor-src :pointer) 0))))
      (when (not (%pointer-equal (%load get-dpi-for-monitor-src :pointer) 0))
-       (let* ((x (%allocate-local 4))
-              (y (%allocate-local 4))
-              (*string-arguments* *string-arguments*)
-              (%temporary-14 (%load get-dpi-for-monitor-src :pointer))
-              (%temporary-15 (%translated-function %temporary-14)))
-         (if %temporary-15
-             (funcall %temporary-15 (%rgfw-monitor-node-h-monitor node) 0 x
-                      y)
-             (cffi:foreign-funcall-pointer
-              (%native-argument-pointer %temporary-14) nil :pointer
-              (%native-argument-pointer (%rgfw-monitor-node-h-monitor node))
-              :uint32 0 :pointer (%native-argument-pointer x) :pointer
-              (%native-argument-pointer y) :int32))
+       (let ((x (%allocate-local 4)) (y (%allocate-local 4)))
+         (%call-pointer (%load get-dpi-for-monitor-src :pointer) nil :pointer
+          (%rgfw-monitor-node-h-monitor node) :uint32 0 :pointer x :pointer y
+          :long)
          (setf (%rgfw-monitor-scale-x %mon)
-                 (coerce (/ (coerce (%load x 4) 'single-float) 96.0)
-                         'single-float)
+                 (/ (coerce (%load x 4) 'single-float) 96.0)
                (%rgfw-monitor-scale-y %mon)
-                 (coerce (/ (coerce (%load y 4) 'single-float) 96.0)
-                         'single-float)
+                 (/ (coerce (%load y 4) 'single-float) 96.0)
                (%rgfw-monitor-pixel-ratio %mon)
                  (if (>= dpi-x 192.0)
                      2.0
@@ -16324,18 +21796,16 @@
               0 0 0)
            dpi-x (coerce (get-device-caps hdc 88) 'single-float)
            dpi-y (coerce (get-device-caps hdc 90) 'single-float)
-           (%rgfw-monitor-scale-x %mon) (coerce (/ dpi-x 96.0) 'single-float)
-           (%rgfw-monitor-scale-y %mon) (coerce (/ dpi-y 96.0) 'single-float)
+           (%rgfw-monitor-scale-x %mon) (/ dpi-x 96.0)
+           (%rgfw-monitor-scale-y %mon) (/ dpi-y 96.0)
            (%rgfw-monitor-pixel-ratio %mon)
              (if (>= dpi-x 192.0)
                  2.0
                  1.0)
            (%rgfw-monitor-phys-w %mon)
-             (coerce (/ (coerce (get-device-caps hdc 4) 'single-float) 25.4)
-                     'single-float)
+             (/ (coerce (get-device-caps hdc 4) 'single-float) 25.4)
            (%rgfw-monitor-phys-h %mon)
-             (coerce (/ (coerce (get-device-caps hdc 6) 'single-float) 25.4)
-                     'single-float))
+             (/ (coerce (get-device-caps hdc 6) 'single-float) 25.4))
      (delete-dc hdc)
      (when (= (%c-hmodule-to-int (%load rgfw-shcore-dll :pointer)) 0)
        (%store rgfw-shcore-dll :pointer
@@ -16361,26 +21831,14 @@
           (%c-pfn-get-dpi-for-monitor-to-int
            (%load get-dpi-for-monitor-src :pointer))
           0)
-       (let* ((x (%allocate-local 4))
-              (y (%allocate-local 4))
-              (*string-arguments* *string-arguments*)
-              (%temporary-14 (%load get-dpi-for-monitor-src :pointer))
-              (%temporary-15 (%translated-function %temporary-14)))
-         (if %temporary-15
-             (funcall %temporary-15 (%rgfw-monitor-node-h-monitor node) 0 x
-                      y)
-             (cffi:foreign-funcall-pointer
-              (%native-argument-pointer %temporary-14) (:convention :stdcall)
-              :pointer
-              (%native-argument-pointer (%rgfw-monitor-node-h-monitor node))
-              :uint32 0 :pointer (%native-argument-pointer x) :pointer
-              (%native-argument-pointer y) :int32))
+       (let ((x (%allocate-local 4)) (y (%allocate-local 4)))
+         (%call-pointer (%load get-dpi-for-monitor-src :pointer)
+          (:convention :stdcall) :pointer (%rgfw-monitor-node-h-monitor node)
+          :uint32 0 :pointer x :pointer y :long)
          (setf (%rgfw-monitor-scale-x %mon)
-                 (coerce (/ (coerce (%load x 4) 'single-float) 96.0)
-                         'single-float)
+                 (/ (coerce (%load x 4) 'single-float) 96.0)
                (%rgfw-monitor-scale-y %mon)
-                 (coerce (/ (coerce (%load y 4) 'single-float) 96.0)
-                         'single-float)
+                 (/ (coerce (%load y 4) 'single-float) 96.0)
                (%rgfw-monitor-pixel-ratio %mon)
                  (if (>= dpi-x 192.0)
                      2.0
@@ -16403,44 +21861,32 @@
 #+(:and :windows (:or :x86-64 :arm64))
 (defun rgfw-win32-make-window-dark-mode (win state)
   (%with-native-frame nil
-   (let* ((%src (%address-rgfw-window-src win)) (value (%allocate-local 4)))
-     (%store value -4
-      (if (= state 1)
-          1
-          0))
-     (let* ((*string-arguments* *string-arguments*)
-            (%temporary-1 (%load dwm-set-window-attribute-src :pointer))
-            (%temporary-2 (%translated-function %temporary-1)))
-       (if %temporary-2
-           (funcall %temporary-2 (%rgfw-window-src-window %src) 20 value
-                    (%c-expression-to-dword 4))
-           (cffi:foreign-funcall-pointer
-            (%native-argument-pointer %temporary-1) nil :pointer
-            (%native-argument-pointer (%rgfw-window-src-window %src)) :uint32
-            20 :pointer (%native-argument-pointer value) :uint32
-            (%c-expression-to-dword 4) :int32)))
-     nil)))
+   (progn
+    (let ((value (%allocate-local 4)))
+      (%store value -4
+       (if (= state 1)
+           1
+           0))
+      (%call-pointer (%load dwm-set-window-attribute-src :pointer) nil
+       :pointer (%rgfw-window-src-window (%address-rgfw-window-src win))
+       :unsigned-long 20 :pointer value :unsigned-long
+       (%c-expression-to-dword 4) :long))
+    nil)))
 #+(:and :windows :x86 (:not :x86-64))
 (defun rgfw-win32-make-window-dark-mode (win state)
   (%with-native-frame nil
-   (let* ((%src (%address-rgfw-window-src win)) (value (%allocate-local 4)))
-     (%store value -4
-      (if (= state 1)
-          1
-          0))
-     (let* ((*string-arguments* *string-arguments*)
-            (%temporary-1 (%load dwm-set-window-attribute-src :pointer))
-            (%temporary-2 (%translated-function %temporary-1)))
-       (if %temporary-2
-           (funcall %temporary-2 (%rgfw-window-src-window %src) 20 value
-                    (%c-expression-to-dword 4))
-           (cffi:foreign-funcall-pointer
-            (%native-argument-pointer %temporary-1) (:convention :stdcall)
-            :pointer
-            (%native-argument-pointer (%rgfw-window-src-window %src)) :uint32
-            20 :pointer (%native-argument-pointer value) :uint32
-            (%c-expression-to-dword 4) :int32)))
-     nil)))
+   (progn
+    (let ((value (%allocate-local 4)))
+      (%store value -4
+       (if (= state 1)
+           1
+           0))
+      (%call-pointer (%load dwm-set-window-attribute-src :pointer)
+       (:convention :stdcall) :pointer
+       (%rgfw-window-src-window (%address-rgfw-window-src win))
+       :unsigned-long 20 :pointer value :unsigned-long
+       (%c-expression-to-dword 4) :long))
+    nil)))
 #+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
 (progn
  ;; C2LISP [storage]
@@ -16468,16 +21914,8 @@
                  (%dwm-blurbehind-dw-flags bb) 1
                  (%dwm-blurbehind-f-enable bb) 1
                  (%dwm-blurbehind-h-rgn-blur bb) 0)
-           (let* ((*string-arguments* *string-arguments*)
-                  (%temporary-4
-                   (%load dwm-enable-blur-behind-window-src :pointer))
-                  (%temporary-5 (%translated-function %temporary-4)))
-             (if %temporary-5
-                 (funcall %temporary-5 (%rgfw-window-src-window %src) bb)
-                 (cffi:foreign-funcall-pointer
-                  (%native-argument-pointer %temporary-4) nil :pointer
-                  (%native-argument-pointer (%rgfw-window-src-window %src))
-                  :pointer (%native-argument-pointer bb) :int32))))
+           (%call-pointer (%load dwm-enable-blur-behind-window-src :pointer)
+            nil :pointer (%rgfw-window-src-window %src) :pointer bb :long))
          (progn
           (set-window-long-a (%rgfw-window-src-window %src) -20 524288)
           (set-layered-window-attributes (%rgfw-window-src-window %src) 0 128
@@ -16507,17 +21945,9 @@
                  (%dwm-blurbehind-dw-flags bb) 1
                  (%dwm-blurbehind-f-enable bb) 1
                  (%dwm-blurbehind-h-rgn-blur bb) 0)
-           (let* ((*string-arguments* *string-arguments*)
-                  (%temporary-4
-                   (%load dwm-enable-blur-behind-window-src :pointer))
-                  (%temporary-5 (%translated-function %temporary-4)))
-             (if %temporary-5
-                 (funcall %temporary-5 (%rgfw-window-src-window %src) bb)
-                 (cffi:foreign-funcall-pointer
-                  (%native-argument-pointer %temporary-4)
-                  (:convention :stdcall) :pointer
-                  (%native-argument-pointer (%rgfw-window-src-window %src))
-                  :pointer (%native-argument-pointer bb) :int32))))
+           (%call-pointer (%load dwm-enable-blur-behind-window-src :pointer)
+            (:convention :stdcall) :pointer (%rgfw-window-src-window %src)
+            :pointer bb :long))
          (progn
           (set-window-long-a (%rgfw-window-src-window %src) -20 524288)
           (set-layered-window-attributes (%rgfw-window-src-window %src) 0 128
@@ -16593,9 +22023,10 @@
         0)
        1
        0)))
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux)))
 (progn
  ;; C source (RGFW.h:1706-1710):
 ;; @brief blits a surface stucture to the window
@@ -16684,6 +22115,104 @@
          (%rgfw-surface-h surface))
      (%rgfw-native-image-hdc-mem %native) 0 0 13369376)
     nil))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-blit-surface (win surface)
+  (%with-native-frame nil
+   (let* ((%native (%address-rgfw-surface-native surface))
+          (min-w 0)
+          (min-h 0)
+          (mon 0)
+          (pool 0)
+          (size (%allocate-local 16))
+          (image 0)
+          (layer 0))
+     (setf min-w
+             (if (< (%rgfw-window-w win) (%rgfw-surface-w surface))
+                 (%rgfw-window-w win)
+                 (%rgfw-surface-w surface))
+           min-h
+             (if (< (%rgfw-window-h win) (%rgfw-surface-h surface))
+                 (%rgfw-window-h win)
+                 (%rgfw-surface-h surface))
+           mon (rgfw-window-get-monitor win))
+     (when (%pointer-equal mon 0) (return-from rgfw-window-blit-surface nil))
+     (setf pool
+             (%call-pointer
+              (cffi:pointer-address
+               (cffi:foreign-symbol-pointer "objc_msgSend"))
+              nil :pointer
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer (objc-get-class (%literal "NSAutoreleasePool"))
+               :pointer (sel-register-name (%literal "alloc")) :pointer)
+              :pointer (sel-register-name (%literal "init")) :pointer)
+           min-w
+             (%c-float-to-i32
+              (* (coerce min-w 'single-float)
+                 (%rgfw-monitor-pixel-ratio mon)))
+           min-h
+             (%c-float-to-i32
+              (* (coerce min-h 'single-float)
+                 (%rgfw-monitor-pixel-ratio mon)))
+           (%rgfw-native-image-rep %native)
+             (ns-bitmap-image-rep-init-with-bitmap-data
+              (%address-rgfw-native-image-buffer %native) min-w min-h 8 4 1 0
+              (%literal "NSDeviceRGBColorSpace")
+              (%c-int-to-ns-bitmap-format 2)
+              (%c-expression-to-u32
+               (ash (%c-i32-to-u32 (%rgfw-surface-w surface)) 2))
+              32))
+     (%copy size
+      (let ((%temporary-1 (%allocate-local 16)))
+        (%fill %temporary-1 0 16)
+        (setf (%cg-size-width %temporary-1) (coerce min-w 'double-float)
+              (%cg-size-height %temporary-1) (coerce min-h 'double-float))
+        %temporary-1)
+      16)
+     (setf image
+             (%call-pointer
+              (cffi:pointer-address
+               (cffi:foreign-symbol-pointer "objc_msgSend"))
+              nil :pointer
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer (objc-get-class (%literal "NSImage")) :pointer
+               (sel-register-name (%literal "alloc")) :pointer)
+              :pointer (sel-get-uid (%literal "initWithSize:"))
+              (:struct %abi-struct-0) size :pointer))
+     (rgfw-copy-image-data
+      (ns-bitmap-image-rep-bitmap-data (%rgfw-native-image-rep %native))
+      (%rgfw-surface-w surface) min-h 2 (%rgfw-surface-data surface)
+      (%rgfw-native-image-format %native)
+      (%rgfw-surface-convert-func surface))
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer image :pointer (sel-get-uid (%literal "addRepresentation:"))
+      :pointer (%rgfw-native-image-rep %native) :void)
+     (setf layer
+             (%call-pointer
+              (cffi:pointer-address
+               (cffi:foreign-symbol-pointer "objc_msgSend"))
+              nil :pointer
+              (%rgfw-window-src-view (%address-rgfw-window-src win)) :pointer
+              (sel-get-uid (%literal "layer")) :pointer))
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer layer :pointer (sel-get-uid (%literal "setContents:"))
+      :pointer image :void)
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer image :pointer (sel-register-name (%literal "release")) :void)
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer (%rgfw-native-image-rep %native) :pointer
+      (sel-register-name (%literal "release")) :void)
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer pool :pointer (sel-register-name (%literal "drain")) :int8)
+     nil)))
 
 ;; C source (RGFW.h:2129-2133):
 ;; @brief checks if the window is borderless (has a border, frame or decor)
@@ -16710,8 +22239,14 @@
           state)
   (rgfw-window-capture-mouse-platform win state)
   nil)
-
-;; C2LISP [storage]
+#+(:or
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
+(progn
+ ;; C2LISP [storage]
+)
 #+(:and
    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
    (:or :freebsd :linux))
@@ -16739,6 +22274,15 @@
       (%address-tag-rect-right clip-rect))
      (clip-cursor clip-rect)
      nil)))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-capture-mouse-platform (win state)
+  win
+  (cg-associate-mouse-and-mouse-cursor-position
+   (%c-expression-to-boolean-t
+    (if (not (= state 1))
+        1
+        0)))
+  nil)
 
 ;; C source (RGFW.h:2230-2235):
 ;; @brief lock/unlock the cursor and enable raw mpuise mode.
@@ -16752,7 +22296,7 @@
 ;; C source (RGFW.h:2090-2093):
 ;; @brief centers the window on the screen
 ;; @param win a pointer to the target window
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-window-center (win)
   (let ((mon 0))
     (assert (not (%pointer-equal win 0)))
@@ -16816,6 +22360,11 @@
     (setf (%rgfw-info-polled-events (%load -rgfw :pointer)) 0)
     (return-from rgfw-window-check-event 0))
   1)
+#+(:or
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (defun rgfw-window-check-mode (win)
   (let* ((%internal (%address-rgfw-window-internal win)))
     (declare (ignorable %internal))
@@ -16866,7 +22415,7 @@
 ;; C source (RGFW.h:4565):
 ;; check queued events
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-window-check-queued-event (win event)
   (let ((ev 0))
     (assert (not (%pointer-equal win 0)))
@@ -16891,7 +22440,7 @@
 ;; C source (RGFW.h:1990-1993):
 ;; @brief closes the window and frees its associated structure
 ;; @param win a pointer to the target window
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-window-close (win)
   (assert (not (%pointer-equal win 0)))
   (rgfw-window-close-ptr win)
@@ -16958,12 +22507,53 @@
     (when (not (%zero-p (%rgfw-window-src-h-icon-big %src)))
       (destroy-icon (%rgfw-window-src-h-icon-big %src)))
     nil))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-close-platform (win)
+  (%with-native-frame nil
+   (let* ((%src (%address-rgfw-window-src win))
+          (pool
+           (%call-pointer
+            (cffi:pointer-address
+             (cffi:foreign-symbol-pointer "objc_msgSend"))
+            nil :pointer
+            (%call-pointer
+             (cffi:pointer-address
+              (cffi:foreign-symbol-pointer "objc_msgSend"))
+             nil :pointer (objc-get-class (%literal "NSAutoreleasePool"))
+             :pointer (sel-register-name (%literal "alloc")) :pointer)
+            :pointer (sel-register-name (%literal "init")) :pointer)))
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer (%rgfw-window-src-window %src) :pointer
+      (sel-register-name (%literal "orderOut:")) :pointer 0 :void)
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer (%rgfw-window-src-window %src) :pointer
+      (sel-register-name (%literal "setDelegate:")) :pointer 0 :void)
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer (%rgfw-window-src-delegate %src) :pointer
+      (sel-register-name (%literal "release")) :void)
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer (%rgfw-window-src-view %src) :pointer
+      (sel-register-name (%literal "release")) :void)
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer (%rgfw-window-src-window %src) :pointer
+      (sel-register-name (%literal "close")) :void)
+     (setf (%rgfw-window-src-window %src) 0)
+     (rgfw-poll-events)
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer pool :pointer (sel-register-name (%literal "drain")) :int8)
+     nil)))
 
 ;; C source (RGFW.h:1996-1999):
 ;; @brief closes the window without freeing its structure
 ;; @param win a pointer to the target window
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-window-close-ptr (win)
   (let* ((%internal (%address-rgfw-window-internal win)))
     (assert (not (%pointer-equal win 0)))
@@ -16995,10 +22585,10 @@
          (%pointer-equal (%rgfw-info-clipboard (%load -rgfw :pointer)) 0))
       (%free (%rgfw-info-clipboard (%load -rgfw :pointer))))
     (setf (%rgfw-info-clipboard (%load -rgfw :pointer)) 0)
-    (let* ((%temporary-8 (%load -rgfw :pointer))
-           (%temporary-9 (%rgfw-info-window-count %temporary-8)))
-      (setf (%rgfw-info-window-count %temporary-8) (+ %temporary-9 -1))
-      %temporary-9)
+    (let* ((%temporary-4 (%load -rgfw :pointer))
+           (%temporary-5 (%rgfw-info-window-count %temporary-4)))
+      (setf (%rgfw-info-window-count %temporary-4) (+ %temporary-5 -1))
+      %temporary-5)
     (rgfw-debug-callback 2 16 (%literal "a window was freed"))
     nil))
 #+(:or (:and :arm (:not :arm64) (:or :linux :freebsd))
@@ -17034,10 +22624,10 @@
             0)
       (%free (%rgfw-info-clipboard (%load -rgfw :pointer))))
     (setf (%rgfw-info-clipboard (%load -rgfw :pointer)) 0)
-    (let* ((%temporary-8 (%load -rgfw :pointer))
-           (%temporary-9 (%rgfw-info-window-count %temporary-8)))
-      (setf (%rgfw-info-window-count %temporary-8) (+ %temporary-9 -1))
-      %temporary-9)
+    (let* ((%temporary-4 (%load -rgfw :pointer))
+           (%temporary-5 (%rgfw-info-window-count %temporary-4)))
+      (setf (%rgfw-info-window-count %temporary-4) (+ %temporary-5 -1))
+      %temporary-5)
     (rgfw-debug-callback 2 16 (%literal "a window was freed"))
     nil))
 
@@ -17075,7 +22665,8 @@
 ;; @return a bool if the creation was successful or not
 ;; C2LISP [storage]
 )
-#+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (progn
  ;; C source (RGFW.h:1688-1696):
 ;; @brief creates a new surface structure using a pre-allocated surface structure
@@ -17157,7 +22748,8 @@
         (return-from rgfw-window-create-surface-ptr 0))
       (setf (%rgfw-native-image-format %native) 4)
       1))))
-#+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (defun rgfw-window-create-surface-ptr (win data w h format surface)
   (%with-string-inputs (data)
    (progn win (rgfw-create-surface-ptr data w h format surface))))
@@ -17166,7 +22758,7 @@
 ;; @brief checks if a data drop occurred in the window (first frame only)
 ;; @param win a pointer to the target window
 ;; @return RGFW_TRUE if data was dropped, RGFW_FALSE otherwise
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-window-did-data-drop (win)
   (%c-expression-to-rgfw-bool
    (if (%pointer-equal (rgfw-window-get-data-drop win) 0)
@@ -17223,7 +22815,7 @@
 ;; @param win A pointer to the target RGFW_window.
 ;; @return A pointer to the popped RGFW_event, or NULL if the queue is empty.
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-window-event-queue-pop (win)
   (let ((ev (rgfw-event-queue-pop)))
     (when (%pointer-equal ev 0) (return-from rgfw-window-event-queue-pop ev))
@@ -17318,6 +22910,37 @@
      (setf (%rgfw-window-w win) (%c-long-to-i32 (%tag-rect-right area))
            (%rgfw-window-h win) (%c-long-to-i32 (%tag-rect-bottom area)))
      (rgfw-window-get-size win w h))))
+#+(:and :darwin :x86-64)
+(defun rgfw-window-fetch-size (win w h)
+  (%with-native-frame nil
+   (let* ((content (%allocate-local 32))
+          (%size (%address-cg-rect-size content)))
+     (%copy content
+      (%call-pointer
+       (cffi:pointer-address
+        (cffi:foreign-symbol-pointer "objc_msgSend_stret"))
+       nil :pointer (%rgfw-window-src-view (%address-rgfw-window-src win))
+       :pointer (sel-register-name (%literal "frame"))
+       (:struct %abi-struct-2))
+      32)
+     (setf (%rgfw-window-w win) (%c-cg-float-to-i32 (%cg-size-width %size))
+           (%rgfw-window-h win) (%c-cg-float-to-i32 (%cg-size-height %size)))
+     (rgfw-window-get-size win w h))))
+#+(:and :darwin :arm64)
+(defun rgfw-window-fetch-size (win w h)
+  (%with-native-frame nil
+   (let* ((content (%allocate-local 32))
+          (%size (%address-cg-rect-size content)))
+     (%copy content
+      (%call-pointer
+       (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+       nil :pointer (%rgfw-window-src-view (%address-rgfw-window-src win))
+       :pointer (sel-register-name (%literal "frame"))
+       (:struct %abi-struct-2))
+      32)
+     (setf (%rgfw-window-w win) (%c-cg-float-to-i32 (%cg-size-width %size))
+           (%rgfw-window-h win) (%c-cg-float-to-i32 (%cg-size-height %size)))
+     (rgfw-window-get-size win w h))))
 
 ;; C source (RGFW.h:2265-2269):
 ;; @breif request a window flash to get attention from the user
@@ -17337,9 +22960,8 @@
     (when (%pointer-equal wmhints 0) (return-from rgfw-window-flash nil))
     (if (not (%zero-p request))
         (progn
-         (let ((%temporary-1 wmhints))
-           (setf (%xwm-hints-flags %temporary-1)
-                   (logior (%xwm-hints-flags %temporary-1) 256)))
+         (with-accessors ((%flags %xwm-hints-flags)) wmhints
+            (setf %flags (logior %flags 256)))
          (when (= request 1)
            (setf (%rgfw-window-src-flash-end %src)
                    (%c-expression-to-u64
@@ -17348,9 +22970,8 @@
            (setf (%rgfw-window-src-flash-end %src) (%c-int-to-u64 -1))))
         (progn
          (setf (%rgfw-window-src-flash-end %src) 0)
-         (let ((%temporary-5 wmhints))
-           (setf (%xwm-hints-flags %temporary-5)
-                   (logand (%xwm-hints-flags %temporary-5) (lognot 256))))))
+         (with-accessors ((%flags-2 %xwm-hints-flags)) wmhints
+            (setf %flags-2 (logand %flags-2 (lognot 256))))))
     (x-set-wm-hints (%rgfw-info-display (%load -rgfw :pointer))
      (%rgfw-window-src-window %src) wmhints)
     (x-free wmhints)
@@ -17370,9 +22991,8 @@
       (return-from rgfw-window-flash nil))
     (if (not (%zero-p request))
         (progn
-         (let ((%temporary-1 wmhints))
-           (setf (%xwm-hints-flags %temporary-1)
-                   (logior (%xwm-hints-flags %temporary-1) 256)))
+         (with-accessors ((%flags %xwm-hints-flags)) wmhints
+            (setf %flags (logior %flags 256)))
          (when (= request 1)
            (setf (%rgfw-window-src-flash-end %src)
                    (%c-expression-to-u64
@@ -17381,9 +23001,8 @@
            (setf (%rgfw-window-src-flash-end %src) (%c-int-to-u64 -1))))
         (progn
          (setf (%rgfw-window-src-flash-end %src) 0)
-         (let ((%temporary-5 wmhints))
-           (setf (%xwm-hints-flags %temporary-5)
-                   (logand (%xwm-hints-flags %temporary-5) (lognot 256))))))
+         (with-accessors ((%flags-2 %xwm-hints-flags)) wmhints
+            (setf %flags-2 (logand %flags-2 (lognot 256))))))
     (x-set-wm-hints (%rgfw-info-display (%load -rgfw :pointer))
      (%rgfw-window-src-window %src) wmhints)
     (x-free wmhints)
@@ -17412,9 +23031,61 @@
         (t))
       (flash-window-ex desc))
     nil)))
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-flash (win request)
+  (%with-native-frame nil
+   (progn
+    (let ((pool 0))
+      (when
+          (and (not (%zero-p (rgfw-window-is-in-focus win)))
+               (not (%zero-p request)))
+        (return-from rgfw-window-flash nil))
+      (setf pool
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer
+               (%call-pointer
+                (cffi:pointer-address
+                 (cffi:foreign-symbol-pointer "objc_msgSend"))
+                nil :pointer (objc-get-class (%literal "NSAutoreleasePool"))
+                :pointer (sel-register-name (%literal "alloc")) :pointer)
+               :pointer (sel-register-name (%literal "init")) :pointer))
+      (when (not (%zero-p (%rgfw-info-flash (%load -rgfw :pointer))))
+        (%call-pointer
+         (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+         nil :pointer (%rgfw-info-ns-app (%load -rgfw :pointer)) :pointer
+         (sel-register-name (%literal "cancelUserAttentionRequest:")) :long
+         (%rgfw-info-flash (%load -rgfw :pointer)) :void))
+      (case request
+        (1
+         (setf (%rgfw-info-flash (%load -rgfw :pointer))
+                 (%call-pointer
+                  (cffi:pointer-address
+                   (cffi:foreign-symbol-pointer "objc_msgSend"))
+                  nil :pointer (%rgfw-info-ns-app (%load -rgfw :pointer))
+                  :pointer
+                  (sel-register-name (%literal "requestUserAttention:"))
+                  :long 10 :long)))
+        (2
+         (setf (%rgfw-info-flash (%load -rgfw :pointer))
+                 (%call-pointer
+                  (cffi:pointer-address
+                   (cffi:foreign-symbol-pointer "objc_msgSend"))
+                  nil :pointer (%rgfw-info-ns-app (%load -rgfw :pointer))
+                  :pointer
+                  (sel-register-name (%literal "requestUserAttention:"))
+                  :long 0 :long)))
+        (t))
+      (%call-pointer
+       (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+       nil :pointer pool :pointer (sel-register-name (%literal "drain"))
+       :int8))
+    nil)))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux)))
 (progn
  ;; C source (RGFW.h:2058-2061):
 ;; @brief sets focus to the window
@@ -17450,8 +23121,28 @@
     (set-foreground-window (%rgfw-window-src-window %src))
     (set-focus (%rgfw-window-src-window %src))
     nil))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-focus (win)
+  (%with-native-frame nil
+   (progn
+    (assert (not (%zero-p win)))
+    (%call-pointer
+     (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+     :pointer (%rgfw-info-ns-app (%load -rgfw :pointer)) :pointer
+     (sel-register-name (%literal "activateIgnoringOtherApps:")) :int8 1
+     :void)
+    (%call-pointer
+     (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+     :pointer (%rgfw-window-src-window (%address-rgfw-window-src win))
+     :pointer (sel-register-name (%literal "makeKeyWindow")) :void)
+    nil)))
 
 ;; C2LISP [storage]
+#+(:or
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (defun rgfw-window-focus-callback (win in-focus)
   (%with-native-frame nil
    (let* ((%internal (%address-rgfw-window-internal win))
@@ -17490,33 +23181,94 @@
             (%address-rgfw-window-internal-old-mode %internal)))
          (setf key 0)
          (loop :while (< key 256)
-               :do (flet ((%temporary-1 ()
-                            (progn
-                             (when
-                                 (= (rgfw-is-key-down (%c-size-t-to-u8 key))
-                                    0)
-                               (return-from %temporary-1))
-                             (setf (%rgfw-key-state-current
-                                    (%offset
-                                     (%address-rgfw-info-keyboard
-                                      (%load -rgfw :pointer))
-                                     (* key 2)))
-                                     0)
-                             (when
-                                 (not
-                                  (%zero-p
-                                   (%c-expression-to-rgfw-event-flag
-                                    (logand
-                                     (%rgfw-window-internal-enabled-events
-                                      %internal)
-                                     (%c-int-to-rgfw-event-flag 4)))))
-                               (rgfw-key-callback win (%c-size-t-to-u8 key)
-                                (%rgfw-window-internal-mod %internal) 0 0)))))
-                     (%temporary-1)) (setf key
-                                             (%c-expression-to-size-t
-                                              (+
-                                               (%c-expression-to-size-t key)
-                                               1))))
+               :do (unless (= (rgfw-is-key-down (%c-size-t-to-u8 key)) 0)
+                     (setf (%rgfw-key-state-current
+                            (%offset
+                             (%address-rgfw-info-keyboard
+                              (%load -rgfw :pointer))
+                             (* key 2)))
+                             0)
+                     (when
+                         (not
+                          (%zero-p
+                           (%c-expression-to-rgfw-event-flag
+                            (logand
+                             (%rgfw-window-internal-enabled-events %internal)
+                             (%c-int-to-rgfw-event-flag 4)))))
+                       (rgfw-key-callback win (%c-size-t-to-u8 key)
+                        (%rgfw-window-internal-mod %internal) 0 0))) (setf key
+                                                                             (%c-expression-to-size-t
+                                                                              (+
+                                                                               (%c-expression-to-size-t
+                                                                                key)
+                                                                               1))))
+         (rgfw-reset-key)
+         (setf (%rgfw-event-type event) 14))))
+     (setf (%rgfw-common-event-win %common) win)
+     (rgfw-event-queue-push-and-call event)
+     nil)))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-focus-callback (win in-focus)
+  (%with-native-frame nil
+   (let* ((%internal (%address-rgfw-window-internal win))
+          (event (%allocate-local +c-size-rgfw-event+))
+          (%common (%address-rgfw-event-common event)))
+     (setf (%rgfw-window-internal-in-focus %internal) in-focus)
+     (when (not (%zero-p (%rgfw-window-internal-capture-mouse %internal)))
+       (rgfw-window-capture-mouse-platform win in-focus))
+     (setf (%rgfw-common-event-win %common) win
+           (%rgfw-window-focus-event-state (%address-rgfw-event-focus event))
+             in-focus)
+     (when (not (%zero-p (rgfw-window-is-fullscreen win)))
+       (rgfw-window-set-fullscreen-platform win in-focus))
+     (cond
+      ((= in-focus 1)
+       (when
+           (and
+            (not
+             (%zero-p
+              (%c-expression-to-u32
+               (logand (%rgfw-window-internal-flags %internal) 16))))
+            (not (%zero-p (%rgfw-window-internal-monitor %internal))))
+         (rgfw-window-raise win)
+         (rgfw-monitor-set-mode (%rgfw-window-internal-monitor %internal)
+          (%address-rgfw-window-internal-new-mode %internal)))
+       (setf (%rgfw-event-type event) 13))
+      ((= in-focus 0)
+       (let ((key 0))
+         (when
+             (and
+              (not
+               (%zero-p
+                (%c-expression-to-u32
+                 (logand (%rgfw-window-internal-flags %internal) 16))))
+              (not (%zero-p (%rgfw-window-internal-monitor %internal))))
+           (rgfw-window-minimize win)
+           (rgfw-monitor-set-mode (%rgfw-window-internal-monitor %internal)
+            (%address-rgfw-window-internal-old-mode %internal)))
+         (setf key 0)
+         (loop :while (< key 256)
+               :do (unless (= (rgfw-is-key-down (%c-size-t-to-u8 key)) 0)
+                     (setf (%rgfw-key-state-current
+                            (%offset
+                             (%address-rgfw-info-keyboard
+                              (%load -rgfw :pointer))
+                             (* key 2)))
+                             0)
+                     (when
+                         (not
+                          (%zero-p
+                           (%c-expression-to-rgfw-event-flag
+                            (logand
+                             (%rgfw-window-internal-enabled-events %internal)
+                             (%c-int-to-rgfw-event-flag 4)))))
+                       (rgfw-key-callback win (%c-size-t-to-u8 key)
+                        (%rgfw-window-internal-mod %internal) 0 0))) (setf key
+                                                                             (%c-expression-to-size-t
+                                                                              (+
+                                                                               (%c-expression-to-size-t
+                                                                                key)
+                                                                               1))))
          (rgfw-reset-key)
          (setf (%rgfw-event-type event) 14))))
      (setf (%rgfw-common-event-win %common) win)
@@ -17601,9 +23353,10 @@
 ;; @brief retrieves the HDC handle for the window
 ;; @param win a pointer to the target window
 ;; @return A pointer to the Windows HDC handle, or NULL if not on Windows
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux)))
 (defun rgfw-window-get-hdc (win) win 0)
 #+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
 (defun rgfw-window-get-hdc (win)
@@ -17613,9 +23366,10 @@
 ;; @brief retrieves the HWND handle for the window
 ;; @param win a pointer to the target window
 ;; @return A pointer to the Windows HWND handle, or NULL if not on Windows
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux)))
 (defun rgfw-window-get-hwnd (win) win 0)
 #+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
 (defun rgfw-window-get-hwnd (win)
@@ -17748,6 +23502,70 @@
                                                                   (%rgfw-monitor-node-next
                                                                    node)))
     (rgfw-get-primary-monitor)))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-get-monitor (win)
+  (%with-native-frame nil
+   (let ((screen 0)
+         (description 0)
+         (screen-number-key 0)
+         (screen-number 0)
+         (display 0)
+         (node 0))
+     (setf screen
+             (%call-pointer
+              (cffi:pointer-address
+               (cffi:foreign-symbol-pointer "objc_msgSend"))
+              nil :pointer
+              (%rgfw-window-src-window (%address-rgfw-window-src win))
+              :pointer (sel-register-name (%literal "screen")) :pointer)
+           description
+             (%call-pointer
+              (cffi:pointer-address
+               (cffi:foreign-symbol-pointer "objc_msgSend"))
+              nil :pointer screen :pointer
+              (sel-register-name (%literal "deviceDescription")) :pointer)
+           screen-number-key
+             (ns-string-string-with-utf8string (%literal "NSScreenNumber"))
+           screen-number
+             (%call-pointer
+              (cffi:pointer-address
+               (cffi:foreign-symbol-pointer "objc_msgSend"))
+              nil :pointer description :pointer
+              (sel-register-name (%literal "objectForKey:")) :pointer
+              screen-number-key :pointer)
+           display
+             (%c-nsu-integer-to-cg-direct-display-id
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer screen-number :pointer
+               (sel-register-name (%literal "unsignedIntValue"))
+               :unsigned-long))
+           node
+             (%rgfw-monitor-list-head
+              (%address-rgfw-monitors-list
+               (%address-rgfw-info-monitors (%load -rgfw :pointer))))
+           node
+             (%rgfw-monitor-list-head
+              (%address-rgfw-monitors-list
+               (%address-rgfw-info-monitors (%load -rgfw :pointer)))))
+     (loop :until (%zero-p node)
+           :do (when (= (%rgfw-monitor-node-display node) display)
+                 (return)) (setf node (%rgfw-monitor-node-next node)))
+     (when (%pointer-equal node 0)
+       (setf node
+               (if (not
+                    (%zero-p
+                     (%rgfw-monitors-primary
+                      (%address-rgfw-info-monitors (%load -rgfw :pointer)))))
+                   (%rgfw-monitors-primary
+                    (%address-rgfw-info-monitors (%load -rgfw :pointer)))
+                   (%rgfw-monitor-list-head
+                    (%address-rgfw-monitors-list
+                     (%address-rgfw-info-monitors
+                      (%load -rgfw :pointer)))))))
+     (when (%pointer-equal node 0) (return-from rgfw-window-get-monitor 0))
+     (%address-rgfw-monitor-node-mon node))))
 
 ;; C source (RGFW.h:2289-2295):
 ;; @brief Retrieves the mouse position relative to the window.
@@ -17756,7 +23574,7 @@
 ;; @param y [OUTPUT] Pointer to store the Y position within the window.
 ;; @return True if the position was successfully retrieved.
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-window-get-mouse (win x y)
   (let* ((%internal (%address-rgfw-window-internal win)))
     (assert (not (%pointer-equal win 0)))
@@ -17809,7 +23627,7 @@
 ;; @param h [OUTPUT] the height of the window
 ;; @return a bool if the function was successful
 ;; C2LISP [storage]
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-window-get-size-in-pixels (win w h)
   (let ((mon (rgfw-window-get-monitor win)))
     (when (%pointer-equal mon 0)
@@ -17863,13 +23681,29 @@
 ;; @brief retrieves the macOS view object associated with the window
 ;; @param win a pointer to the target window
 ;; @return A pointer to the macOS view object, or NULL if not on macOS
+#+(:or
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (defun rgfw-window-get-view-osx (win) win 0)
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-get-view-osx (win)
+  (%rgfw-window-src-view (%address-rgfw-window-src win)))
 
 ;; C source (RGFW.h:1825-1829):
 ;; @brief retrieves the macOS window object
 ;; @param win a pointer to the target window
 ;; @return A pointer to the macOS window object, or NULL if not on macOS
+#+(:or
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (defun rgfw-window-get-window-osx (win) win 0)
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-get-window-osx (win)
+  (%rgfw-window-src-window (%address-rgfw-window-src win)))
 
 ;; C source (RGFW.h:1853-1857):
 ;; @brief retrieves the Wayland surface handle for the window
@@ -17886,7 +23720,8 @@
    (:or :freebsd :linux))
 (defun rgfw-window-get-window-x11 (win)
   (%c-window-to-u64 (%rgfw-window-src-window (%address-rgfw-window-src win))))
-#+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (defun rgfw-window-get-window-x11 (win) win 0)
 #+(:and
    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
@@ -17897,7 +23732,8 @@
 ;; @param win The target window.
 ;; C2LISP [storage]
 )
-#+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (progn
  ;; C source (RGFW.h:2253-2256):
 ;; @brief Hides the window from view.
@@ -17907,10 +23743,9 @@
    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
    (:or :freebsd :linux))
 (defun rgfw-window-hide (win)
-  (let ((%temporary-1 (%address-rgfw-window-internal win)))
-    (setf (%rgfw-window-internal-flags %temporary-1)
-            (%c-expression-to-u32
-             (logior (%rgfw-window-internal-flags %temporary-1) 512))))
+  (with-accessors ((%flags %rgfw-window-internal-flags))
+       (%address-rgfw-window-internal win)
+     (setf %flags (%c-expression-to-u32 (logior %flags 512))))
   (x-unmap-window (%rgfw-info-display (%load -rgfw :pointer))
    (%rgfw-window-src-window (%address-rgfw-window-src win)))
   (x-flush (%rgfw-info-display (%load -rgfw :pointer)))
@@ -17919,6 +23754,15 @@
 (defun rgfw-window-hide (win)
   (show-window (%rgfw-window-src-window (%address-rgfw-window-src win)) 0)
   nil)
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-hide (win)
+  (%with-native-frame nil
+   (progn
+    (%call-pointer
+     (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+     :pointer (%rgfw-window-src-window (%address-rgfw-window-src win))
+     :pointer (sel-register-name (%literal "setIsVisible:")) :int8 0 :void)
+    nil)))
 
 ;; C source (RGFW.h:2246-2250):
 ;; @brief Returns true if the mouse is captured
@@ -17948,7 +23792,8 @@
 ;; @return True if the window is floating.
 ;; C2LISP [storage]
 )
-#+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (progn
  ;; C source (RGFW.h:2369-2373):
 ;; @brief Checks if the window is floating.
@@ -18017,6 +23862,22 @@
         0)
        1
        0)))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-is-floating (win)
+  (%with-native-frame nil
+   (let ((level 0))
+     (assert (not (%pointer-equal win 0)))
+     (setf level
+             (%call-pointer
+              (cffi:pointer-address
+               (cffi:foreign-symbol-pointer "objc_msgSend"))
+              nil :pointer
+              (%rgfw-window-src-window (%address-rgfw-window-src win))
+              :pointer (sel-register-name (%literal "level")) :int32))
+     (%c-expression-to-rgfw-bool
+      (if (> level 0)
+          1
+          0)))))
 
 ;; C source (RGFW.h:2327-2331):
 ;; @brief Checks if the window is currently fullscreen (borderless or exclusive).
@@ -18068,7 +23929,8 @@
 ;; @return True if the window is hidden.
 ;; C2LISP [storage]
 )
-#+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (progn
  ;; C source (RGFW.h:2348-2352):
 ;; @brief Checks if the window is currently hidden.
@@ -18124,6 +23986,26 @@
         (%zero-p (rgfw-window-is-minimized win)))
        1
        0)))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-is-hidden (win)
+  (%with-native-frame nil
+   (let ((visible 0))
+     (assert (not (%pointer-equal win 0)))
+     (setf visible
+             (if (%zero-p
+                  (%call-pointer
+                   (cffi:pointer-address
+                    (cffi:foreign-symbol-pointer "objc_msgSend"))
+                   nil :pointer
+                   (%rgfw-window-src-window (%address-rgfw-window-src win))
+                   :pointer (sel-register-name (%literal "isVisible"))
+                   :int8))
+                 0
+                 1))
+     (%c-expression-to-rgfw-bool
+      (if (and (= visible 0) (%zero-p (rgfw-window-is-minimized win)))
+          1
+          0)))))
 
 ;; C source (RGFW.h:2064-2068):
 ;; @brief checks if the window is currently in focus
@@ -18172,12 +24054,25 @@
             (not (%zero-p (rgfw-window-is-in-focus win))))
        1
        0)))
-
-;; C source (RGFW.h:2362-2366):
+#+(:or
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
+(progn
+ ;; C source (RGFW.h:2362-2366):
 ;; @brief Checks if the window is maximized.
 ;; @param win The target window.
 ;; @return True if the window is maximized.
 ;; C2LISP [storage]
+)
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ ;; C source (RGFW.h:2362-2366):
+;; @brief Checks if the window is maximized.
+;; @param win The target window.
+;; @return True if the window is maximized.
+)
 #+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
 (defun rgfw-window-is-maximized (win)
   (%with-native-frame nil
@@ -18307,12 +24202,39 @@
               (not (%zero-p (is-zoomed (%rgfw-window-src-window %src)))))
           1
           0)))))
-
-;; C source (RGFW.h:2355-2359):
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-is-maximized (win)
+  (%with-native-frame nil
+   (let ((b 0))
+     (assert (not (%pointer-equal win 0)))
+     (setf b
+             (%c-bool-to-rgfw-bool
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer
+               (%rgfw-window-src-window (%address-rgfw-window-src win))
+               :pointer (sel-register-name (%literal "isZoomed")) :int8)))
+     b)))
+#+(:or
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
+(progn
+ ;; C source (RGFW.h:2355-2359):
 ;; @brief Checks if the window is minimized.
 ;; @param win The target window.
 ;; @return True if the window is minimized.
 ;; C2LISP [storage]
+)
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ ;; C source (RGFW.h:2355-2359):
+;; @brief Checks if the window is minimized.
+;; @param win The target window.
+;; @return True if the window is minimized.
+)
 #+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
 (defun rgfw-window-is-minimized (win)
   (%with-native-frame nil
@@ -18400,6 +24322,22 @@
       (if (= (%tag-windowplacement-show-cmd placement) 2)
           1
           0)))))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-is-minimized (win)
+  (%with-native-frame nil
+   (progn
+    (assert (not (%pointer-equal win 0)))
+    (%c-expression-to-rgfw-bool
+     (if (=
+          (%call-pointer
+           (cffi:pointer-address
+            (cffi:foreign-symbol-pointer "objc_msgSend"))
+           nil :pointer
+           (%rgfw-window-src-window (%address-rgfw-window-src win)) :pointer
+           (sel-register-name (%literal "isMiniaturized")) :int8)
+          1)
+         1
+         0)))))
 
 ;; C source (RGFW.h:1923-1928):
 ;; @brief checks if a mouse button is currently held down
@@ -18474,7 +24412,7 @@
 ;; C source (RGFW.h:2077-2080):
 ;; @brief maximizes the window
 ;; @param win a pointer to the target window
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-window-maximize (win)
   (let* ((%internal (%address-rgfw-window-internal win)))
     (assert (not (%pointer-equal win 0)))
@@ -18482,10 +24420,8 @@
           (%rgfw-window-internal-old-y %internal) (%rgfw-window-y win)
           (%rgfw-window-internal-old-w %internal) (%rgfw-window-w win)
           (%rgfw-window-internal-old-h %internal) (%rgfw-window-h win))
-    (let ((%temporary-5 %internal))
-      (setf (%rgfw-window-internal-flags %temporary-5)
-              (%c-expression-to-u32
-               (logior (%rgfw-window-internal-flags %temporary-5) 1024))))
+    (with-accessors ((%flags %rgfw-window-internal-flags)) %internal
+       (setf %flags (%c-expression-to-u32 (logior %flags 1024))))
     (rgfw-window-fetch-size win 0 0)
     (rgfw-window-maximize-platform win)
     nil))
@@ -18498,10 +24434,8 @@
           (%rgfw-window-internal-old-y %internal) (%rgfw-window-y win)
           (%rgfw-window-internal-old-w %internal) (%rgfw-window-w win)
           (%rgfw-window-internal-old-h %internal) (%rgfw-window-h win))
-    (let ((%temporary-5 %internal))
-      (setf (%rgfw-window-internal-flags %temporary-5)
-              (%c-expression-to-u32
-               (logior (%rgfw-window-internal-flags %temporary-5) 1024))))
+    (with-accessors ((%flags %rgfw-window-internal-flags)) %internal
+       (setf %flags (%c-expression-to-u32 (logior %flags 1024))))
     (rgfw-window-fetch-size win 0 0)
     (rgfw-window-maximize-platform win)
     nil))
@@ -18523,18 +24457,27 @@
   (rgfw-window-hide win)
   (show-window (%rgfw-window-src-window (%address-rgfw-window-src win)) 3)
   nil)
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-maximize-platform (win)
+  (%with-native-frame nil
+   (progn
+    (when (not (%zero-p (rgfw-window-is-maximized win)))
+      (return-from rgfw-window-maximize-platform nil))
+    (%call-pointer
+     (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+     :pointer (%rgfw-window-src-window (%address-rgfw-window-src win))
+     :pointer (sel-register-name (%literal "zoom:")) :pointer 0 :void)
+    nil)))
 
 ;; C2LISP [storage]
 (defun rgfw-window-maximized-callback (win x y w h)
   (%with-native-frame nil
    (let* ((%internal (%address-rgfw-window-internal win))
           (event (%allocate-local +c-size-rgfw-event+))
-          (%update (%address-rgfw-event-update event))
-          (%temporary-1 %internal))
-     (setf (%rgfw-window-internal-flags %temporary-1)
-             (%c-expression-to-u32
-              (logior (%rgfw-window-internal-flags %temporary-1) 1024))
-           (%rgfw-window-x win) x
+          (%update (%address-rgfw-event-update event)))
+     (with-accessors ((%flags %rgfw-window-internal-flags)) %internal
+        (setf %flags (%c-expression-to-u32 (logior %flags 1024))))
+     (setf (%rgfw-window-x win) x
            (%rgfw-window-y win) y
            (%rgfw-window-w win) w
            (%rgfw-window-h win) h)
@@ -18555,26 +24498,26 @@
 ;; C source (RGFW.h:2096-2099):
 ;; @brief minimizes the window
 ;; @param win a pointer to the target window
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-window-minimize (win)
   (assert (not (%pointer-equal win 0)))
   (rgfw-window-minimize-platform win)
-  (let ((%temporary-1 (%address-rgfw-window-internal win)))
-    (setf (%rgfw-window-internal-flags %temporary-1)
-            (%c-expression-to-u32
-             (logand (%rgfw-window-internal-flags %temporary-1)
-                     (%c-expression-to-u32 (lognot 1024))))))
+  (with-accessors ((%flags %rgfw-window-internal-flags))
+       (%address-rgfw-window-internal win)
+     (setf %flags
+             (%c-expression-to-u32
+              (logand %flags (%c-expression-to-u32 (lognot 1024))))))
   nil)
 #+(:or (:and :arm (:not :arm64) (:or :linux :freebsd))
    (:and :x86 (:not :x86-64) (:or :linux :windows :freebsd)))
 (defun rgfw-window-minimize (win)
   (assert (/= (%c-pointer-to-int win) 0))
   (rgfw-window-minimize-platform win)
-  (let ((%temporary-1 (%address-rgfw-window-internal win)))
-    (setf (%rgfw-window-internal-flags %temporary-1)
-            (%c-expression-to-u32
-             (logand (%rgfw-window-internal-flags %temporary-1)
-                     (%c-expression-to-u32 (lognot 1024))))))
+  (with-accessors ((%flags %rgfw-window-internal-flags))
+       (%address-rgfw-window-internal win)
+     (setf %flags
+             (%c-expression-to-u32
+              (logand %flags (%c-expression-to-u32 (lognot 1024))))))
   nil)
 #+(:and
    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
@@ -18625,17 +24568,25 @@
   (assert (/= (%c-pointer-to-int win) 0))
   (show-window (%rgfw-window-src-window (%address-rgfw-window-src win)) 6)
   nil)
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-minimize-platform (win)
+  (%with-native-frame nil
+   (progn
+    (assert (not (%pointer-equal win 0)))
+    (%call-pointer
+     (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+     :pointer (%rgfw-window-src-window (%address-rgfw-window-src win))
+     :pointer (sel-register-name (%literal "miniaturize:")) :pointer 0 :void)
+    nil)))
 
 ;; C2LISP [storage]
 (defun rgfw-window-minimized-callback (win)
   (%with-native-frame nil
    (let* ((%internal (%address-rgfw-window-internal win))
           (event (%allocate-local +c-size-rgfw-event+))
-          (%update (%address-rgfw-event-update event))
-          (%temporary-1 %internal))
-     (setf (%rgfw-window-internal-flags %temporary-1)
-             (%c-expression-to-u32
-              (logior (%rgfw-window-internal-flags %temporary-1) 16384)))
+          (%update (%address-rgfw-event-update event)))
+     (with-accessors ((%flags %rgfw-window-internal-flags)) %internal
+        (setf %flags (%c-expression-to-u32 (logior %flags 16384))))
      (when
          (%zero-p
           (%c-expression-to-rgfw-event-flag
@@ -18655,17 +24606,17 @@
 ;; @param win a pointer to the target window
 ;; @param x the new x position
 ;; @param y the new y position
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-window-move (win x y)
   (assert (not (%pointer-equal win 0)))
   (setf (%rgfw-window-x win) x
         (%rgfw-window-y win) y)
   (rgfw-window-move-platform win x y)
-  (let ((%temporary-3 (%address-rgfw-window-internal win)))
-    (setf (%rgfw-window-internal-flags %temporary-3)
-            (%c-expression-to-u32
-             (logand (%rgfw-window-internal-flags %temporary-3)
-                     (%c-expression-to-u32 (lognot 1024))))))
+  (with-accessors ((%flags %rgfw-window-internal-flags))
+       (%address-rgfw-window-internal win)
+     (setf %flags
+             (%c-expression-to-u32
+              (logand %flags (%c-expression-to-u32 (lognot 1024))))))
   nil)
 #+(:or (:and :arm (:not :arm64) (:or :linux :freebsd))
    (:and :x86 (:not :x86-64) (:or :linux :windows :freebsd)))
@@ -18674,15 +24625,16 @@
   (setf (%rgfw-window-x win) x
         (%rgfw-window-y win) y)
   (rgfw-window-move-platform win x y)
-  (let ((%temporary-3 (%address-rgfw-window-internal win)))
-    (setf (%rgfw-window-internal-flags %temporary-3)
-            (%c-expression-to-u32
-             (logand (%rgfw-window-internal-flags %temporary-3)
-                     (%c-expression-to-u32 (lognot 1024))))))
+  (with-accessors ((%flags %rgfw-window-internal-flags))
+       (%address-rgfw-window-internal win)
+     (setf %flags
+             (%c-expression-to-u32
+              (logand %flags (%c-expression-to-u32 (lognot 1024))))))
   nil)
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux)))
 (progn
  ;; C source (RGFW.h:2312-2317):
 ;; @brief Moves the mouse to the specified position within the window.
@@ -18790,27 +24742,112 @@
             (- y (%rgfw-window-y win)))
     (set-cursor-pos x y)
     nil))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-move-mouse (win x y)
+  (%with-native-frame nil
+   (let* ((%internal (%address-rgfw-window-internal win)))
+     win
+     (setf (%rgfw-window-internal-last-mouse-x %internal)
+             (- x (%rgfw-window-x win))
+           (%rgfw-window-internal-last-mouse-y %internal)
+             (- y (%rgfw-window-y win)))
+     (cg-warp-mouse-cursor-position
+      (let ((%temporary-1 (%allocate-local 16)))
+        (%fill %temporary-1 0 16)
+        (setf (%cg-point-x %temporary-1) (coerce x 'double-float)
+              (%cg-point-y %temporary-1) (coerce y 'double-float))
+        %temporary-1))
+     nil)))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux)))
+(progn
+ ;; C2LISP [storage]
+)
 #+(:and
    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
    (:or :freebsd :linux))
-(progn
- ;; C2LISP [storage]
-
- (defun rgfw-window-move-platform (win x y)
-   (x-move-window (%rgfw-info-display (%load -rgfw :pointer))
-    (%rgfw-window-src-window (%address-rgfw-window-src win)) x y)
-   nil))
+(defun rgfw-window-move-platform (win x y)
+  (x-move-window (%rgfw-info-display (%load -rgfw :pointer))
+   (%rgfw-window-src-window (%address-rgfw-window-src win)) x y)
+  nil)
 #+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
 (defun rgfw-window-move-platform (win x y)
   (set-window-pos (%rgfw-window-src-window (%address-rgfw-window-src win)) 0
    x y 0 0 1)
   nil)
+#+(:and :darwin :x86-64)
+(defun rgfw-window-move-platform (win x y)
+  (%with-native-frame nil
+   (let* ((%src (%address-rgfw-window-src win))
+          (content (%allocate-local 32))
+          (y-flip 0.0))
+     (%copy content
+      (%call-pointer
+       (cffi:pointer-address
+        (cffi:foreign-symbol-pointer "objc_msgSend_stret"))
+       nil :pointer (%rgfw-window-src-view %src) :pointer
+       (sel-register-name (%literal "frame")) (:struct %abi-struct-2))
+      32)
+     (setf y-flip
+             (rgfw-cocoa-y-transform
+              (-
+               (+ (coerce y 'single-float)
+                  (coerce (%cg-size-height (%address-cg-rect-size content))
+                          'single-float))
+               1.0)))
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer (%rgfw-window-src-window %src) :pointer
+      (sel-register-name (%literal "setFrameOrigin:"))
+      (:struct %abi-struct-1)
+      (let ((%temporary-1 (%allocate-local 16)))
+        (%fill %temporary-1 0 16)
+        (setf (%cg-point-x %temporary-1) (coerce x 'double-float)
+              (%cg-point-y %temporary-1) (coerce y-flip 'double-float))
+        %temporary-1)
+      :void)
+     (rgfw-cocoa-fetch-rect win)
+     nil)))
+#+(:and :darwin :arm64)
+(defun rgfw-window-move-platform (win x y)
+  (%with-native-frame nil
+   (let* ((%src (%address-rgfw-window-src win))
+          (content (%allocate-local 32))
+          (y-flip 0.0))
+     (%copy content
+      (%call-pointer
+       (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+       nil :pointer (%rgfw-window-src-view %src) :pointer
+       (sel-register-name (%literal "frame")) (:struct %abi-struct-2))
+      32)
+     (setf y-flip
+             (rgfw-cocoa-y-transform
+              (-
+               (+ (coerce y 'single-float)
+                  (coerce (%cg-size-height (%address-cg-rect-size content))
+                          'single-float))
+               1.0)))
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer (%rgfw-window-src-window %src) :pointer
+      (sel-register-name (%literal "setFrameOrigin:"))
+      (:struct %abi-struct-1)
+      (let ((%temporary-1 (%allocate-local 16)))
+        (%fill %temporary-1 0 16)
+        (setf (%cg-point-x %temporary-1) (coerce x 'double-float)
+              (%cg-point-y %temporary-1) (coerce y-flip 'double-float))
+        %temporary-1)
+      :void)
+     (rgfw-cocoa-fetch-rect win)
+     nil)))
 
 ;; C source (RGFW.h:2019-2023):
 ;; @brief moves the window to a specific monitor
 ;; @param win a pointer to the target window
 ;; @param m the target monitor
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-window-move-to-monitor (win m)
   (assert (not (%pointer-equal m 0)))
   (rgfw-window-move win (+ (%rgfw-monitor-x m) (%rgfw-window-x win))
@@ -18857,7 +24894,8 @@
 ;; @param win a pointer to the target window
 ;; C2LISP [storage]
 )
-#+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (progn
  ;; C source (RGFW.h:2071-2074):
 ;; @brief raises the window to the top of the stack
@@ -18881,6 +24919,17 @@
      (%rgfw-window-y win) (%rgfw-window-w win) (%rgfw-window-h win)
      (%c-int-to-uint (logior (logior (logior 1 2) 512) 32)))
     nil))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-raise (win)
+  (%with-native-frame nil
+   (progn
+    (assert (not (%pointer-equal win 0)))
+    (%call-pointer
+     (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+     :pointer (%rgfw-window-src-window (%address-rgfw-window-src win))
+     :pointer (sel-register-name (%literal "orderFront:")) :pointer 0
+     :pointer)
+    nil)))
 
 ;; C2LISP [storage]
 (defun rgfw-window-refresh-callback (win x y w h)
@@ -18910,17 +24959,17 @@
 ;; @param win a pointer to the target window
 ;; @param w the new width
 ;; @param h the new height
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-window-resize (win w h)
   (assert (not (%pointer-equal win 0)))
   (setf (%rgfw-window-w win) w
         (%rgfw-window-h win) h)
   (rgfw-window-resize-platform win w h)
-  (let ((%temporary-3 (%address-rgfw-window-internal win)))
-    (setf (%rgfw-window-internal-flags %temporary-3)
-            (%c-expression-to-u32
-             (logand (%rgfw-window-internal-flags %temporary-3)
-                     (%c-expression-to-u32 (lognot 1024))))))
+  (with-accessors ((%flags %rgfw-window-internal-flags))
+       (%address-rgfw-window-internal win)
+     (setf %flags
+             (%c-expression-to-u32
+              (logand %flags (%c-expression-to-u32 (lognot 1024))))))
   nil)
 #+(:or (:and :arm (:not :arm64) (:or :linux :freebsd))
    (:and :x86 (:not :x86-64) (:or :linux :windows :freebsd)))
@@ -18929,11 +24978,11 @@
   (setf (%rgfw-window-w win) w
         (%rgfw-window-h win) h)
   (rgfw-window-resize-platform win w h)
-  (let ((%temporary-3 (%address-rgfw-window-internal win)))
-    (setf (%rgfw-window-internal-flags %temporary-3)
-            (%c-expression-to-u32
-             (logand (%rgfw-window-internal-flags %temporary-3)
-                     (%c-expression-to-u32 (lognot 1024))))))
+  (with-accessors ((%flags %rgfw-window-internal-flags))
+       (%address-rgfw-window-internal win)
+     (setf %flags
+             (%c-expression-to-u32
+              (logand %flags (%c-expression-to-u32 (lognot 1024))))))
   nil)
 
 ;; C2LISP [storage]
@@ -18996,6 +25045,99 @@
       (%c-long-to-int (- (%tag-rect-bottom rect) (%tag-rect-top rect)))
       (%c-int-to-uint (logior (logior (logior 16 512) 2) 4)))
      nil)))
+#+(:and :darwin :x86-64)
+(defun rgfw-window-resize-platform (win w h)
+  (%with-native-frame nil
+   (let* ((%src (%address-rgfw-window-src win))
+          (frame (%allocate-local 32))
+          (content (%allocate-local 32)))
+     (%copy frame
+      (%call-pointer
+       (cffi:pointer-address
+        (cffi:foreign-symbol-pointer "objc_msgSend_stret"))
+       nil :pointer (%rgfw-window-src-window %src) :pointer
+       (sel-register-name (%literal "frame")) (:struct %abi-struct-2))
+      32)
+     (%copy content
+      (%call-pointer
+       (cffi:pointer-address
+        (cffi:foreign-symbol-pointer "objc_msgSend_stret"))
+       nil :pointer (%rgfw-window-src-window %src) :pointer
+       (sel-register-name (%literal "contentRectForFrameRect:"))
+       (:struct %abi-struct-2) frame (:struct %abi-struct-2))
+      32)
+     (with-accessors ((%y %cg-point-y)) (%address-cg-rect-origin content)
+        (setf %y
+                (+ %y
+                   (- (%cg-size-height (%address-cg-rect-size content))
+                      (coerce h 'double-float)))))
+     (%copy (%address-cg-rect-size content)
+      (let ((%temporary-2 (%allocate-local 16)))
+        (%fill %temporary-2 0 16)
+        (setf (%cg-size-width %temporary-2) (coerce w 'double-float)
+              (%cg-size-height %temporary-2) (coerce h 'double-float))
+        %temporary-2)
+      16)
+     (%copy frame
+      (%call-pointer
+       (cffi:pointer-address
+        (cffi:foreign-symbol-pointer "objc_msgSend_stret"))
+       nil :pointer (%rgfw-window-src-window %src) :pointer
+       (sel-register-name (%literal "frameRectForContentRect:"))
+       (:struct %abi-struct-2) content (:struct %abi-struct-2))
+      32)
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer (%rgfw-window-src-window %src) :pointer
+      (sel-register-name (%literal "setFrame:display:"))
+      (:struct %abi-struct-2) frame :int8 1 :void)
+     (rgfw-cocoa-fetch-rect win)
+     nil)))
+#+(:and :darwin :arm64)
+(defun rgfw-window-resize-platform (win w h)
+  (%with-native-frame nil
+   (let* ((%src (%address-rgfw-window-src win))
+          (frame (%allocate-local 32))
+          (content (%allocate-local 32)))
+     (%copy frame
+      (%call-pointer
+       (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+       nil :pointer (%rgfw-window-src-window %src) :pointer
+       (sel-register-name (%literal "frame")) (:struct %abi-struct-2))
+      32)
+     (%copy content
+      (%call-pointer
+       (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+       nil :pointer (%rgfw-window-src-window %src) :pointer
+       (sel-register-name (%literal "contentRectForFrameRect:"))
+       (:struct %abi-struct-2) frame (:struct %abi-struct-2))
+      32)
+     (with-accessors ((%y %cg-point-y)) (%address-cg-rect-origin content)
+        (setf %y
+                (+ %y
+                   (- (%cg-size-height (%address-cg-rect-size content))
+                      (coerce h 'double-float)))))
+     (%copy (%address-cg-rect-size content)
+      (let ((%temporary-2 (%allocate-local 16)))
+        (%fill %temporary-2 0 16)
+        (setf (%cg-size-width %temporary-2) (coerce w 'double-float)
+              (%cg-size-height %temporary-2) (coerce h 'double-float))
+        %temporary-2)
+      16)
+     (%copy frame
+      (%call-pointer
+       (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+       nil :pointer (%rgfw-window-src-window %src) :pointer
+       (sel-register-name (%literal "frameRectForContentRect:"))
+       (:struct %abi-struct-2) content (:struct %abi-struct-2))
+      32)
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer (%rgfw-window-src-window %src) :pointer
+      (sel-register-name (%literal "setFrame:display:"))
+      (:struct %abi-struct-2) frame :int8 1 :void)
+     (rgfw-cocoa-fetch-rect win)
+     nil)))
 
 ;; C2LISP [storage]
 (defun rgfw-window-resized-callback (win w h)
@@ -19025,16 +25167,15 @@
 ;; C source (RGFW.h:2102-2105):
 ;; @brief restores the window from minimized state
 ;; @param win a pointer to the target window
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-window-restore (win)
   (let* ((%internal (%address-rgfw-window-internal win)))
     (assert (not (%pointer-equal win 0)))
     (rgfw-window-restore-platform win)
-    (let ((%temporary-1 %internal))
-      (setf (%rgfw-window-internal-flags %temporary-1)
-              (%c-expression-to-u32
-               (logand (%rgfw-window-internal-flags %temporary-1)
-                       (%c-expression-to-u32 (lognot 1024))))))
+    (with-accessors ((%flags %rgfw-window-internal-flags)) %internal
+       (setf %flags
+               (%c-expression-to-u32
+                (logand %flags (%c-expression-to-u32 (lognot 1024))))))
     (rgfw-window-show win)
     (rgfw-window-move win (%rgfw-window-internal-old-x %internal)
      (%rgfw-window-internal-old-y %internal))
@@ -19047,11 +25188,10 @@
   (let* ((%internal (%address-rgfw-window-internal win)))
     (assert (/= (%c-pointer-to-int win) 0))
     (rgfw-window-restore-platform win)
-    (let ((%temporary-1 %internal))
-      (setf (%rgfw-window-internal-flags %temporary-1)
-              (%c-expression-to-u32
-               (logand (%rgfw-window-internal-flags %temporary-1)
-                       (%c-expression-to-u32 (lognot 1024))))))
+    (with-accessors ((%flags %rgfw-window-internal-flags)) %internal
+       (setf %flags
+               (%c-expression-to-u32
+                (logand %flags (%c-expression-to-u32 (lognot 1024))))))
     (rgfw-window-show win)
     (rgfw-window-move win (%rgfw-window-internal-old-x %internal)
      (%rgfw-window-internal-old-y %internal))
@@ -19079,28 +25219,42 @@
   nil)
 #+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
 (defun rgfw-window-restore-platform (win) win nil)
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-restore-platform (win)
+  (%with-native-frame nil
+   (let* ((%src (%address-rgfw-window-src win)))
+     (assert (not (%pointer-equal win 0)))
+     (when (not (%zero-p (rgfw-window-is-maximized win)))
+       (%call-pointer
+        (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+        nil :pointer (%rgfw-window-src-window %src) :pointer
+        (sel-register-name (%literal "zoom:")) :pointer 0 :void))
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer (%rgfw-window-src-window %src) :pointer
+      (sel-register-name (%literal "deminiaturize:")) :pointer 0 :void)
+     (rgfw-window-show win)
+     nil)))
 
 ;; C2LISP [storage]
 (defun rgfw-window-restored-callback (win x y w h)
   (%with-native-frame nil
    (let* ((%internal (%address-rgfw-window-internal win))
           (event (%allocate-local +c-size-rgfw-event+))
-          (%update (%address-rgfw-event-update event))
-          (%temporary-1 %internal))
-     (setf (%rgfw-window-internal-flags %temporary-1)
-             (%c-expression-to-u32
-              (logand (%rgfw-window-internal-flags %temporary-1)
-                      (%c-expression-to-u32 (lognot 16384))))
-           (%rgfw-window-x win) x
+          (%update (%address-rgfw-event-update event)))
+     (with-accessors ((%flags %rgfw-window-internal-flags)) %internal
+        (setf %flags
+                (%c-expression-to-u32
+                 (logand %flags (%c-expression-to-u32 (lognot 16384))))))
+     (setf (%rgfw-window-x win) x
            (%rgfw-window-y win) y
            (%rgfw-window-w win) w
            (%rgfw-window-h win) h)
      (when (= (rgfw-window-is-maximized win) 0)
-       (let ((%temporary-6 %internal))
-         (setf (%rgfw-window-internal-flags %temporary-6)
-                 (%c-expression-to-u32
-                  (logand (%rgfw-window-internal-flags %temporary-6)
-                          (%c-expression-to-u32 (lognot 1024)))))))
+       (with-accessors ((%flags-2 %rgfw-window-internal-flags)) %internal
+          (setf %flags-2
+                  (%c-expression-to-u32
+                   (logand %flags-2 (%c-expression-to-u32 (lognot 1024)))))))
      (when
          (%zero-p
           (%c-expression-to-rgfw-event-flag
@@ -19124,7 +25278,7 @@
 ;;
 ;; This function is automatically called when the flag `RGFW_scaleToMonitor`
 ;; is used during window creation.
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-window-scale-to-monitor (win)
   (let ((monitor (rgfw-window-get-monitor win)))
     (when
@@ -19157,9 +25311,10 @@
       (* (%rgfw-monitor-scale-y monitor)
          (coerce (%rgfw-window-h win) 'single-float)))))
   nil)
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux)))
 (progn
  ;; C source (RGFW.h:2034-2039):
 ;; @brief sets the aspect ratio of the window
@@ -19189,9 +25344,8 @@
        (return-from rgfw-window-set-aspect-ratio nil))
      (x-get-wm-normal-hints (%rgfw-info-display (%load -rgfw :pointer))
       (%rgfw-window-src-window %src) hints flags)
-     (let ((%temporary-1 hints))
-       (setf (%x-size-hints-flags %temporary-1)
-               (logior (%x-size-hints-flags %temporary-1) 128)))
+     (with-accessors ((%flags %x-size-hints-flags)) hints
+        (setf %flags (logior %flags 128)))
      (setf (%x-size-hints-min-aspect-x %aspect)
              (setf (%x-size-hints-min-aspect-x %aspect-2) w)
            (%x-size-hints-min-aspect-y %aspect)
@@ -19213,9 +25367,8 @@
        (return-from rgfw-window-set-aspect-ratio nil))
      (x-get-wm-normal-hints (%rgfw-info-display (%load -rgfw :pointer))
       (%rgfw-window-src-window %src) hints flags)
-     (let ((%temporary-1 hints))
-       (setf (%x-size-hints-flags %temporary-1)
-               (logior (%x-size-hints-flags %temporary-1) 128)))
+     (with-accessors ((%flags %x-size-hints-flags)) hints
+        (setf %flags (logior %flags 128)))
      (setf (%x-size-hints-min-aspect-x %aspect)
              (setf (%x-size-hints-min-aspect-x %aspect-2) w)
            (%x-size-hints-min-aspect-y %aspect)
@@ -19237,12 +25390,46 @@
     (setf (%rgfw-window-src-aspect-ratio-w %src) w
           (%rgfw-window-src-aspect-ratio-h %src) h)
     nil))
-
-;; C source (RGFW.h:2122-2126):
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-set-aspect-ratio (win w h)
+  (%with-native-frame nil
+   (progn
+    (when (and (= w 0) (= h 0))
+      (setf w 1
+            h 1))
+    (%call-pointer
+     (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+     :pointer (%rgfw-window-src-window (%address-rgfw-window-src win))
+     :pointer (sel-register-name (%literal "setContentAspectRatio:"))
+     (:struct %abi-struct-0)
+     (let ((%temporary-1 (%allocate-local 16)))
+       (%fill %temporary-1 0 16)
+       (setf (%cg-size-width %temporary-1) (coerce w 'double-float)
+             (%cg-size-height %temporary-1) (coerce h 'double-float))
+       %temporary-1)
+     :void)
+    nil)))
+#+(:or
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
+(progn
+ ;; C source (RGFW.h:2122-2126):
 ;; @brief toggles window borders / frame / decor
 ;; @param win a pointer to the target window
 ;; @param border RGFW_TRUE for bordered, RGFW_FALSE for borderless
 ;; C2LISP [storage]
+)
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ ;; C source (RGFW.h:2122-2126):
+;; @brief toggles window borders / frame / decor
+;; @param win a pointer to the target window
+;; @param border RGFW_TRUE for bordered, RGFW_FALSE for borderless
+;; C source (RGFW.h:14786):
+;; changing the style can clear the first responder
+)
 #+(:and
    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
    (:or :freebsd :linux))
@@ -19336,6 +25523,54 @@
       (%c-long-to-int (- (%tag-rect-bottom rect) (%tag-rect-top rect)))
       (%c-int-to-uint (logior (logior 32 16) 4)))
      nil)))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-set-border (win border)
+  (%with-native-frame nil
+   (let* ((%src (%address-rgfw-window-src win)) (style-mask 0))
+     (rgfw-set-bit
+      (%address-rgfw-window-internal-flags
+       (%address-rgfw-window-internal win))
+      1
+      (%c-expression-to-rgfw-bool
+       (if (%zero-p border)
+           1
+           0)))
+     (setf style-mask
+             (%call-pointer
+              (cffi:pointer-address
+               (cffi:foreign-symbol-pointer "objc_msgSend"))
+              nil :pointer (%rgfw-window-src-window %src) :pointer
+              (sel-register-name (%literal "styleMask")) :unsigned-long))
+     (if (not (%zero-p border))
+         (setf style-mask
+                 (%c-expression-to-ns-window-style-mask
+                  (logior style-mask
+                          (%c-int-to-ns-window-style-mask (logior 1 2))))
+               style-mask
+                 (%c-expression-to-ns-window-style-mask
+                  (logand style-mask
+                          (%c-u32-to-ns-window-style-mask
+                           (%c-int-to-u32 (lognot 0))))))
+         (setf style-mask
+                 (%c-expression-to-ns-window-style-mask
+                  (logior style-mask 0))
+               style-mask
+                 (%c-expression-to-ns-window-style-mask
+                  (logand style-mask
+                          (%c-u32-to-ns-window-style-mask
+                           (%c-int-to-u32 (lognot (logior 1 2))))))))
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer (%rgfw-window-src-window %src) :pointer
+      (sel-register-name (%literal "setStyleMask:")) :unsigned-long
+      style-mask :void)
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer (%rgfw-window-src-window %src) :pointer
+      (sel-register-name (%literal "makeFirstResponder:")) :pointer
+      (%rgfw-window-src-view %src) :void)
+     (rgfw-window-move win (%rgfw-window-x win) (%rgfw-window-y win))
+     nil)))
 
 ;; C source (RGFW.h:1774-1778):
 ;; @brief enables all events and disables selected ones
@@ -19353,9 +25588,10 @@
 ;; @param win a pointer to the target window
 ;; @param allow RGFW_TRUE to allow DND, RGFW_FALSE to disable
 ;; @note RGFW_windowAllowDND must still be passed when creating the window
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux)))
 (defun rgfw-window-set-dnd (win allow)
   (rgfw-set-bit
    (%address-rgfw-window-internal-flags (%address-rgfw-window-internal win))
@@ -19507,7 +25743,8 @@
 ;; @param floating RGFW_TRUE to float, RGFW_FALSE to disable
 ;; C2LISP [storage]
 )
-#+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (progn
  ;; C source (RGFW.h:2108-2112):
 ;; @brief makes the window a floating window
@@ -19547,12 +25784,27 @@
         (set-window-pos (%rgfw-window-src-window %src) (%c-int-to-hwnd -2) 0
          0 0 0 (%c-int-to-uint (logior (logior 2 1) 64))))
     nil))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-set-floating (win floating)
+  (%with-native-frame nil
+   (let* ((%src (%address-rgfw-window-src win)))
+     (assert (not (%pointer-equal win 0)))
+     (if (not (%zero-p floating))
+         (%call-pointer
+          (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+          nil :pointer (%rgfw-window-src-window %src) :pointer
+          (sel-register-name (%literal "setLevel:")) :pointer 3 :void)
+         (%call-pointer
+          (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+          nil :pointer (%rgfw-window-src-window %src) :pointer
+          (sel-register-name (%literal "setLevel:")) :pointer 0 :void))
+     nil)))
 
 ;; C source (RGFW.h:2083-2087):
 ;; @brief toggles fullscreen mode for the window
 ;; @param win a pointer to the target window
 ;; @param fullscreen the fullscreen mode to use RGFW_fullscreenNone, RGFW_fullscreenBorderless, RGFW_fullscreenExclusive
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-window-set-fullscreen (win fullscreen)
   (let* ((%internal (%address-rgfw-window-internal win)))
     (assert (not (%pointer-equal win 0)))
@@ -19614,17 +25866,13 @@
              (setf (%rgfw-window-internal-monitor %internal) mon)
              (%copy (%address-rgfw-window-internal-new-mode %internal)
               (%address-rgfw-monitor-mode mon) 24)
-             (let ((%temporary-9 %internal))
-               (setf (%rgfw-window-internal-flags %temporary-9)
-                       (%c-expression-to-u32
-                        (logior (%rgfw-window-internal-flags %temporary-9)
-                                16)))))
+             (with-accessors ((%flags %rgfw-window-internal-flags)) %internal
+                (setf %flags (%c-expression-to-u32 (logior %flags 16)))))
             (progn
-             (let ((%temporary-10 %internal))
-               (setf (%rgfw-window-internal-flags %temporary-10)
-                       (%c-expression-to-u32
-                        (logior (%rgfw-window-internal-flags %temporary-10)
-                                524288))))
+             (with-accessors ((%flags-2 %rgfw-window-internal-flags))
+                  %internal
+                (setf %flags-2
+                        (%c-expression-to-u32 (logior %flags-2 524288))))
              (setf (%rgfw-window-internal-monitor %internal) 0)))
         (rgfw-window-resize win
          (%rgfw-monitor-mode-w (%address-rgfw-monitor-mode mon))
@@ -19648,16 +25896,14 @@
        (%rgfw-window-internal-old-y %internal))
       (rgfw-window-resize win (%rgfw-window-internal-old-w %internal)
        (%rgfw-window-internal-old-h %internal))
-      (let ((%temporary-12 %internal))
-        (setf (%rgfw-window-internal-flags %temporary-12)
-                (%c-expression-to-u32
-                 (logand (%rgfw-window-internal-flags %temporary-12)
-                         (%c-expression-to-u32 (lognot 16))))))
-      (let ((%temporary-13 %internal))
-        (setf (%rgfw-window-internal-flags %temporary-13)
-                (%c-expression-to-u32
-                 (logand (%rgfw-window-internal-flags %temporary-13)
-                         (%c-expression-to-u32 (lognot 524288))))))
+      (with-accessors ((%flags-3 %rgfw-window-internal-flags)) %internal
+         (setf %flags-3
+                 (%c-expression-to-u32
+                  (logand %flags-3 (%c-expression-to-u32 (lognot 16))))))
+      (with-accessors ((%flags-4 %rgfw-window-internal-flags)) %internal
+         (setf %flags-4
+                 (%c-expression-to-u32
+                  (logand %flags-4 (%c-expression-to-u32 (lognot 524288))))))
       (setf (%rgfw-window-x win) (%rgfw-window-internal-old-x %internal)
             (%rgfw-window-y win) (%rgfw-window-internal-old-y %internal)
             (%rgfw-window-w win) (%rgfw-window-internal-old-w %internal)
@@ -19727,17 +25973,13 @@
              (setf (%rgfw-window-internal-monitor %internal) mon)
              (%copy (%address-rgfw-window-internal-new-mode %internal)
               (%address-rgfw-monitor-mode mon) 20)
-             (let ((%temporary-9 %internal))
-               (setf (%rgfw-window-internal-flags %temporary-9)
-                       (%c-expression-to-u32
-                        (logior (%rgfw-window-internal-flags %temporary-9)
-                                16)))))
+             (with-accessors ((%flags %rgfw-window-internal-flags)) %internal
+                (setf %flags (%c-expression-to-u32 (logior %flags 16)))))
             (progn
-             (let ((%temporary-10 %internal))
-               (setf (%rgfw-window-internal-flags %temporary-10)
-                       (%c-expression-to-u32
-                        (logior (%rgfw-window-internal-flags %temporary-10)
-                                524288))))
+             (with-accessors ((%flags-2 %rgfw-window-internal-flags))
+                  %internal
+                (setf %flags-2
+                        (%c-expression-to-u32 (logior %flags-2 524288))))
              (setf (%rgfw-window-internal-monitor %internal) 0)))
         (rgfw-window-resize win
          (%rgfw-monitor-mode-w (%address-rgfw-monitor-mode mon))
@@ -19762,16 +26004,14 @@
        (%rgfw-window-internal-old-y %internal))
       (rgfw-window-resize win (%rgfw-window-internal-old-w %internal)
        (%rgfw-window-internal-old-h %internal))
-      (let ((%temporary-12 %internal))
-        (setf (%rgfw-window-internal-flags %temporary-12)
-                (%c-expression-to-u32
-                 (logand (%rgfw-window-internal-flags %temporary-12)
-                         (%c-expression-to-u32 (lognot 16))))))
-      (let ((%temporary-13 %internal))
-        (setf (%rgfw-window-internal-flags %temporary-13)
-                (%c-expression-to-u32
-                 (logand (%rgfw-window-internal-flags %temporary-13)
-                         (%c-expression-to-u32 (lognot 524288))))))
+      (with-accessors ((%flags-3 %rgfw-window-internal-flags)) %internal
+         (setf %flags-3
+                 (%c-expression-to-u32
+                  (logand %flags-3 (%c-expression-to-u32 (lognot 16))))))
+      (with-accessors ((%flags-4 %rgfw-window-internal-flags)) %internal
+         (setf %flags-4
+                 (%c-expression-to-u32
+                  (logand %flags-4 (%c-expression-to-u32 (lognot 524288))))))
       (setf (%rgfw-window-x win) (%rgfw-window-internal-old-x %internal)
             (%rgfw-window-y win) (%rgfw-window-internal-old-y %internal)
             (%rgfw-window-w win) (%rgfw-window-internal-old-w %internal)
@@ -19811,6 +26051,47 @@
   win
   fullscreen
   nil)
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-set-fullscreen-platform (win fullscreen)
+  (%with-native-frame nil
+   (let* ((%src (%address-rgfw-window-src win)) (style-mask 0))
+     (if (not (%zero-p fullscreen))
+         (progn
+          (%call-pointer
+           (cffi:pointer-address
+            (cffi:foreign-symbol-pointer "objc_msgSend"))
+           nil :pointer (%rgfw-window-src-window %src) :pointer
+           (sel-register-name (%literal "orderFront:")) :pointer 0 :pointer)
+          (%call-pointer
+           (cffi:pointer-address
+            (cffi:foreign-symbol-pointer "objc_msgSend"))
+           nil :pointer (%rgfw-window-src-window %src) :pointer
+           (sel-register-name (%literal "setLevel:")) :pointer 25 :void))
+         (%call-pointer
+          (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+          nil :pointer (%rgfw-window-src-window %src) :pointer
+          (sel-register-name (%literal "setLevel:")) :pointer 0 :void))
+     (setf style-mask
+             (%call-pointer
+              (cffi:pointer-address
+               (cffi:foreign-symbol-pointer "objc_msgSend"))
+              nil :pointer (%rgfw-window-src-window %src) :pointer
+              (sel-register-name (%literal "styleMask")) :unsigned-long))
+     (when
+         (/=
+          (%c-expression-to-rgfw-bool
+           (if (/=
+                (%c-expression-to-ns-window-style-mask
+                 (logand style-mask 16384))
+                0)
+               1
+               0))
+          fullscreen)
+       (%call-pointer
+        (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+        nil :pointer (%rgfw-window-src-window %src) :pointer
+        (sel-register-name (%literal "toggleFullScreen:")) :pointer 0 :void))
+     nil)))
 
 ;; C source (RGFW.h:2167-2177):
 ;; @brief sets the icon for the window and taskbar
@@ -19853,6 +26134,19 @@
 ;; @param format the image format
 ;; @param type the target icon type (taskbar, window, or both)
 ;; @return RGFW_TRUE if successful, RGFW_FALSE otherwise
+)
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ ;; C source (RGFW.h:2180-2189):
+;; @brief sets the icon for the window and/or taskbar
+;; @param win a pointer to the target window
+;; @param data the image data
+;; @param w the width of the icon
+;; @param h the height of the icon
+;; @param format the image format
+;; @param type the target icon type (taskbar, window, or both)
+;; @return RGFW_TRUE if successful, RGFW_FALSE otherwise
+;; C2LISP [storage]
 )
 #+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
 (defun rgfw-window-set-icon-ex (win data-src w h format type)
@@ -19940,15 +26234,8 @@
               +c-size-screen+)))
            image 0 0 0 0 (%c-i32-to-u32 w) (%c-i32-to-u32 h))
           (setf (%-x-image-data image) 0)
-          (let* ((*string-arguments* *string-arguments*)
-                 (%temporary-4
-                  (%funcs-destroy-image (%address--x-image-f image)))
-                 (%temporary-5 (%translated-function %temporary-4)))
-            (if %temporary-5
-                (funcall %temporary-5 image)
-                (cffi:foreign-funcall-pointer
-                 (%native-argument-pointer %temporary-4) nil :pointer
-                 (%native-argument-pointer image) :int32)))
+          (%call-pointer (%funcs-destroy-image (%address--x-image-f image))
+           nil :pointer image :int32)
           (x-set-wm-hints (%rgfw-info-display (%load -rgfw :pointer))
            (%rgfw-window-src-window %src) wm-hints)))
       (%free data)
@@ -20046,15 +26333,8 @@
               +c-size-screen+)))
            image 0 0 0 0 (%c-i32-to-u32 w) (%c-i32-to-u32 h))
           (setf (%-x-image-data image) 0)
-          (let* ((*string-arguments* *string-arguments*)
-                 (%temporary-4
-                  (%funcs-destroy-image (%address--x-image-f image)))
-                 (%temporary-5 (%translated-function %temporary-4)))
-            (if %temporary-5
-                (funcall %temporary-5 image)
-                (cffi:foreign-funcall-pointer
-                 (%native-argument-pointer %temporary-4) nil :pointer
-                 (%native-argument-pointer image) :int32)))
+          (%call-pointer (%funcs-destroy-image (%address--x-image-f image))
+           nil :pointer image :int32)
           (x-set-wm-hints (%rgfw-info-display (%load -rgfw :pointer))
            (%rgfw-window-src-window %src) wm-hints)))
       (%free data)
@@ -20129,16 +26409,108 @@
        (send-message-a (%rgfw-window-src-window %src) 128 1
         (%c-hicon-to-lparam (%rgfw-window-src-h-icon-big %src))))
      1)))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-set-icon-ex (win data w h format type)
+  (%with-native-frame nil
+   (%with-string-inputs (data)
+    (let ((pool 0) (representation 0) (dock-image 0))
+      (assert (not (%pointer-equal win 0)))
+      type
+      (setf pool
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer
+               (%call-pointer
+                (cffi:pointer-address
+                 (cffi:foreign-symbol-pointer "objc_msgSend"))
+                nil :pointer (objc-get-class (%literal "NSAutoreleasePool"))
+                :pointer (sel-register-name (%literal "alloc")) :pointer)
+               :pointer (sel-register-name (%literal "init")) :pointer))
+      (when (%pointer-equal data 0)
+        (%call-pointer
+         (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+         nil :pointer (%rgfw-info-ns-app (%load -rgfw :pointer)) :pointer
+         (sel-register-name (%literal "setApplicationIconImage:")) :pointer 0
+         :void)
+        (%call-pointer
+         (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+         nil :pointer pool :pointer (sel-register-name (%literal "drain"))
+         :int8)
+        (return-from rgfw-window-set-icon-ex 1))
+      (setf representation
+              (ns-bitmap-image-rep-init-with-bitmap-data 0 w h 8 4 1 0
+               (%literal "NSCalibratedRGBColorSpace")
+               (%c-int-to-ns-bitmap-format 2) (ash w 2) 32))
+      (rgfw-copy-image-data (ns-bitmap-image-rep-bitmap-data representation)
+       w h 2 data format 0)
+      (setf dock-image
+              (%call-pointer
+               (cffi:pointer-address
+                (cffi:foreign-symbol-pointer "objc_msgSend"))
+               nil :pointer
+               (%call-pointer
+                (cffi:pointer-address
+                 (cffi:foreign-symbol-pointer "objc_msgSend"))
+                nil :pointer (objc-get-class (%literal "NSImage")) :pointer
+                (sel-register-name (%literal "alloc")) :pointer)
+               :pointer (sel-register-name (%literal "initWithSize:"))
+               (:struct %abi-struct-0)
+               (let ((%temporary-1 (%allocate-local 16)))
+                 (%fill %temporary-1 0 16)
+                 (setf (%cg-size-width %temporary-1) (coerce w 'double-float)
+                       (%cg-size-height %temporary-1)
+                         (coerce h 'double-float))
+                 %temporary-1)
+               :pointer))
+      (%call-pointer
+       (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+       nil :pointer dock-image :pointer
+       (sel-register-name (%literal "addRepresentation:")) :pointer
+       representation :void)
+      (%call-pointer
+       (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+       nil :pointer (%rgfw-info-ns-app (%load -rgfw :pointer)) :pointer
+       (sel-register-name (%literal "setApplicationIconImage:")) :pointer
+       dock-image :void)
+      (%call-pointer
+       (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+       nil :pointer dock-image :pointer
+       (sel-register-name (%literal "release")) :void)
+      (%call-pointer
+       (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+       nil :pointer representation :pointer
+       (sel-register-name (%literal "release")) :void)
+      (%call-pointer
+       (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+       nil :pointer pool :pointer (sel-register-name (%literal "drain"))
+       :int8)
+      1))))
 
 ;; C source (RGFW.h:1810-1815):
 ;; @brief sets the macOS layer object associated with the window
 ;; @param win a pointer to the target window
 ;; @param layer a pointer to the macOS layer object
 ;; @note Only available on macOS platforms
+#+(:or
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (defun rgfw-window-set-layer-osx (win layer) win layer nil)
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-set-layer-osx (win layer)
+  (%with-native-frame nil
+   (progn
+    (%call-pointer
+     (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+     :pointer (%rgfw-window-src-view (%address-rgfw-window-src win)) :pointer
+     (sel-register-name (%literal "setLayer:")) :pointer layer :void)
+    nil)))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux)))
 (progn
  ;; C source (RGFW.h:2050-2055):
 ;; @brief sets the maximum size of the window
@@ -20165,9 +26537,8 @@
      (%fill hints 0 (%c-expression-to-size-t +c-size-x-size-hints+))
      (x-get-wm-normal-hints (%rgfw-info-display (%load -rgfw :pointer))
       (%rgfw-window-src-window %src) hints flags)
-     (let ((%temporary-1 hints))
-       (setf (%x-size-hints-flags %temporary-1)
-               (logior (%x-size-hints-flags %temporary-1) 32)))
+     (with-accessors ((%flags %x-size-hints-flags)) hints
+        (setf %flags (logior %flags 32)))
      (setf (%x-size-hints-max-width hints) w
            (%x-size-hints-max-height hints) h)
      (x-set-wm-normal-hints (%rgfw-info-display (%load -rgfw :pointer))
@@ -20184,9 +26555,8 @@
      (%fill hints 0 (%c-expression-to-size-t +c-size-x-size-hints+))
      (x-get-wm-normal-hints (%rgfw-info-display (%load -rgfw :pointer))
       (%rgfw-window-src-window %src) hints flags)
-     (let ((%temporary-1 hints))
-       (setf (%x-size-hints-flags %temporary-1)
-               (logior (%x-size-hints-flags %temporary-1) 32)))
+     (with-accessors ((%flags %x-size-hints-flags)) hints
+        (setf %flags (logior %flags 32)))
      (setf (%x-size-hints-max-width hints) w
            (%x-size-hints-max-height hints) h)
      (x-set-wm-normal-hints (%rgfw-info-display (%load -rgfw :pointer))
@@ -20206,9 +26576,31 @@
     (setf (%rgfw-window-src-max-size-w %src) w
           (%rgfw-window-src-max-size-h %src) h)
     nil))
-#+(:and
-   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
-   (:or :freebsd :linux))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-set-max-size (win w h)
+  (%with-native-frame nil
+   (progn
+    (when (and (= w 0) (= h 0))
+      (let ((mon (rgfw-window-get-monitor win)))
+        (when (not (%pointer-equal mon 0))
+          (setf w (%rgfw-monitor-mode-w (%address-rgfw-monitor-mode mon))
+                h (%rgfw-monitor-mode-h (%address-rgfw-monitor-mode mon))))))
+    (%call-pointer
+     (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+     :pointer (%rgfw-window-src-window (%address-rgfw-window-src win))
+     :pointer (sel-register-name (%literal "setMaxSize:"))
+     (:struct %abi-struct-0)
+     (let ((%temporary-1 (%allocate-local 16)))
+       (%fill %temporary-1 0 16)
+       (setf (%cg-size-width %temporary-1) (coerce w 'double-float)
+             (%cg-size-height %temporary-1) (coerce h 'double-float))
+       %temporary-1)
+     :void)
+    nil)))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux)))
 (progn
  ;; C source (RGFW.h:2042-2047):
 ;; @brief sets the minimum size of the window
@@ -20235,9 +26627,8 @@
      (%fill hints 0 (%c-expression-to-size-t +c-size-x-size-hints+))
      (x-get-wm-normal-hints (%rgfw-info-display (%load -rgfw :pointer))
       (%rgfw-window-src-window %src) hints flags)
-     (let ((%temporary-1 hints))
-       (setf (%x-size-hints-flags %temporary-1)
-               (logior (%x-size-hints-flags %temporary-1) 16)))
+     (with-accessors ((%flags %x-size-hints-flags)) hints
+        (setf %flags (logior %flags 16)))
      (setf (%x-size-hints-min-width hints) w
            (%x-size-hints-min-height hints) h)
      (x-set-wm-normal-hints (%rgfw-info-display (%load -rgfw :pointer))
@@ -20254,9 +26645,8 @@
      (%fill hints 0 (%c-expression-to-size-t +c-size-x-size-hints+))
      (x-get-wm-normal-hints (%rgfw-info-display (%load -rgfw :pointer))
       (%rgfw-window-src-window %src) hints flags)
-     (let ((%temporary-1 hints))
-       (setf (%x-size-hints-flags %temporary-1)
-               (logior (%x-size-hints-flags %temporary-1) 16)))
+     (with-accessors ((%flags %x-size-hints-flags)) hints
+        (setf %flags (logior %flags 16)))
      (setf (%x-size-hints-min-width hints) w
            (%x-size-hints-min-height hints) h)
      (x-set-wm-normal-hints (%rgfw-info-display (%load -rgfw :pointer))
@@ -20276,6 +26666,22 @@
     (setf (%rgfw-window-src-min-size-w %src) w
           (%rgfw-window-src-min-size-h %src) h)
     nil))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-set-min-size (win w h)
+  (%with-native-frame nil
+   (progn
+    (%call-pointer
+     (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+     :pointer (%rgfw-window-src-window (%address-rgfw-window-src win))
+     :pointer (sel-register-name (%literal "setMinSize:"))
+     (:struct %abi-struct-0)
+     (let ((%temporary-1 (%allocate-local 16)))
+       (%fill %temporary-1 0 16)
+       (setf (%cg-size-width %temporary-1) (coerce w 'double-float)
+             (%cg-size-height %temporary-1) (coerce h 'double-float))
+       %temporary-1)
+     :void)
+    nil)))
 
 ;; C source (RGFW.h:2192-2196):
 ;; @brief sets the mouse icon for the window using a loaded mouse icon
@@ -20298,46 +26704,42 @@
 ;; @return True if the default cursor was successfully set.
 (defun rgfw-window-set-mouse-default (win)
   (rgfw-window-set-mouse-standard win 0))
-
-;; C source (RGFW.h:2152-2156):
+#+(:or
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
+(progn
+ ;; C source (RGFW.h:2152-2156):
 ;; @brief toggles mouse passthrough for the window
 ;; @param win a pointer to the target window
 ;; @param passthrough RGFW_TRUE to enable passthrough, RGFW_FALSE to disable
 ;; C2LISP [storage]
+)
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ ;; C source (RGFW.h:2152-2156):
+;; @brief toggles mouse passthrough for the window
+;; @param win a pointer to the target window
+;; @param passthrough RGFW_TRUE to enable passthrough, RGFW_FALSE to disable
+)
 #+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
 (defun rgfw-window-set-mouse-passthrough (win passthrough)
   (%with-native-frame nil
    (let* ((%src (%address-rgfw-window-src win)))
      (assert (not (%pointer-equal win 0)))
      (when (not (%zero-p passthrough))
-       (let* ((region (x-create-region))
-              (*string-arguments* *string-arguments*)
-              (%temporary-1 (%load x-shape-combine-region-src :pointer))
-              (%temporary-2 (%translated-function %temporary-1)))
-         (if %temporary-2
-             (funcall %temporary-2
-                      (%rgfw-info-display (%load -rgfw :pointer))
-                      (%rgfw-window-src-window %src) 2 0 0 region 0)
-             (cffi:foreign-funcall-pointer
-              (%native-argument-pointer %temporary-1) nil :pointer
-              (%native-argument-pointer
-               (%rgfw-info-display (%load -rgfw :pointer)))
-              :uint64 (%rgfw-window-src-window %src) :int32 2 :int32 0 :int32
-              0 :pointer (%native-argument-pointer region) :int32 0 :void))
+       (let ((region (x-create-region)))
+         (%call-pointer (%load x-shape-combine-region-src :pointer) nil
+          :pointer (%rgfw-info-display (%load -rgfw :pointer)) :unsigned-long
+          (%rgfw-window-src-window %src) :int32 2 :int32 0 :int32 0 :pointer
+          region :int32 0 :void)
          (x-destroy-region region)
          (return-from rgfw-window-set-mouse-passthrough nil)))
-     (let* ((*string-arguments* *string-arguments*)
-            (%temporary-3 (%load x-shape-combine-mask-src :pointer))
-            (%temporary-4 (%translated-function %temporary-3)))
-       (if %temporary-4
-           (funcall %temporary-4 (%rgfw-info-display (%load -rgfw :pointer))
-                    (%rgfw-window-src-window %src) 2 0 0 0 0)
-           (cffi:foreign-funcall-pointer
-            (%native-argument-pointer %temporary-3) nil :pointer
-            (%native-argument-pointer
-             (%rgfw-info-display (%load -rgfw :pointer)))
-            :uint64 (%rgfw-window-src-window %src) :int32 2 :int32 0 :int32 0
-            :uint64 0 :int32 0 :void)))
+     (%call-pointer (%load x-shape-combine-mask-src :pointer) nil :pointer
+      (%rgfw-info-display (%load -rgfw :pointer)) :unsigned-long
+      (%rgfw-window-src-window %src) :int32 2 :int32 0 :int32 0
+      :unsigned-long 0 :int32 0 :void)
      nil)))
 #+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
    (:or :freebsd :linux))
@@ -20346,34 +26748,17 @@
    (let* ((%src (%address-rgfw-window-src win)))
      (assert (/= (%c-pointer-to-int win) 0))
      (when (not (%zero-p passthrough))
-       (let* ((region (x-create-region))
-              (*string-arguments* *string-arguments*)
-              (%temporary-1 (%load x-shape-combine-region-src :pointer))
-              (%temporary-2 (%translated-function %temporary-1)))
-         (if %temporary-2
-             (funcall %temporary-2
-                      (%rgfw-info-display (%load -rgfw :pointer))
-                      (%rgfw-window-src-window %src) 2 0 0 region 0)
-             (cffi:foreign-funcall-pointer
-              (%native-argument-pointer %temporary-1) nil :pointer
-              (%native-argument-pointer
-               (%rgfw-info-display (%load -rgfw :pointer)))
-              :uint32 (%rgfw-window-src-window %src) :int32 2 :int32 0 :int32
-              0 :pointer (%native-argument-pointer region) :int32 0 :void))
+       (let ((region (x-create-region)))
+         (%call-pointer (%load x-shape-combine-region-src :pointer) nil
+          :pointer (%rgfw-info-display (%load -rgfw :pointer)) :unsigned-long
+          (%rgfw-window-src-window %src) :int32 2 :int32 0 :int32 0 :pointer
+          region :int32 0 :void)
          (x-destroy-region region)
          (return-from rgfw-window-set-mouse-passthrough nil)))
-     (let* ((*string-arguments* *string-arguments*)
-            (%temporary-3 (%load x-shape-combine-mask-src :pointer))
-            (%temporary-4 (%translated-function %temporary-3)))
-       (if %temporary-4
-           (funcall %temporary-4 (%rgfw-info-display (%load -rgfw :pointer))
-                    (%rgfw-window-src-window %src) 2 0 0 0 0)
-           (cffi:foreign-funcall-pointer
-            (%native-argument-pointer %temporary-3) nil :pointer
-            (%native-argument-pointer
-             (%rgfw-info-display (%load -rgfw :pointer)))
-            :uint32 (%rgfw-window-src-window %src) :int32 2 :int32 0 :int32 0
-            :uint32 0 :int32 0 :void)))
+     (%call-pointer (%load x-shape-combine-mask-src :pointer) nil :pointer
+      (%rgfw-info-display (%load -rgfw :pointer)) :unsigned-long
+      (%rgfw-window-src-window %src) :int32 2 :int32 0 :int32 0
+      :unsigned-long 0 :int32 0 :void)
      nil)))
 #+(:and :windows (:or :x86-64 :arm64))
 (defun rgfw-window-set-mouse-passthrough (win passthrough)
@@ -20441,6 +26826,16 @@
        (set-layered-window-attributes (%rgfw-window-src-window %src)
         (%load key 4) (%load alpha 1) (%load flags 4)))
      nil)))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-set-mouse-passthrough (win passthrough)
+  (%with-native-frame nil
+   (progn
+    (%call-pointer
+     (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+     :pointer (%rgfw-window-src-window (%address-rgfw-window-src win))
+     :pointer (sel-register-name (%literal "setIgnoresMouseEvents:")) :int8
+     (%c-rgfw-bool-to-bool passthrough) :void)
+    nil)))
 #+(:and
    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
    (:or :freebsd :linux))
@@ -20468,6 +26863,18 @@
    -12 (%c-pointer-to-lparam mouse))
   (set-cursor mouse)
   0)
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-set-mouse-platform (win mouse)
+  (%with-native-frame nil
+   (progn
+    (assert (not (%pointer-equal win 0)))
+    (assert (not (%zero-p mouse)))
+    (cg-display-show-cursor (cg-main-display-id))
+    (%call-pointer
+     (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+     :pointer mouse :pointer (sel-register-name (%literal "set")) :void)
+    (setf (%rgfw-window-src-mouse (%address-rgfw-window-src win)) mouse)
+    1)))
 
 ;; C source (RGFW.h:2199-2204):
 ;; @brief Sets the mouse to a preloaded [by RGFW] standard system cursor.
@@ -20483,12 +26890,25 @@
     (%offset (%address-rgfw-info-standard-mice (%load -rgfw :pointer))
      (* icon +c-size-pointer+))
     :pointer)))
-
-;; C source (RGFW.h:2160-2164):
+#+(:or
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
+(progn
+ ;; C source (RGFW.h:2160-2164):
 ;; @brief renames the window
 ;; @param win a pointer to the target window
 ;; @param name the new title string for the window
 ;; C2LISP [storage]
+)
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ ;; C source (RGFW.h:2160-2164):
+;; @brief renames the window
+;; @param win a pointer to the target window
+;; @param name the new title string for the window
+)
 #+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
 (defun rgfw-window-set-name (win name)
   (%with-string-inputs (name)
@@ -20552,6 +26972,38 @@
        (set-window-text-w
         (%rgfw-window-src-window (%address-rgfw-window-src win)) wide-name))
      nil))))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-set-name (win name)
+  (%with-native-frame nil
+   (%with-string-inputs (name)
+    (progn
+     (let ((pool 0) (str 0))
+       (assert (not (%pointer-equal win 0)))
+       (when (%pointer-equal name 0)
+         (setf name
+                 (%literal (common-lisp:format nil "~C" #.(code-char 0)))))
+       (setf pool
+               (%call-pointer
+                (cffi:pointer-address
+                 (cffi:foreign-symbol-pointer "objc_msgSend"))
+                nil :pointer
+                (%call-pointer
+                 (cffi:pointer-address
+                  (cffi:foreign-symbol-pointer "objc_msgSend"))
+                 nil :pointer (objc-get-class (%literal "NSAutoreleasePool"))
+                 :pointer (sel-register-name (%literal "alloc")) :pointer)
+                :pointer (sel-register-name (%literal "init")) :pointer)
+             str (ns-string-string-with-utf8string name))
+       (%call-pointer
+        (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+        nil :pointer (%rgfw-window-src-window (%address-rgfw-window-src win))
+        :pointer (sel-register-name (%literal "setTitle:")) :pointer str
+        :void)
+       (%call-pointer
+        (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+        nil :pointer pool :pointer (sel-register-name (%literal "drain"))
+        :int8))
+     nil))))
 #+(:and
    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
    (:or :freebsd :linux))
@@ -20562,7 +27014,8 @@
 ;; @param opacity the opacity level (0–255)
 ;; C2LISP [storage]
 )
-#+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
+#+(:or (:and :darwin (:or :x86-64 :arm64))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (progn
  ;; C source (RGFW.h:2115-2119):
 ;; @brief sets the opacity level of the window
@@ -20603,6 +27056,33 @@
     (set-layered-window-attributes (%rgfw-window-src-window %src) 0 opacity
      2)
     nil))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-set-opacity (win opacity)
+  (%with-native-frame nil
+   (let* ((%src (%address-rgfw-window-src win)))
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer (%rgfw-window-src-window %src) :pointer
+      (sel-register-name (%literal "setAlphaValue:")) :double
+      (/ (coerce opacity 'double-float) 255.0d0) :void)
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer (%rgfw-window-src-window %src) :pointer
+      (sel-register-name (%literal "setOpaque:")) :int8
+      (%c-expression-to-bool
+       (if (< opacity 255)
+           1
+           0))
+      :void)
+     (when (not (%zero-p opacity))
+       (%call-pointer
+        (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+        nil :pointer (%rgfw-window-src-window %src) :pointer
+        (sel-register-name (%literal "setBackgroundColor:")) :pointer
+        (ns-color-color-with-srgb 0.0d0 0.0d0 0.0d0
+         (coerce opacity 'double-float))
+        :void))
+     nil)))
 
 ;; C source (RGFW.h:2214-2219):
 ;; @brief set (enable or disable) raw mouse mode only for the select window
@@ -20613,41 +27093,16 @@
           state)
   (rgfw-window-set-raw-mouse-mode-platform win state)
   nil)
-
-;; C2LISP [storage]
-#+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
-(defun rgfw-window-set-raw-mouse-mode-platform (win state)
-  (%with-native-frame nil
-   (progn
-    (let ((mask (%allocate-local 3))
-          (em (%allocate-local +c-size-xi-event-mask+)))
-      win
-      (%fill mask 0 (%c-expression-to-size-t 3))
-      (when (not (%zero-p state))
-        (let ((%temporary-1 (%offset mask (* 2 1))))
-          (%store %temporary-1 1
-           (logand (logior (%load %temporary-1 1) 2) 255))))
-      (setf (%xi-event-mask-deviceid em) 1
-            (%xi-event-mask-mask-len em) 3
-            (%xi-event-mask-mask em) mask)
-      (let* ((*string-arguments* *string-arguments*)
-             (%temporary-5 (%load xi-select-events-src :pointer))
-             (%temporary-6 (%translated-function %temporary-5)))
-        (if %temporary-6
-            (funcall %temporary-6 (%rgfw-info-display (%load -rgfw :pointer))
-                     (x-default-root-window
-                      (%rgfw-info-display (%load -rgfw :pointer)))
-                     em 1)
-            (cffi:foreign-funcall-pointer
-             (%native-argument-pointer %temporary-5) nil :pointer
-             (%native-argument-pointer
-              (%rgfw-info-display (%load -rgfw :pointer)))
-             :uint64
-             (x-default-root-window
-              (%rgfw-info-display (%load -rgfw :pointer)))
-             :pointer (%native-argument-pointer em) :int32 1 :int32))))
-    nil)))
-#+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+#+(:or
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
+(progn
+ ;; C2LISP [storage]
+)
+#+(:and
+   (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
    (:or :freebsd :linux))
 (defun rgfw-window-set-raw-mouse-mode-platform (win state)
   (%with-native-frame nil
@@ -20663,22 +27118,10 @@
       (setf (%xi-event-mask-deviceid em) 1
             (%xi-event-mask-mask-len em) 3
             (%xi-event-mask-mask em) mask)
-      (let* ((*string-arguments* *string-arguments*)
-             (%temporary-5 (%load xi-select-events-src :pointer))
-             (%temporary-6 (%translated-function %temporary-5)))
-        (if %temporary-6
-            (funcall %temporary-6 (%rgfw-info-display (%load -rgfw :pointer))
-                     (x-default-root-window
-                      (%rgfw-info-display (%load -rgfw :pointer)))
-                     em 1)
-            (cffi:foreign-funcall-pointer
-             (%native-argument-pointer %temporary-5) nil :pointer
-             (%native-argument-pointer
-              (%rgfw-info-display (%load -rgfw :pointer)))
-             :uint32
-             (x-default-root-window
-              (%rgfw-info-display (%load -rgfw :pointer)))
-             :pointer (%native-argument-pointer em) :int32 1 :int32))))
+      (%call-pointer (%load xi-select-events-src :pointer) nil :pointer
+       (%rgfw-info-display (%load -rgfw :pointer)) :unsigned-long
+       (x-default-root-window (%rgfw-info-display (%load -rgfw :pointer)))
+       :pointer em :int32 1 :int32))
     nil)))
 #+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
 (defun rgfw-window-set-raw-mouse-mode-platform (win state)
@@ -20700,6 +27143,8 @@
       (register-raw-input-devices id 1
        (%c-expression-to-uint +c-size-tag-rawinputdevice+)))
     nil)))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-set-raw-mouse-mode-platform (win state) win state nil)
 
 ;; C source (RGFW.h:2272-2278):
 ;; @brief Sets whether the window should close.
@@ -20728,7 +27173,7 @@
 ;; @brief Checks if the window should close.
 ;; @param win The target window.
 ;; @return True if the window should close (for example, if ESC was pressed or a close event occurred).
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-window-should-close (win)
   (let* ((%internal (%address-rgfw-window-internal win)))
     (%c-expression-to-rgfw-bool
@@ -20759,7 +27204,7 @@
 ;; C source (RGFW.h:2259-2262):
 ;; @brief Shows the window if it was hidden.
 ;; @param win The target window.
-#+(:and (:or :linux :windows :freebsd) (:or :arm64 :x86-64))
+#+(:and (:or :linux :windows :darwin :freebsd) (:or :arm64 :x86-64))
 (defun rgfw-window-show (win)
   (let* ((%internal (%address-rgfw-window-internal win)))
     (assert (not (%pointer-equal win 0)))
@@ -20796,12 +27241,30 @@
            (logand (%rgfw-window-internal-flags %internal) 1024))))
       (rgfw-window-maximize win))
     nil))
-
-;; C source (RGFW.h:2298-2302):
+#+(:or
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
+(progn
+ ;; C source (RGFW.h:2298-2302):
 ;; @brief Shows or hides the mouse cursor for the window.
 ;; @param win The target window.
 ;; @param show True to show the mouse, false to hide it.
 ;; C2LISP [storage]
+)
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ ;; C source (RGFW.h:2298-2302):
+;; @brief Shows or hides the mouse cursor for the window.
+;; @param win The target window.
+;; @param show True to show the mouse, false to hide it.
+)
+#+(:or
+   (:and
+    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
+    (:or :freebsd :linux))
+   (:and :windows (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)))))
 (defun rgfw-window-show-mouse (win show)
   (rgfw-window-show-mouse-flags win show)
   (if (= show 0)
@@ -20809,6 +27272,15 @@
        (%rgfw-info-hidden-mouse (%load -rgfw :pointer)))
       (rgfw-window-set-mouse win
        (%rgfw-window-internal-mouse (%address-rgfw-window-internal win))))
+  nil)
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-show-mouse (win show)
+  (when (/= (rgfw-window-is-mouse-hidden win) show)
+    (return-from rgfw-window-show-mouse nil))
+  (rgfw-window-show-mouse-flags win show)
+  (if (not (%zero-p show))
+      (cg-display-show-cursor (cg-main-display-id))
+      (cg-display-hide-cursor (cg-main-display-id)))
   nil)
 (defun rgfw-window-show-mouse-flags (win show)
   (declare (ignorable show))
@@ -20819,18 +27291,14 @@
             (%zero-p
              (%c-expression-to-u32
               (logand (%rgfw-window-internal-flags %internal) 8)))))
-      (let ((%temporary-1 %internal))
-        (setf (%rgfw-window-internal-flags %temporary-1)
-                (%c-expression-to-u32
-                 (logxor (%rgfw-window-internal-flags %temporary-1) 8)))))
+      (with-accessors ((%flags %rgfw-window-internal-flags)) %internal
+         (setf %flags (%c-expression-to-u32 (logxor %flags 8)))))
      ((and (%zero-p show)
            (%zero-p
             (%c-expression-to-u32
              (logand (%rgfw-window-internal-flags %internal) 8))))
-      (let ((%temporary-2 %internal))
-        (setf (%rgfw-window-internal-flags %temporary-2)
-                (%c-expression-to-u32
-                 (logior (%rgfw-window-internal-flags %temporary-2) 8))))))
+      (with-accessors ((%flags-2 %rgfw-window-internal-flags)) %internal
+         (setf %flags-2 (%c-expression-to-u32 (logior %flags-2 8))))))
     nil))
 #+(:and
    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
@@ -20839,11 +27307,11 @@
  ;; C2LISP [storage]
 
  (defun rgfw-window-show-platform (win)
-   (let ((%temporary-1 (%address-rgfw-window-internal win)))
-     (setf (%rgfw-window-internal-flags %temporary-1)
-             (%c-expression-to-u32
-              (logand (%rgfw-window-internal-flags %temporary-1)
-                      (%c-expression-to-u32 (lognot 512))))))
+   (with-accessors ((%flags %rgfw-window-internal-flags))
+        (%address-rgfw-window-internal win)
+      (setf %flags
+              (%c-expression-to-u32
+               (logand %flags (%c-expression-to-u32 (lognot 512))))))
    (when (= (rgfw-window-is-hidden win) 0)
      (return-from rgfw-window-show-platform nil))
    (x-map-window (%rgfw-info-display (%load -rgfw :pointer))
@@ -20862,6 +27330,33 @@
          1024)))
     (show-window (%rgfw-window-src-window (%address-rgfw-window-src win)) 9))
   nil)
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-window-show-platform (win)
+  (%with-native-frame nil
+   (let* ((%src (%address-rgfw-window-src win)))
+     (when
+         (not
+          (%zero-p
+           (%c-expression-to-u32
+            (logand
+             (%rgfw-window-internal-flags
+              (%address-rgfw-window-internal win))
+             8192))))
+       (%call-pointer
+        (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend"))
+        nil :pointer (%rgfw-window-src-window %src) :pointer
+        (sel-register-name (%literal "makeKeyAndOrderFront:")) :pointer 0
+        :pointer))
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer (%rgfw-window-src-window %src) :pointer
+      (sel-register-name (%literal "orderFront:")) :pointer 0 :pointer)
+     (%call-pointer
+      (cffi:pointer-address (cffi:foreign-symbol-pointer "objc_msgSend")) nil
+      :pointer (%rgfw-window-src-window %src) :pointer
+      (sel-register-name (%literal "setIsVisible:")) :int8 1 :void)
+     (rgfw-cocoa-fetch-rect win)
+     nil)))
 #+(:and
    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
    (:or :freebsd :linux))
@@ -20880,6 +27375,14 @@
 ;; @brief Writes data to the clipboard.
 ;; @param data The data to be written to the clipboard, including the length and type.
 ;; @param returns RGFW_TRUE on success and RGFW_FALSE on failure
+)
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ ;; C source (RGFW.h:2434-2438):
+;; @brief Writes data to the clipboard.
+;; @param data The data to be written to the clipboard, including the length and type.
+;; @param returns RGFW_TRUE on success and RGFW_FALSE on failure
+;; C2LISP [storage]
 )
 #+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
 (defun rgfw-write-clipboard (data)
@@ -21065,6 +27568,33 @@
     (set-clipboard-data 13 object)
     (close-clipboard)
     1))
+#+(:and :darwin (:or :x86-64 :arm64))
+(defun rgfw-write-clipboard (data)
+  (%with-native-frame nil
+   (let ((array (%allocate-local 16)) (func 0) (ret 0))
+     (assert (not (%pointer-equal data 0)))
+     (%fill array 0 16)
+     (%store array :string-pointer (%literal "public.utf8-plain-text"))
+     (%store (%offset array +c-size-pointer+) :string-pointer 0)
+     (ns-paste-board-declare-types (ns-pasteboard-general-pasteboard) array 1
+      0)
+     (setf func (sel-register-name (%literal "setString:forType:"))
+           ret
+             (%call-pointer
+              (cffi:pointer-address
+               (cffi:foreign-symbol-pointer "objc_msgSend"))
+              nil :pointer (ns-pasteboard-general-pasteboard) :pointer func
+              :pointer
+              (ns-string-string-with-utf8string
+               (%rgfw-data-transfer-data data))
+              :pointer
+              (ns-string-string-with-utf8string
+               (%literal "public.utf8-plain-text"))
+              :uint8))
+     (%c-expression-to-rgfw-bool
+      (if (= ret 1)
+          1
+          0)))))
 #+(:and
    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
    (:or :freebsd :linux))
@@ -21187,15 +27717,17 @@
                                      (%rgfw-info-im (%load -rgfw :pointer)))
                            :pointer (%native-argument-pointer
                                      (%literal "inputStyle"))
-                           :int64 (logior 8 1024)
+                           :long (logior 8 1024)
                            :pointer (%native-argument-pointer
                                      (%literal "clientWindow"))
-                           :uint64 (%rgfw-window-src-window
-                                    (%address-rgfw-window-src %temporary-4))
+                           :unsigned-long (%rgfw-window-src-window
+                                           (%address-rgfw-window-src
+                                            %temporary-4))
                            :pointer (%native-argument-pointer
                                      (%literal "focusWindow"))
-                           :uint64 (%rgfw-window-src-window
-                                    (%address-rgfw-window-src %temporary-4))
+                           :unsigned-long (%rgfw-window-src-window
+                                           (%address-rgfw-window-src
+                                            %temporary-4))
                            :pointer (%native-argument-pointer
                                      (%literal "destroyCallback"))
                            :pointer (%native-argument-pointer callback)
@@ -21230,11 +27762,10 @@
             (not
              (%zero-p
               (%c-expression-to-rgfw-window-flags (logand %temporary-3 4))))
-          (let ((version (%allocate-local 1))
-                (%temporary-19 (%address-rgfw-window-internal %temporary-4)))
-            (setf (%rgfw-window-internal-flags %temporary-19)
-                    (%c-expression-to-u32
-                     (logior (%rgfw-window-internal-flags %temporary-19) 4)))
+          (let ((version (%allocate-local 1)))
+            (with-accessors ((%flags %rgfw-window-internal-flags))
+                 (%address-rgfw-window-internal %temporary-4)
+               (setf %flags (%c-expression-to-u32 (logior %flags 4))))
             (%store version 1 5)
             (x-change-property (%rgfw-info-display (%load -rgfw :pointer))
              (%rgfw-window-src-window
@@ -21360,15 +27891,17 @@
                                      (%rgfw-info-im (%load -rgfw :pointer)))
                            :pointer (%native-argument-pointer
                                      (%literal "inputStyle"))
-                           :int32 (logior 8 1024)
+                           :long (logior 8 1024)
                            :pointer (%native-argument-pointer
                                      (%literal "clientWindow"))
-                           :uint32 (%rgfw-window-src-window
-                                    (%address-rgfw-window-src %temporary-4))
+                           :unsigned-long (%rgfw-window-src-window
+                                           (%address-rgfw-window-src
+                                            %temporary-4))
                            :pointer (%native-argument-pointer
                                      (%literal "focusWindow"))
-                           :uint32 (%rgfw-window-src-window
-                                    (%address-rgfw-window-src %temporary-4))
+                           :unsigned-long (%rgfw-window-src-window
+                                           (%address-rgfw-window-src
+                                            %temporary-4))
                            :pointer (%native-argument-pointer
                                      (%literal "destroyCallback"))
                            :pointer (%native-argument-pointer callback)
@@ -21403,11 +27936,10 @@
             (not
              (%zero-p
               (%c-expression-to-rgfw-window-flags (logand %temporary-3 4))))
-          (let ((version (%allocate-local 1))
-                (%temporary-19 (%address-rgfw-window-internal %temporary-4)))
-            (setf (%rgfw-window-internal-flags %temporary-19)
-                    (%c-expression-to-u32
-                     (logior (%rgfw-window-internal-flags %temporary-19) 4)))
+          (let ((version (%allocate-local 1)))
+            (with-accessors ((%flags %rgfw-window-internal-flags))
+                 (%address-rgfw-window-internal %temporary-4)
+               (setf %flags (%c-expression-to-u32 (logior %flags 4))))
             (%store version 1 5)
             (x-change-property (%rgfw-info-display (%load -rgfw :pointer))
              (%rgfw-window-src-window
@@ -22489,234 +29021,194 @@
 )
 #+(:and (:or :x86-64 :arm64) (:or :freebsd :linux))
 (defun rgfw-unix-parse-uri (win data)
-  (declare (ignorable win))
   (%with-native-frame nil
    (%with-string-inputs (data)
     (progn
      (let ((prefix 0) (line 0))
        (declare (ignorable prefix))
-       (declare (ignorable line))
        (setf prefix (%literal "file://"))
        (loop :until (%zero-p
                      (setf line
                              (rgfw-strtok data
                               (%literal
                                (common-lisp:format nil "~C~%" #\Return)))))
-             :do (flet ((%temporary-1 ()
-                          (let ((l 0) (len 0) (path 0) (index 0))
-                            (setf data 0)
-                            (when (= (%load line +c-code-char+) 35)
-                              (return-from %temporary-1))
-                            (setf l line)
-                            (loop :do (cond
-                                       ((> (%distance l line 1) 7) (return))
-                                       ((/= (%load l +c-code-char+)
+             :do (let ((l 0) (len 0) (path 0) (index 0))
+                   (setf data 0)
+                   (unless (= (%load line +c-code-char+) 35)
+                     (setf l line)
+                     (loop :do (cond ((> (%distance l line 1) 7) (return))
+                                     ((/= (%load l +c-code-char+)
+                                          (%load
+                                           (%offset prefix
+                                            (* (%distance l line 1) 1))
+                                           +c-code-char+))
+                                      (return))
+                                     ((and (= (%load l +c-code-char+) 0)
+                                           (=
                                             (%load
                                              (%offset prefix
                                               (* (%distance l line 1) 1))
+                                             +c-code-char+)
+                                            0))
+                                      (setf line (%offset line (* 7 1)))
+                                      (loop :while (/=
+                                                    (%load line
+                                                     +c-code-char+)
+                                                    47)
+                                            :do (setf line (%offset line 1)))
+                                      (return))
+                                     ((= (%load l +c-code-char+) 0)
+                                      (return))) (setf l (%offset l 1)))
+                     (setf len (rgfw-unix-stringlen line)
+                           path
+                             (%allocate (%c-expression-to-size-t (+ len 1)))
+                           index 0)
+                     (loop :until (%zero-p (%load line +c-code-char+))
+                           :do (if (and (= (%load line +c-code-char+) 37)
+                                        (not
+                                         (%zero-p
+                                          (%load (%offset line 1)
+                                           +c-code-char+)))
+                                        (not
+                                         (%zero-p
+                                          (%load (%offset line (ash 1 1))
+                                           +c-code-char+))))
+                                   (let ((*frame* (common-lisp:list nil)))
+                                     (declare (dynamic-extent *frame*))
+                                     (unwind-protect
+                                         (let ((digits (%allocate-local 3)))
+                                           (%fill digits 0 3)
+                                           (%store digits +c-code-char+ 0)
+                                           (%store digits +c-code-char+
+                                            (%load (%offset line 1)
                                              +c-code-char+))
-                                        (return))
-                                       ((and (= (%load l +c-code-char+) 0)
-                                             (=
-                                              (%load
-                                               (%offset prefix
-                                                (* (%distance l line 1) 1))
-                                               +c-code-char+)
-                                              0))
-                                        (setf line (%offset line (* 7 1)))
-                                        (loop :while (/=
-                                                      (%load line
-                                                       +c-code-char+)
-                                                      47)
-                                              :do (setf line
-                                                          (%offset line 1)))
-                                        (return))
-                                       ((= (%load l +c-code-char+) 0)
-                                        (return))) (setf l (%offset l 1)))
-                            (setf len (rgfw-unix-stringlen line)
-                                  path
-                                    (%allocate
-                                     (%c-expression-to-size-t (+ len 1)))
-                                  index 0)
-                            (loop :until (%zero-p (%load line +c-code-char+))
-                                  :do (if (and
-                                           (= (%load line +c-code-char+) 37)
-                                           (not
-                                            (%zero-p
-                                             (%load (%offset line 1)
-                                              +c-code-char+)))
-                                           (not
-                                            (%zero-p
-                                             (%load (%offset line (ash 1 1))
-                                              +c-code-char+))))
-                                          (let ((*frame*
-                                                 (common-lisp:list nil)))
-                                            (declare
-                                             (dynamic-extent *frame*))
-                                            (unwind-protect
-                                                (let ((digits
-                                                       (%allocate-local 3)))
-                                                  (%fill digits 0 3)
-                                                  (%store digits
-                                                   +c-code-char+ 0)
-                                                  (%store digits
-                                                   +c-code-char+
-                                                   (%load (%offset line 1)
-                                                    +c-code-char+))
-                                                  (%store (%offset digits 1)
-                                                   +c-code-char+
-                                                   (%load
-                                                    (%offset line (ash 1 1))
-                                                    +c-code-char+))
-                                                  (%store
-                                                   (%offset digits (ash 1 1))
-                                                   +c-code-char+ 0)
-                                                  (%store
-                                                   (%offset path (* index 1))
-                                                   +c-code-char+
-                                                   (%c-long-to-char
-                                                    (%strtol digits 0 16 64
-                                                     nil)))
-                                                  (setf line
-                                                          (%offset line
-                                                           (ash 1 1))))
-                                              (%release-frame *frame*)))
-                                          (progn
-                                           (when (>= index len) (return))
+                                           (%store (%offset digits 1)
+                                            +c-code-char+
+                                            (%load (%offset line (ash 1 1))
+                                             +c-code-char+))
+                                           (%store (%offset digits (ash 1 1))
+                                            +c-code-char+ 0)
                                            (%store (%offset path (* index 1))
                                             +c-code-char+
-                                            (%load line
-                                             +c-code-char+)))) (setf index
-                                                                       (%c-expression-to-size-t
-                                                                        (+
-                                                                         (%c-expression-to-size-t
-                                                                          index)
-                                                                         1))
-                                                                     line
-                                                                       (%offset
-                                                                        line
-                                                                        1)))
-                            (%store (%offset path (* len 1)) +c-code-char+ 0)
-                            (rgfw-data-drop-callback win path
-                             (%c-expression-to-size-t (+ len 1)) 2)
-                            (%free path))))
-                   (%temporary-1))))
+                                            (%c-long-to-char
+                                             (%strtol digits 0 16 64 nil)))
+                                           (setf line
+                                                   (%offset line (ash 1 1))))
+                                       (%release-frame *frame*)))
+                                   (progn
+                                    (when (>= index len) (return))
+                                    (%store (%offset path (* index 1))
+                                     +c-code-char+
+                                     (%load line +c-code-char+)))) (setf index
+                                                                           (%c-expression-to-size-t
+                                                                            (+
+                                                                             (%c-expression-to-size-t
+                                                                              index)
+                                                                             1))
+                                                                         line
+                                                                           (%offset
+                                                                            line
+                                                                            1)))
+                     (%store (%offset path (* len 1)) +c-code-char+ 0)
+                     (rgfw-data-drop-callback win path
+                      (%c-expression-to-size-t (+ len 1)) 2)
+                     (%free path)))))
      nil))))
 #+(:and (:or (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
    (:or :freebsd :linux))
 (defun rgfw-unix-parse-uri (win data)
-  (declare (ignorable win))
   (%with-native-frame nil
    (%with-string-inputs (data)
     (progn
      (let ((prefix 0) (line 0))
        (declare (ignorable prefix))
-       (declare (ignorable line))
        (setf prefix (%literal "file://"))
        (loop :until (%zero-p
                      (setf line
                              (rgfw-strtok data
                               (%literal
                                (common-lisp:format nil "~C~%" #\Return)))))
-             :do (flet ((%temporary-1 ()
-                          (let ((l 0) (len 0) (path 0) (index 0))
-                            (setf data 0)
-                            (when (= (%load line +c-code-char+) 35)
-                              (return-from %temporary-1))
-                            (setf l line)
-                            (loop :do (cond
-                                       ((> (%distance l line 1) 7) (return))
-                                       ((/= (%load l +c-code-char+)
+             :do (let ((l 0) (len 0) (path 0) (index 0))
+                   (setf data 0)
+                   (unless (= (%load line +c-code-char+) 35)
+                     (setf l line)
+                     (loop :do (cond ((> (%distance l line 1) 7) (return))
+                                     ((/= (%load l +c-code-char+)
+                                          (%load
+                                           (%offset prefix
+                                            (* (%distance l line 1) 1))
+                                           +c-code-char+))
+                                      (return))
+                                     ((and (= (%load l +c-code-char+) 0)
+                                           (=
                                             (%load
                                              (%offset prefix
                                               (* (%distance l line 1) 1))
+                                             +c-code-char+)
+                                            0))
+                                      (setf line (%offset line (* 7 1)))
+                                      (loop :while (/=
+                                                    (%load line
+                                                     +c-code-char+)
+                                                    47)
+                                            :do (setf line (%offset line 1)))
+                                      (return))
+                                     ((= (%load l +c-code-char+) 0)
+                                      (return))) (setf l (%offset l 1)))
+                     (setf len (rgfw-unix-stringlen line)
+                           path
+                             (%allocate (%c-expression-to-size-t (+ len 1)))
+                           index 0)
+                     (loop :until (%zero-p (%load line +c-code-char+))
+                           :do (if (and (= (%load line +c-code-char+) 37)
+                                        (not
+                                         (%zero-p
+                                          (%load (%offset line 1)
+                                           +c-code-char+)))
+                                        (not
+                                         (%zero-p
+                                          (%load (%offset line (ash 1 1))
+                                           +c-code-char+))))
+                                   (let ((*frame* (common-lisp:list nil)))
+                                     (declare (dynamic-extent *frame*))
+                                     (unwind-protect
+                                         (let ((digits (%allocate-local 3)))
+                                           (%fill digits 0 3)
+                                           (%store digits +c-code-char+ 0)
+                                           (%store digits +c-code-char+
+                                            (%load (%offset line 1)
                                              +c-code-char+))
-                                        (return))
-                                       ((and (= (%load l +c-code-char+) 0)
-                                             (=
-                                              (%load
-                                               (%offset prefix
-                                                (* (%distance l line 1) 1))
-                                               +c-code-char+)
-                                              0))
-                                        (setf line (%offset line (* 7 1)))
-                                        (loop :while (/=
-                                                      (%load line
-                                                       +c-code-char+)
-                                                      47)
-                                              :do (setf line
-                                                          (%offset line 1)))
-                                        (return))
-                                       ((= (%load l +c-code-char+) 0)
-                                        (return))) (setf l (%offset l 1)))
-                            (setf len (rgfw-unix-stringlen line)
-                                  path
-                                    (%allocate
-                                     (%c-expression-to-size-t (+ len 1)))
-                                  index 0)
-                            (loop :until (%zero-p (%load line +c-code-char+))
-                                  :do (if (and
-                                           (= (%load line +c-code-char+) 37)
-                                           (not
-                                            (%zero-p
-                                             (%load (%offset line 1)
-                                              +c-code-char+)))
-                                           (not
-                                            (%zero-p
-                                             (%load (%offset line (ash 1 1))
-                                              +c-code-char+))))
-                                          (let ((*frame*
-                                                 (common-lisp:list nil)))
-                                            (declare
-                                             (dynamic-extent *frame*))
-                                            (unwind-protect
-                                                (let ((digits
-                                                       (%allocate-local 3)))
-                                                  (%fill digits 0 3)
-                                                  (%store digits
-                                                   +c-code-char+ 0)
-                                                  (%store digits
-                                                   +c-code-char+
-                                                   (%load (%offset line 1)
-                                                    +c-code-char+))
-                                                  (%store (%offset digits 1)
-                                                   +c-code-char+
-                                                   (%load
-                                                    (%offset line (ash 1 1))
-                                                    +c-code-char+))
-                                                  (%store
-                                                   (%offset digits (ash 1 1))
-                                                   +c-code-char+ 0)
-                                                  (%store
-                                                   (%offset path (* index 1))
-                                                   +c-code-char+
-                                                   (%c-long-to-char
-                                                    (%strtol digits 0 16 32
-                                                     nil)))
-                                                  (setf line
-                                                          (%offset line
-                                                           (ash 1 1))))
-                                              (%release-frame *frame*)))
-                                          (progn
-                                           (when (>= index len) (return))
+                                           (%store (%offset digits 1)
+                                            +c-code-char+
+                                            (%load (%offset line (ash 1 1))
+                                             +c-code-char+))
+                                           (%store (%offset digits (ash 1 1))
+                                            +c-code-char+ 0)
                                            (%store (%offset path (* index 1))
                                             +c-code-char+
-                                            (%load line
-                                             +c-code-char+)))) (setf index
-                                                                       (%c-expression-to-size-t
-                                                                        (+
-                                                                         (%c-expression-to-size-t
-                                                                          index)
-                                                                         1))
-                                                                     line
-                                                                       (%offset
-                                                                        line
-                                                                        1)))
-                            (%store (%offset path (* len 1)) +c-code-char+ 0)
-                            (rgfw-data-drop-callback win path
-                             (%c-expression-to-size-t (+ len 1)) 2)
-                            (%free path))))
-                   (%temporary-1))))
+                                            (%c-long-to-char
+                                             (%strtol digits 0 16 32 nil)))
+                                           (setf line
+                                                   (%offset line (ash 1 1))))
+                                       (%release-frame *frame*)))
+                                   (progn
+                                    (when (>= index len) (return))
+                                    (%store (%offset path (* index 1))
+                                     +c-code-char+
+                                     (%load line +c-code-char+)))) (setf index
+                                                                           (%c-expression-to-size-t
+                                                                            (+
+                                                                             (%c-expression-to-size-t
+                                                                              index)
+                                                                             1))
+                                                                         line
+                                                                           (%offset
+                                                                            line
+                                                                            1)))
+                     (%store (%offset path (* len 1)) +c-code-char+ 0)
+                     (rgfw-data-drop-callback win path
+                      (%c-expression-to-size-t (+ len 1)) 2)
+                     (%free path)))))
      nil))))
 #+(:and
    (:or :x86-64 :arm64 (:and :x86 (:not :x86-64)) (:and :arm (:not :arm64)))
@@ -22915,31 +29407,21 @@
         (t
          (let ((i-2 0))
            (loop :while (< i-2 format-count)
-                 :do (flet ((%temporary-1 ()
-                              (progn
-                               (when
-                                   (/=
-                                    (%x-selection-request-event-target
-                                     request)
-                                    (%load
-                                     (%offset formats (* i-2 +c-size-atom+))
-                                     +c-code-atom+))
-                                 (return-from %temporary-1))
-                               (x-change-property
-                                (%rgfw-info-display (%load -rgfw :pointer))
-                                (%x-selection-request-event-requestor
-                                 request)
-                                (%x-selection-request-event-property request)
-                                (%x-selection-request-event-target request) 8
-                                0
-                                (%rgfw-data-transfer-data
-                                 (%rgfw-info-unix-clipboard
-                                  (%load -rgfw :pointer)))
-                                (%c-size-t-to-i32
-                                 (%rgfw-data-transfer-length
-                                  (%rgfw-info-unix-clipboard
-                                   (%load -rgfw :pointer))))))))
-                       (%temporary-1)) (incf i-2)))))
+                 :do (unless
+                         (/= (%x-selection-request-event-target request)
+                             (%load (%offset formats (* i-2 +c-size-atom+))
+                              +c-code-atom+))
+                       (x-change-property
+                        (%rgfw-info-display (%load -rgfw :pointer))
+                        (%x-selection-request-event-requestor request)
+                        (%x-selection-request-event-property request)
+                        (%x-selection-request-event-target request) 8 0
+                        (%rgfw-data-transfer-data
+                         (%rgfw-info-unix-clipboard (%load -rgfw :pointer)))
+                        (%c-size-t-to-i32
+                         (%rgfw-data-transfer-length
+                          (%rgfw-info-unix-clipboard
+                           (%load -rgfw :pointer)))))) (incf i-2)))))
        (%fill reply 0 +c-size--x-event+)
        (setf (%-x-event-type reply) 31
              (%x-selection-event-property %xselection)
@@ -23354,7 +29836,7 @@
                         (%x-key-event-keycode %xkey)))
               (x-next-event (%rgfw-info-display (%load -rgfw :pointer)) e)
               (setf key-repeat 1))))
-        (block %temporary-3
+        (block %temporary-1
           (case (%-x-event-type e)
             (2
              (let ((value 0) (state (%allocate-local 18)))
@@ -23534,14 +30016,14 @@
                (when (not (%zero-p scroll))
                  (rgfw-mouse-scroll-callback (%load win :pointer) scroll-x
                   scroll-y)
-                 (return-from %temporary-3))
+                 (return-from %temporary-1))
                (rgfw-mouse-button-callback (%load win :pointer) value-3 1)))
             (5
              (let ((value-4 0))
                (when
                    (and (>= (%x-button-event-button %xbutton) 4)
                         (<= (%x-button-event-button %xbutton) 7))
-                 (return-from %temporary-3))
+                 (return-from %temporary-1))
                (setf value-4 0)
                (case (%x-button-event-button %xbutton)
                  (1 (setf value-4 0))
@@ -23567,7 +30049,7 @@
               (%x-expose-event-height %xexpose)))
             (28
              (when (/= (%x-property-event-state %xproperty) 0)
-               (return-from %temporary-3))
+               (return-from %temporary-1))
              (cond
               ((= (%x-property-event-atom %xproperty)
                   (%rgfw-info-wm-state (%load -rgfw :pointer)))
@@ -23583,7 +30065,7 @@
                         (%address-rgfw-window-internal (%load win :pointer)))
                        18))))
                  (rgfw-window-minimized-callback (%load win :pointer))
-                 (return-from %temporary-3)))
+                 (return-from %temporary-1)))
               ((= (%x-property-event-atom %xproperty)
                   (%rgfw-info--net-wm-state (%load -rgfw :pointer)))
                (when
@@ -23602,7 +30084,7 @@
                   (%rgfw-window-y (%load win :pointer))
                   (%rgfw-window-w (%load win :pointer))
                   (%rgfw-window-h (%load win :pointer)))
-                 (return-from %temporary-3))))
+                 (return-from %temporary-1))))
              (rgfw-window-check-mode (%load win :pointer)))
             ((19 18) (rgfw-window-check-mode (%load win :pointer)))
             (33
@@ -23612,7 +30094,7 @@
                       (%c-atom-to-long
                        (%rgfw-info-wm-delete-window (%load -rgfw :pointer))))
                  (rgfw-window-close-callback (%load win :pointer))
-                 (return-from %temporary-3))
+                 (return-from %temporary-1))
                (when
                    (or
                     (=
@@ -23693,9 +30175,9 @@
                                                         1))))
                          (%store formats :pointer real-formats)))
                    (setf i 0)
-                   (loop :named %temporary-14
+                   (loop :named %temporary-9
                          :while (< i (%load count-2 +c-code-unsigned-long+))
-                         :do (flet ((%temporary-1 ()
+                         :do (flet ((%temporary-2 ()
                                       (progn
                                        (cond
                                         ((=
@@ -23718,7 +30200,7 @@
                                          (setf (%rgfw-info-x11transfer-type
                                                 (%load -rgfw :pointer))
                                                  1))
-                                        (t (return-from %temporary-1)))
+                                        (t (return-from %temporary-2)))
                                        (setf (%rgfw-info-x11format
                                               (%load -rgfw :pointer))
                                                (%c-atom-to-int
@@ -23727,8 +30209,8 @@
                                                   (%load formats :pointer)
                                                   (* i +c-size-atom+))
                                                  +c-code-atom+)))
-                                       (return-from %temporary-14))))
-                               (%temporary-1)) (setf i
+                                       (return-from %temporary-9))))
+                               (%temporary-2)) (setf i
                                                        (%c-expression-to-size-t
                                                         (+
                                                          (%c-expression-to-size-t
@@ -24261,22 +30743,18 @@
            refresh-rate 0.0)
      (when (<= denominator 0) (setf denominator 1))
      (setf refresh-rate
-             (coerce
-              (/ (coerce numerator 'single-float)
-                 (coerce denominator 'single-float))
-              'single-float)
+             (/ (coerce numerator 'single-float)
+                (coerce denominator 'single-float))
            (%rgfw-monitor-mode-refresh-rate found-mode)
-             (coerce
-              (/
-               (coerce
-                (%c-float-to-i32
-                 (+ (* refresh-rate 100.0)
-                    (if (< (* refresh-rate 100.0) 0.0)
-                        -0.5
-                        0.5)))
-                'single-float)
-               100.0)
-              'single-float))
+             (/
+              (coerce
+               (%c-float-to-i32
+                (+ (* refresh-rate 100.0)
+                   (if (< (* refresh-rate 100.0) 0.0)
+                       -0.5
+                       0.5)))
+               'single-float)
+              100.0))
      mi))
  ;; C2LISP [storage]
 )
@@ -24525,26 +31003,22 @@
          (736
           (let ((scale-x 0.0) (scale-y 0.0))
             (setf scale-x
-                    (coerce
-                     (/
-                      (coerce
-                       (%c-dword-ptr-to-word
-                        (%c-expression-to-dword-ptr
-                         (logand
-                          (%c-expression-to-dword-ptr (ash w-param -16))
-                          65535)))
-                       'single-float)
-                      96.0)
-                     'single-float)
+                    (/
+                     (coerce
+                      (%c-dword-ptr-to-word
+                       (%c-expression-to-dword-ptr
+                        (logand
+                         (%c-expression-to-dword-ptr (ash w-param -16))
+                         65535)))
+                      'single-float)
+                     96.0)
                   scale-y
-                    (coerce
-                     (/
-                      (coerce
-                       (%c-dword-ptr-to-word
-                        (%c-expression-to-dword-ptr (logand w-param 65535)))
-                       'single-float)
-                      96.0)
-                     'single-float))
+                    (/
+                     (coerce
+                      (%c-dword-ptr-to-word
+                       (%c-expression-to-dword-ptr (logand w-param 65535)))
+                      'single-float)
+                     96.0))
             (rgfw-scale-updated-callback win scale-x scale-y)
             (return-from wnd-proc-w
               (def-window-proc-w h-wnd message w-param l-param))))
@@ -24565,17 +31039,15 @@
             (setf area (%c-lparam-to-pointer l-param)
                   edge (%c-wparam-to-i32 w-param)
                   ratio
-                    (coerce
-                     (/
-                      (coerce
-                       (%rgfw-window-src-aspect-ratio-w
-                        (%address-rgfw-window-src win))
-                       'double-float)
-                      (coerce
-                       (%rgfw-window-src-aspect-ratio-h
-                        (%address-rgfw-window-src win))
-                       'double-float))
-                     'double-float))
+                    (/
+                     (coerce
+                      (%rgfw-window-src-aspect-ratio-w
+                       (%address-rgfw-window-src win))
+                      'double-float)
+                     (coerce
+                      (%rgfw-window-src-aspect-ratio-h
+                       (%address-rgfw-window-src win))
+                      'double-float)))
             (cond
              ((or (= edge 1) (= edge 7) (= edge 2) (= edge 8))
               (setf (%tag-rect-bottom area)
@@ -24583,32 +31055,26 @@
                        (+ (%tag-rect-top area)
                           (- (%tag-rect-bottom frame) (%tag-rect-top frame)))
                        (%c-double-to-i32
-                        (coerce
-                         (/
-                          (coerce
-                           (-
-                            (- (%tag-rect-right area) (%tag-rect-left area))
-                            (- (%tag-rect-right frame)
-                               (%tag-rect-left frame)))
-                           'double-float)
-                          ratio)
-                         'double-float)))))
+                        (/
+                         (coerce
+                          (- (- (%tag-rect-right area) (%tag-rect-left area))
+                             (- (%tag-rect-right frame)
+                                (%tag-rect-left frame)))
+                          'double-float)
+                         ratio)))))
              ((or (= edge 4) (= edge 5))
               (setf (%tag-rect-top area)
                       (-
                        (- (%tag-rect-bottom area)
                           (- (%tag-rect-bottom frame) (%tag-rect-top frame)))
                        (%c-double-to-i32
-                        (coerce
-                         (/
-                          (coerce
-                           (-
-                            (- (%tag-rect-right area) (%tag-rect-left area))
-                            (- (%tag-rect-right frame)
-                               (%tag-rect-left frame)))
-                           'double-float)
-                          ratio)
-                         'double-float)))))
+                        (/
+                         (coerce
+                          (- (- (%tag-rect-right area) (%tag-rect-left area))
+                             (- (%tag-rect-right frame)
+                                (%tag-rect-left frame)))
+                          'double-float)
+                         ratio)))))
              ((or (= edge 3) (= edge 6))
               (setf (%tag-rect-right area)
                       (+
@@ -24929,8 +31395,8 @@
                  (raw
                   (or %static-2
                       (setf %static-2
-                              (let ((%temporary-14 (%allocate 48)))
-                                %temporary-14))))
+                              (let ((%temporary-3 (%allocate 48)))
+                                %temporary-3))))
                  (vec-x 0.0)
                  (vec-y 0.0)
                  (%data (%address-tag-rawinput-data raw))
@@ -24968,42 +31434,34 @@
                   (if (not
                        (%zero-p (logand (%tag-rawmouse-us-flags %mouse) 2)))
                       (progn
-                       (let ((%temporary-15 pos))
-                         (setf (%tag-point-x %temporary-15)
-                                 (+ (%tag-point-x %temporary-15)
-                                    (get-system-metrics 76))))
-                       (let ((%temporary-16 pos))
-                         (setf (%tag-point-y %temporary-16)
-                                 (+ (%tag-point-y %temporary-16)
-                                    (get-system-metrics 77))))
+                       (with-accessors ((%x %tag-point-x)) pos
+                          (setf %x (+ %x (get-system-metrics 76))))
+                       (with-accessors ((%y %tag-point-y)) pos
+                          (setf %y (+ %y (get-system-metrics 77))))
                        (setf width (get-system-metrics 78)
                              height (get-system-metrics 79)))
                       (setf width (get-system-metrics 0)
                             height (get-system-metrics 1)))
-                  (let ((%temporary-17 pos))
-                    (setf (%tag-point-x %temporary-17)
-                            (+ (%tag-point-x %temporary-17)
-                               (truncate
-                                (*
-                                 (coerce
+                  (with-accessors ((%x-2 %tag-point-x)) pos
+                     (setf %x-2
+                             (+ %x-2
+                                (truncate
+                                 (*
                                   (/
                                    (coerce (%tag-rawmouse-l-last-x %mouse)
                                            'single-float)
                                    65535.0)
-                                  'single-float)
-                                 (coerce width 'single-float))))))
-                  (let ((%temporary-18 pos))
-                    (setf (%tag-point-y %temporary-18)
-                            (+ (%tag-point-y %temporary-18)
-                               (truncate
-                                (*
-                                 (coerce
+                                  (coerce width 'single-float))))))
+                  (with-accessors ((%y-2 %tag-point-y)) pos
+                     (setf %y-2
+                             (+ %y-2
+                                (truncate
+                                 (*
                                   (/
                                    (coerce (%tag-rawmouse-l-last-y %mouse)
                                            'single-float)
                                    65535.0)
-                                  'single-float)
-                                 (coerce height 'single-float))))))
+                                  (coerce height 'single-float))))))
                   (screen-to-client
                    (%rgfw-window-src-window (%address-rgfw-window-src win))
                    pos)
@@ -25078,18 +31536,15 @@
          (522
           (let ((scroll-y
                  (coerce
-                  (coerce
-                   (/
-                    (coerce
-                     (%c-word-to-i16
-                      (%c-dword-ptr-to-word
-                       (%c-expression-to-dword-ptr
-                        (logand
-                         (%c-expression-to-dword-ptr (ash w-param -16))
-                         65535))))
-                     'double-float)
-                    120.0d0)
-                   'double-float)
+                  (/
+                   (coerce
+                    (%c-word-to-i16
+                     (%c-dword-ptr-to-word
+                      (%c-expression-to-dword-ptr
+                       (logand (%c-expression-to-dword-ptr (ash w-param -16))
+                               65535))))
+                    'double-float)
+                   120.0d0)
                   'single-float)))
             (rgfw-mouse-scroll-callback win 0.0 scroll-y)))
          (526
@@ -25097,18 +31552,16 @@
                  (coerce
                   (-
                    (coerce
-                    (coerce
-                     (/
-                      (coerce
-                       (%c-word-to-i16
-                        (%c-dword-ptr-to-word
-                         (%c-expression-to-dword-ptr
-                          (logand
-                           (%c-expression-to-dword-ptr (ash w-param -16))
-                           65535))))
-                       'double-float)
-                      120.0d0)
-                     'double-float)
+                    (/
+                     (coerce
+                      (%c-word-to-i16
+                       (%c-dword-ptr-to-word
+                        (%c-expression-to-dword-ptr
+                         (logand
+                          (%c-expression-to-dword-ptr (ash w-param -16))
+                          65535))))
+                      'double-float)
+                     120.0d0)
                     'single-float))
                   'single-float)))
             (rgfw-mouse-scroll-callback win scroll-x 0.0)))
@@ -25133,42 +31586,38 @@
                      (drag-query-file-w drop 4294967295 0 0))
                   i-2 0)
             (loop :while (< (%c-u32-to-size-t i-2) count)
-                  :do (flet ((%temporary-3 ()
-                               (let ((length 0) (buffer 0) (clength 0))
-                                 (setf length
-                                         (%c-expression-to-uint
-                                          (+ (drag-query-file-w drop i-2 0 0)
-                                             1)))
-                                 (when (<= length 1)
-                                   (return-from %temporary-3))
-                                 (setf buffer
-                                         (%allocate
-                                          (%c-expression-to-size-t
-                                           (* (%c-expression-to-size-t 2)
-                                              (%c-uint-to-size-t length)))))
-                                 (drag-query-file-w drop i-2 buffer length)
-                                 (setf clength
-                                         (rgfw-create-utf8from-wide-string-win32
-                                          buffer 0 0))
-                                 (when (> clength 0)
-                                   (let ((cbuffer
-                                          (%allocate
-                                           (%c-i32-to-size-t clength))))
-                                     (when
-                                         (/=
-                                          (rgfw-create-utf8from-wide-string-win32
-                                           buffer cbuffer
-                                           (%c-i32-to-size-t clength))
-                                          0)
-                                       (rgfw-data-drop-callback win cbuffer
-                                        (%c-i32-to-size-t clength) 2))
-                                     (%free cbuffer)))
-                                 (%free buffer))))
-                        (%temporary-3)) (setf i-2
-                                                (%c-expression-to-u32
-                                                 (+
-                                                  (%c-expression-to-u32 i-2)
-                                                  1))))
+                  :do (let ((length 0) (buffer 0) (clength 0))
+                        (setf length
+                                (%c-expression-to-uint
+                                 (+ (drag-query-file-w drop i-2 0 0) 1)))
+                        (unless (<= length 1)
+                          (setf buffer
+                                  (%allocate
+                                   (%c-expression-to-size-t
+                                    (* (%c-expression-to-size-t 2)
+                                       (%c-uint-to-size-t length)))))
+                          (drag-query-file-w drop i-2 buffer length)
+                          (setf clength
+                                  (rgfw-create-utf8from-wide-string-win32
+                                   buffer 0 0))
+                          (when (> clength 0)
+                            (let ((cbuffer
+                                   (%allocate (%c-i32-to-size-t clength))))
+                              (when
+                                  (/=
+                                   (rgfw-create-utf8from-wide-string-win32
+                                    buffer cbuffer
+                                    (%c-i32-to-size-t clength))
+                                   0)
+                                (rgfw-data-drop-callback win cbuffer
+                                 (%c-i32-to-size-t clength) 2))
+                              (%free cbuffer)))
+                          (%free buffer))) (setf i-2
+                                                   (%c-expression-to-u32
+                                                    (+
+                                                     (%c-expression-to-u32
+                                                      i-2)
+                                                     1))))
             (drag-finish drop)))
          (t)))
      (def-window-proc-w h-wnd message w-param l-param))))
@@ -25299,26 +31748,22 @@
          (736
           (let ((scale-x 0.0) (scale-y 0.0))
             (setf scale-x
-                    (coerce
-                     (/
-                      (coerce
-                       (%c-dword-ptr-to-word
-                        (%c-expression-to-dword-ptr
-                         (logand
-                          (%c-expression-to-dword-ptr (ash w-param -16))
-                          65535)))
-                       'single-float)
-                      96.0)
-                     'single-float)
+                    (/
+                     (coerce
+                      (%c-dword-ptr-to-word
+                       (%c-expression-to-dword-ptr
+                        (logand
+                         (%c-expression-to-dword-ptr (ash w-param -16))
+                         65535)))
+                      'single-float)
+                     96.0)
                   scale-y
-                    (coerce
-                     (/
-                      (coerce
-                       (%c-dword-ptr-to-word
-                        (%c-expression-to-dword-ptr (logand w-param 65535)))
-                       'single-float)
-                      96.0)
-                     'single-float))
+                    (/
+                     (coerce
+                      (%c-dword-ptr-to-word
+                       (%c-expression-to-dword-ptr (logand w-param 65535)))
+                      'single-float)
+                     96.0))
             (rgfw-scale-updated-callback win scale-x scale-y)
             (return-from wnd-proc-w
               (def-window-proc-w h-wnd message w-param l-param))))
@@ -25339,17 +31784,15 @@
             (setf area (%c-lparam-to-pointer l-param)
                   edge (%c-wparam-to-i32 w-param)
                   ratio
-                    (coerce
-                     (/
-                      (coerce
-                       (%rgfw-window-src-aspect-ratio-w
-                        (%address-rgfw-window-src win))
-                       'double-float)
-                      (coerce
-                       (%rgfw-window-src-aspect-ratio-h
-                        (%address-rgfw-window-src win))
-                       'double-float))
-                     'double-float))
+                    (/
+                     (coerce
+                      (%rgfw-window-src-aspect-ratio-w
+                       (%address-rgfw-window-src win))
+                      'double-float)
+                     (coerce
+                      (%rgfw-window-src-aspect-ratio-h
+                       (%address-rgfw-window-src win))
+                      'double-float)))
             (cond
              ((or (= edge 1) (= edge 7) (= edge 2) (= edge 8))
               (setf (%tag-rect-bottom area)
@@ -25357,32 +31800,26 @@
                        (+ (%tag-rect-top area)
                           (- (%tag-rect-bottom frame) (%tag-rect-top frame)))
                        (%c-double-to-i32
-                        (coerce
-                         (/
-                          (coerce
-                           (-
-                            (- (%tag-rect-right area) (%tag-rect-left area))
-                            (- (%tag-rect-right frame)
-                               (%tag-rect-left frame)))
-                           'double-float)
-                          ratio)
-                         'double-float)))))
+                        (/
+                         (coerce
+                          (- (- (%tag-rect-right area) (%tag-rect-left area))
+                             (- (%tag-rect-right frame)
+                                (%tag-rect-left frame)))
+                          'double-float)
+                         ratio)))))
              ((or (= edge 4) (= edge 5))
               (setf (%tag-rect-top area)
                       (-
                        (- (%tag-rect-bottom area)
                           (- (%tag-rect-bottom frame) (%tag-rect-top frame)))
                        (%c-double-to-i32
-                        (coerce
-                         (/
-                          (coerce
-                           (-
-                            (- (%tag-rect-right area) (%tag-rect-left area))
-                            (- (%tag-rect-right frame)
-                               (%tag-rect-left frame)))
-                           'double-float)
-                          ratio)
-                         'double-float)))))
+                        (/
+                         (coerce
+                          (- (- (%tag-rect-right area) (%tag-rect-left area))
+                             (- (%tag-rect-right frame)
+                                (%tag-rect-left frame)))
+                          'double-float)
+                         ratio)))))
              ((or (= edge 3) (= edge 6))
               (setf (%tag-rect-right area)
                       (+
@@ -25703,8 +32140,8 @@
                  (raw
                   (or %static-2
                       (setf %static-2
-                              (let ((%temporary-14 (%allocate 40)))
-                                %temporary-14))))
+                              (let ((%temporary-3 (%allocate 40)))
+                                %temporary-3))))
                  (vec-x 0.0)
                  (vec-y 0.0)
                  (%data (%address-tag-rawinput-data raw))
@@ -25742,42 +32179,34 @@
                   (if (not
                        (%zero-p (logand (%tag-rawmouse-us-flags %mouse) 2)))
                       (progn
-                       (let ((%temporary-15 pos))
-                         (setf (%tag-point-x %temporary-15)
-                                 (+ (%tag-point-x %temporary-15)
-                                    (get-system-metrics 76))))
-                       (let ((%temporary-16 pos))
-                         (setf (%tag-point-y %temporary-16)
-                                 (+ (%tag-point-y %temporary-16)
-                                    (get-system-metrics 77))))
+                       (with-accessors ((%x %tag-point-x)) pos
+                          (setf %x (+ %x (get-system-metrics 76))))
+                       (with-accessors ((%y %tag-point-y)) pos
+                          (setf %y (+ %y (get-system-metrics 77))))
                        (setf width (get-system-metrics 78)
                              height (get-system-metrics 79)))
                       (setf width (get-system-metrics 0)
                             height (get-system-metrics 1)))
-                  (let ((%temporary-17 pos))
-                    (setf (%tag-point-x %temporary-17)
-                            (+ (%tag-point-x %temporary-17)
-                               (truncate
-                                (*
-                                 (coerce
+                  (with-accessors ((%x-2 %tag-point-x)) pos
+                     (setf %x-2
+                             (+ %x-2
+                                (truncate
+                                 (*
                                   (/
                                    (coerce (%tag-rawmouse-l-last-x %mouse)
                                            'single-float)
                                    65535.0)
-                                  'single-float)
-                                 (coerce width 'single-float))))))
-                  (let ((%temporary-18 pos))
-                    (setf (%tag-point-y %temporary-18)
-                            (+ (%tag-point-y %temporary-18)
-                               (truncate
-                                (*
-                                 (coerce
+                                  (coerce width 'single-float))))))
+                  (with-accessors ((%y-2 %tag-point-y)) pos
+                     (setf %y-2
+                             (+ %y-2
+                                (truncate
+                                 (*
                                   (/
                                    (coerce (%tag-rawmouse-l-last-y %mouse)
                                            'single-float)
                                    65535.0)
-                                  'single-float)
-                                 (coerce height 'single-float))))))
+                                  (coerce height 'single-float))))))
                   (screen-to-client
                    (%rgfw-window-src-window (%address-rgfw-window-src win))
                    pos)
@@ -25852,18 +32281,15 @@
          (522
           (let ((scroll-y
                  (coerce
-                  (coerce
-                   (/
-                    (coerce
-                     (%c-word-to-i16
-                      (%c-dword-ptr-to-word
-                       (%c-expression-to-dword-ptr
-                        (logand
-                         (%c-expression-to-dword-ptr (ash w-param -16))
-                         65535))))
-                     'double-float)
-                    120.0d0)
-                   'double-float)
+                  (/
+                   (coerce
+                    (%c-word-to-i16
+                     (%c-dword-ptr-to-word
+                      (%c-expression-to-dword-ptr
+                       (logand (%c-expression-to-dword-ptr (ash w-param -16))
+                               65535))))
+                    'double-float)
+                   120.0d0)
                   'single-float)))
             (rgfw-mouse-scroll-callback win 0.0 scroll-y)))
          (526
@@ -25871,18 +32297,16 @@
                  (coerce
                   (-
                    (coerce
-                    (coerce
-                     (/
-                      (coerce
-                       (%c-word-to-i16
-                        (%c-dword-ptr-to-word
-                         (%c-expression-to-dword-ptr
-                          (logand
-                           (%c-expression-to-dword-ptr (ash w-param -16))
-                           65535))))
-                       'double-float)
-                      120.0d0)
-                     'double-float)
+                    (/
+                     (coerce
+                      (%c-word-to-i16
+                       (%c-dword-ptr-to-word
+                        (%c-expression-to-dword-ptr
+                         (logand
+                          (%c-expression-to-dword-ptr (ash w-param -16))
+                          65535))))
+                      'double-float)
+                     120.0d0)
                     'single-float))
                   'single-float)))
             (rgfw-mouse-scroll-callback win scroll-x 0.0)))
@@ -25906,43 +32330,39 @@
                     (%c-uint-to-size-t
                      (drag-query-file-w drop 4294967295 0 0))
                   i-2 0)
-            (loop :while (< i-2 count)
-                  :do (flet ((%temporary-3 ()
-                               (let ((length 0) (buffer 0) (clength 0))
-                                 (setf length
-                                         (%c-expression-to-uint
-                                          (+ (drag-query-file-w drop i-2 0 0)
-                                             1)))
-                                 (when (<= length 1)
-                                   (return-from %temporary-3))
-                                 (setf buffer
-                                         (%allocate
-                                          (%c-expression-to-size-t
-                                           (* (%c-expression-to-size-t 2)
-                                              (%c-uint-to-size-t length)))))
-                                 (drag-query-file-w drop i-2 buffer length)
-                                 (setf clength
-                                         (rgfw-create-utf8from-wide-string-win32
-                                          buffer 0 0))
-                                 (when (> clength 0)
-                                   (let ((cbuffer
-                                          (%allocate
-                                           (%c-i32-to-size-t clength))))
-                                     (when
-                                         (/=
-                                          (rgfw-create-utf8from-wide-string-win32
-                                           buffer cbuffer
-                                           (%c-i32-to-size-t clength))
-                                          0)
-                                       (rgfw-data-drop-callback win cbuffer
-                                        (%c-i32-to-size-t clength) 2))
-                                     (%free cbuffer)))
-                                 (%free buffer))))
-                        (%temporary-3)) (setf i-2
-                                                (%c-expression-to-u32
-                                                 (+
-                                                  (%c-expression-to-u32 i-2)
-                                                  1))))
+            (loop :while (< i-2 (%c-size-t-to-u32 count))
+                  :do (let ((length 0) (buffer 0) (clength 0))
+                        (setf length
+                                (%c-expression-to-uint
+                                 (+ (drag-query-file-w drop i-2 0 0) 1)))
+                        (unless (<= length 1)
+                          (setf buffer
+                                  (%allocate
+                                   (%c-expression-to-size-t
+                                    (* (%c-expression-to-size-t 2)
+                                       (%c-uint-to-size-t length)))))
+                          (drag-query-file-w drop i-2 buffer length)
+                          (setf clength
+                                  (rgfw-create-utf8from-wide-string-win32
+                                   buffer 0 0))
+                          (when (> clength 0)
+                            (let ((cbuffer
+                                   (%allocate (%c-i32-to-size-t clength))))
+                              (when
+                                  (/=
+                                   (rgfw-create-utf8from-wide-string-win32
+                                    buffer cbuffer
+                                    (%c-i32-to-size-t clength))
+                                   0)
+                                (rgfw-data-drop-callback win cbuffer
+                                 (%c-i32-to-size-t clength) 2))
+                              (%free cbuffer)))
+                          (%free buffer))) (setf i-2
+                                                   (%c-expression-to-u32
+                                                    (+
+                                                     (%c-expression-to-u32
+                                                      i-2)
+                                                     1))))
             (drag-finish drop)))
          (t)))
      (def-window-proc-w h-wnd message w-param l-param))))
@@ -25951,8 +32371,8 @@
  ((%arg-0 :pointer) (%arg-1 :uint32) (%arg-2 :uint64) (%arg-3 :int64))
  (wnd-proc-w (cffi:pointer-address %arg-0) %arg-1 %arg-2 %arg-3))
 #+(:and :windows :x86 (:not :x86-64))
-(cffi:defcallback (%callback-wnd-proc-w :convention :stdcall) :int32
- ((%arg-0 :pointer) (%arg-1 :uint32) (%arg-2 :uint32) (%arg-3 :int32))
+(cffi:defcallback (%callback-wnd-proc-w :convention :stdcall) :long
+ ((%arg-0 :pointer) (%arg-1 :uint32) (%arg-2 :uint32) (%arg-3 :long))
  (wnd-proc-w (cffi:pointer-address %arg-0) %arg-1 %arg-2 %arg-3))
 #+(:and :windows (:or :x86-64 :arm64))
 (cffi:defcallback %callback-rgfw-win32-get-monitor-handle :int32
@@ -25962,7 +32382,7 @@
 #+(:and :windows :x86 (:not :x86-64))
 (cffi:defcallback
  (%callback-rgfw-win32-get-monitor-handle :convention :stdcall) :int32
- ((%arg-0 :pointer) (%arg-1 :pointer) (%arg-2 :pointer) (%arg-3 :int32))
+ ((%arg-0 :pointer) (%arg-1 :pointer) (%arg-2 :pointer) (%arg-3 :long))
  (rgfw-win32-get-monitor-handle (cffi:pointer-address %arg-0)
   (cffi:pointer-address %arg-1) (cffi:pointer-address %arg-2) %arg-3))
 #+(:and :windows (:or :x86-64 :arm64 (:and (:not :x86-64) :x86)))
@@ -25973,6 +32393,282 @@
   (cffi:pointer-address
    (cffi:callback %callback-rgfw-win32-get-monitor-handle))
   'rgfw-win32-get-monitor-handle))
+#+(:and :darwin (:or :x86-64 :arm64))
+(progn
+ (cffi:defcallback %callback-rgfw--osx-did-change-screen-parameters :void
+  ((%arg-0 :pointer) (%arg-1 :pointer) (%arg-2 :pointer))
+  (rgfw--osx-did-change-screen-parameters (cffi:pointer-address %arg-0)
+   (cffi:pointer-address %arg-1) (cffi:pointer-address %arg-2)))
+ (cffi:defcallback %callback-rgfw--osx-application-should-terminate
+  :unsigned-long ((%arg-0 :pointer) (%arg-1 :pointer) (%arg-2 :pointer))
+  (rgfw--osx-application-should-terminate (cffi:pointer-address %arg-0)
+   (cffi:pointer-address %arg-1) (cffi:pointer-address %arg-2)))
+ (cffi:defcallback %callback-rgfw--osx-accepts-first-mouse :int8
+  ((%arg-0 :pointer) (%arg-1 :pointer) (%arg-2 :pointer))
+  (rgfw--osx-accepts-first-mouse (cffi:pointer-address %arg-0)
+   (cffi:pointer-address %arg-1) (cffi:pointer-address %arg-2)))
+ (cffi:defcallback %callback-rgfw--osx-draw-rect :void
+  ((%cif :pointer) (%result :pointer) (%arguments :pointer)
+   (%user-data :pointer))
+  (declare (ignore %cif %user-data %result))
+  (%with-native-frame nil
+   (rgfw--osx-draw-rect
+    (%load (cffi:pointer-address (cffi:mem-aref %arguments :pointer 0))
+     :pointer)
+    (%load (cffi:pointer-address (cffi:mem-aref %arguments :pointer 1))
+     :pointer)
+    (cffi:pointer-address (cffi:mem-aref %arguments :pointer 2)))))
+ (cffi:defcallback %callback-rgfw--osx-view-did-change-backing-properties
+  :void ((%arg-0 :pointer) (%arg-1 :pointer))
+  (rgfw--osx-view-did-change-backing-properties (cffi:pointer-address %arg-0)
+   (cffi:pointer-address %arg-1)))
+ (cffi:defcallback %callback-rgfw--osx-mouse-down :void
+  ((%arg-0 :pointer) (%arg-1 :pointer) (%arg-2 :pointer))
+  (rgfw--osx-mouse-down (cffi:pointer-address %arg-0)
+   (cffi:pointer-address %arg-1) (cffi:pointer-address %arg-2)))
+ (cffi:defcallback %callback-rgfw--osx-mouse-up :void
+  ((%arg-0 :pointer) (%arg-1 :pointer) (%arg-2 :pointer))
+  (rgfw--osx-mouse-up (cffi:pointer-address %arg-0)
+   (cffi:pointer-address %arg-1) (cffi:pointer-address %arg-2)))
+ (cffi:defcallback %callback-rgfw--osx-scroll-wheel :void
+  ((%arg-0 :pointer) (%arg-1 :pointer) (%arg-2 :pointer))
+  (rgfw--osx-scroll-wheel (cffi:pointer-address %arg-0)
+   (cffi:pointer-address %arg-1) (cffi:pointer-address %arg-2)))
+ (cffi:defcallback %callback-rgfw--osx-mouse-moved :void
+  ((%arg-0 :pointer) (%arg-1 :pointer) (%arg-2 :pointer))
+  (rgfw--osx-mouse-moved (cffi:pointer-address %arg-0)
+   (cffi:pointer-address %arg-1) (cffi:pointer-address %arg-2)))
+ (cffi:defcallback %callback-rgfw--osx-key-down :void
+  ((%arg-0 :pointer) (%arg-1 :pointer) (%arg-2 :pointer))
+  (rgfw--osx-key-down (cffi:pointer-address %arg-0)
+   (cffi:pointer-address %arg-1) (cffi:pointer-address %arg-2)))
+ (cffi:defcallback %callback-rgfw--osx-key-up :void
+  ((%arg-0 :pointer) (%arg-1 :pointer) (%arg-2 :pointer))
+  (rgfw--osx-key-up (cffi:pointer-address %arg-0)
+   (cffi:pointer-address %arg-1) (cffi:pointer-address %arg-2)))
+ (cffi:defcallback %callback-rgfw--osx-mouse-entered :void
+  ((%arg-0 :pointer) (%arg-1 :pointer) (%arg-2 :pointer))
+  (rgfw--osx-mouse-entered (cffi:pointer-address %arg-0)
+   (cffi:pointer-address %arg-1) (cffi:pointer-address %arg-2)))
+ (cffi:defcallback %callback-rgfw--osx-mouse-exited :void
+  ((%arg-0 :pointer) (%arg-1 :pointer) (%arg-2 :pointer))
+  (rgfw--osx-mouse-exited (cffi:pointer-address %arg-0)
+   (cffi:pointer-address %arg-1) (cffi:pointer-address %arg-2)))
+ (cffi:defcallback %callback-rgfw--osx-flags-changed :void
+  ((%arg-0 :pointer) (%arg-1 :pointer) (%arg-2 :pointer))
+  (rgfw--osx-flags-changed (cffi:pointer-address %arg-0)
+   (cffi:pointer-address %arg-1) (cffi:pointer-address %arg-2)))
+ (cffi:defcallback %callback-rgfw--osx-accepts-first-responder :int8
+  ((%arg-0 :pointer) (%arg-1 :pointer))
+  (rgfw--osx-accepts-first-responder (cffi:pointer-address %arg-0)
+   (cffi:pointer-address %arg-1)))
+ (cffi:defcallback %callback-rgfw--osx-custom-init-with-rgfw-window :pointer
+  ((%arg-0 :pointer) (%arg-1 :pointer) (%arg-2 :pointer))
+  (%native-pointer
+   (rgfw--osx-custom-init-with-rgfw-window (cffi:pointer-address %arg-0)
+    (cffi:pointer-address %arg-1) (cffi:pointer-address %arg-2))))
+ (cffi:defcallback %callback-rgfw--osx-wants-update-layer :int8
+  ((%arg-0 :pointer) (%arg-1 :pointer))
+  (rgfw--osx-wants-update-layer (cffi:pointer-address %arg-0)
+   (cffi:pointer-address %arg-1)))
+ (cffi:defcallback %callback-rgfw--osx-update-layer :void
+  ((%arg-0 :pointer) (%arg-1 :pointer))
+  (rgfw--osx-update-layer (cffi:pointer-address %arg-0)
+   (cffi:pointer-address %arg-1)))
+ (cffi:defcallback %callback-rgfw--osx-dragging-entered :unsigned-long
+  ((%arg-0 :pointer) (%arg-1 :pointer) (%arg-2 :pointer))
+  (rgfw--osx-dragging-entered (cffi:pointer-address %arg-0)
+   (cffi:pointer-address %arg-1) (cffi:pointer-address %arg-2)))
+ (cffi:defcallback %callback-rgfw--osx-dragging-updated :unsigned-long
+  ((%arg-0 :pointer) (%arg-1 :pointer) (%arg-2 :pointer))
+  (rgfw--osx-dragging-updated (cffi:pointer-address %arg-0)
+   (cffi:pointer-address %arg-1) (cffi:pointer-address %arg-2)))
+ (cffi:defcallback %callback-rgfw--osx-dragging-ended :void
+  ((%arg-0 :pointer) (%arg-1 :pointer) (%arg-2 :pointer))
+  (rgfw--osx-dragging-ended (cffi:pointer-address %arg-0)
+   (cffi:pointer-address %arg-1) (cffi:pointer-address %arg-2)))
+ (cffi:defcallback %callback-rgfw--osx-prepare-for-drag-operation :int8
+  ((%arg-0 :pointer))
+  (rgfw--osx-prepare-for-drag-operation (cffi:pointer-address %arg-0)))
+ (cffi:defcallback %callback-rgfw--osx-perform-drag-operation :int8
+  ((%arg-0 :pointer) (%arg-1 :pointer) (%arg-2 :pointer))
+  (rgfw--osx-perform-drag-operation (cffi:pointer-address %arg-0)
+   (cffi:pointer-address %arg-1) (cffi:pointer-address %arg-2)))
+ (cffi:defcallback %callback-rgfw--osx-perform-key-equivalent :int8
+  ((%arg-0 :pointer) (%arg-1 :pointer) (%arg-2 :pointer))
+  (rgfw--osx-perform-key-equivalent (cffi:pointer-address %arg-0)
+   (cffi:pointer-address %arg-1) (cffi:pointer-address %arg-2)))
+ (cffi:defcallback %callback-rgfw--osx-update-tracking-areas :void
+  ((%arg-0 :pointer) (%arg-1 :pointer))
+  (rgfw--osx-update-tracking-areas (cffi:pointer-address %arg-0)
+   (cffi:pointer-address %arg-1)))
+ (cffi:defcallback %callback-rgfw--osx-view-dealloc :void
+  ((%arg-0 :pointer) (%arg-1 :pointer))
+  (rgfw--osx-view-dealloc (cffi:pointer-address %arg-0)
+   (cffi:pointer-address %arg-1)))
+ (cffi:defcallback %callback-rgfw--osx-did-window-resize :void
+  ((%arg-0 :pointer) (%arg-1 :pointer) (%arg-2 :pointer))
+  (rgfw--osx-did-window-resize (cffi:pointer-address %arg-0)
+   (cffi:pointer-address %arg-1) (cffi:pointer-address %arg-2)))
+ (cffi:defcallback %callback-rgfw--osx-window-move :void
+  ((%arg-0 :pointer) (%arg-1 :pointer) (%arg-2 :pointer))
+  (rgfw--osx-window-move (cffi:pointer-address %arg-0)
+   (cffi:pointer-address %arg-1) (cffi:pointer-address %arg-2)))
+ (cffi:defcallback %callback-rgfw--osx-window-miniaturize :void
+  ((%arg-0 :pointer) (%arg-1 :pointer) (%arg-2 :pointer))
+  (rgfw--osx-window-miniaturize (cffi:pointer-address %arg-0)
+   (cffi:pointer-address %arg-1) (cffi:pointer-address %arg-2)))
+ (cffi:defcallback %callback-rgfw--osx-window-deminiaturize :void
+  ((%arg-0 :pointer) (%arg-1 :pointer) (%arg-2 :pointer))
+  (rgfw--osx-window-deminiaturize (cffi:pointer-address %arg-0)
+   (cffi:pointer-address %arg-1) (cffi:pointer-address %arg-2)))
+ (cffi:defcallback %callback-rgfw--osx-window-became-key :void
+  ((%arg-0 :pointer) (%arg-1 :pointer) (%arg-2 :pointer))
+  (rgfw--osx-window-became-key (cffi:pointer-address %arg-0)
+   (cffi:pointer-address %arg-1) (cffi:pointer-address %arg-2)))
+ (cffi:defcallback %callback-rgfw--osx-window-resign-key :void
+  ((%arg-0 :pointer) (%arg-1 :pointer) (%arg-2 :pointer))
+  (rgfw--osx-window-resign-key (cffi:pointer-address %arg-0)
+   (cffi:pointer-address %arg-1) (cffi:pointer-address %arg-2)))
+ (cffi:defcallback %callback-rgfw-osx-window-should-close :int8
+  ((%arg-0 :pointer) (%arg-1 :pointer) (%arg-2 :pointer))
+  (rgfw-osx-window-should-close (cffi:pointer-address %arg-0)
+   (cffi:pointer-address %arg-1) (cffi:pointer-address %arg-2)))
+ (cffi:defcallback %callback-rgfw--osx-can-become-key-window :int8
+  ((%arg-0 :pointer) (%arg-1 :pointer))
+  (rgfw--osx-can-become-key-window (cffi:pointer-address %arg-0)
+   (cffi:pointer-address %arg-1)))
+ (cffi:defcallback %callback-rgfw--osx-can-become-main-window :int8
+  ((%arg-0 :pointer) (%arg-1 :pointer))
+  (rgfw--osx-can-become-main-window (cffi:pointer-address %arg-0)
+   (cffi:pointer-address %arg-1)))
+ (%register-translated-function
+  (cffi:pointer-address
+   (cffi:callback %callback-rgfw--osx-did-change-screen-parameters))
+  'rgfw--osx-did-change-screen-parameters)
+ (%register-translated-function
+  (cffi:pointer-address
+   (cffi:callback %callback-rgfw--osx-application-should-terminate))
+  'rgfw--osx-application-should-terminate)
+ (%register-translated-function
+  (cffi:pointer-address
+   (cffi:callback %callback-rgfw--osx-accepts-first-mouse))
+  'rgfw--osx-accepts-first-mouse)
+ (%register-translated-function
+  (cffi:pointer-address
+   (%aggregate-callback '%callback-rgfw--osx-draw-rect
+    (cffi:callback %callback-rgfw--osx-draw-rect) ':void
+    '(:pointer :pointer (:struct %abi-struct-3))))
+  'rgfw--osx-draw-rect)
+ (%register-translated-function
+  (cffi:pointer-address
+   (cffi:callback %callback-rgfw--osx-view-did-change-backing-properties))
+  'rgfw--osx-view-did-change-backing-properties)
+ (%register-translated-function
+  (cffi:pointer-address (cffi:callback %callback-rgfw--osx-mouse-down))
+  'rgfw--osx-mouse-down)
+ (%register-translated-function
+  (cffi:pointer-address (cffi:callback %callback-rgfw--osx-mouse-up))
+  'rgfw--osx-mouse-up)
+ (%register-translated-function
+  (cffi:pointer-address (cffi:callback %callback-rgfw--osx-scroll-wheel))
+  'rgfw--osx-scroll-wheel)
+ (%register-translated-function
+  (cffi:pointer-address (cffi:callback %callback-rgfw--osx-mouse-moved))
+  'rgfw--osx-mouse-moved)
+ (%register-translated-function
+  (cffi:pointer-address (cffi:callback %callback-rgfw--osx-key-down))
+  'rgfw--osx-key-down)
+ (%register-translated-function
+  (cffi:pointer-address (cffi:callback %callback-rgfw--osx-key-up))
+  'rgfw--osx-key-up)
+ (%register-translated-function
+  (cffi:pointer-address (cffi:callback %callback-rgfw--osx-mouse-entered))
+  'rgfw--osx-mouse-entered)
+ (%register-translated-function
+  (cffi:pointer-address (cffi:callback %callback-rgfw--osx-mouse-exited))
+  'rgfw--osx-mouse-exited)
+ (%register-translated-function
+  (cffi:pointer-address (cffi:callback %callback-rgfw--osx-flags-changed))
+  'rgfw--osx-flags-changed)
+ (%register-translated-function
+  (cffi:pointer-address
+   (cffi:callback %callback-rgfw--osx-accepts-first-responder))
+  'rgfw--osx-accepts-first-responder)
+ (%register-translated-function
+  (cffi:pointer-address
+   (cffi:callback %callback-rgfw--osx-custom-init-with-rgfw-window))
+  'rgfw--osx-custom-init-with-rgfw-window)
+ (%register-translated-function
+  (cffi:pointer-address
+   (cffi:callback %callback-rgfw--osx-wants-update-layer))
+  'rgfw--osx-wants-update-layer)
+ (%register-translated-function
+  (cffi:pointer-address (cffi:callback %callback-rgfw--osx-update-layer))
+  'rgfw--osx-update-layer)
+ (%register-translated-function
+  (cffi:pointer-address (cffi:callback %callback-rgfw--osx-dragging-entered))
+  'rgfw--osx-dragging-entered)
+ (%register-translated-function
+  (cffi:pointer-address (cffi:callback %callback-rgfw--osx-dragging-updated))
+  'rgfw--osx-dragging-updated)
+ (%register-translated-function
+  (cffi:pointer-address (cffi:callback %callback-rgfw--osx-dragging-ended))
+  'rgfw--osx-dragging-ended)
+ (%register-translated-function
+  (cffi:pointer-address
+   (cffi:callback %callback-rgfw--osx-prepare-for-drag-operation))
+  'rgfw--osx-prepare-for-drag-operation)
+ (%register-translated-function
+  (cffi:pointer-address
+   (cffi:callback %callback-rgfw--osx-perform-drag-operation))
+  'rgfw--osx-perform-drag-operation)
+ (%register-translated-function
+  (cffi:pointer-address
+   (cffi:callback %callback-rgfw--osx-perform-key-equivalent))
+  'rgfw--osx-perform-key-equivalent)
+ (%register-translated-function
+  (cffi:pointer-address
+   (cffi:callback %callback-rgfw--osx-update-tracking-areas))
+  'rgfw--osx-update-tracking-areas)
+ (%register-translated-function
+  (cffi:pointer-address (cffi:callback %callback-rgfw--osx-view-dealloc))
+  'rgfw--osx-view-dealloc)
+ (%register-translated-function
+  (cffi:pointer-address
+   (cffi:callback %callback-rgfw--osx-did-window-resize))
+  'rgfw--osx-did-window-resize)
+ (%register-translated-function
+  (cffi:pointer-address (cffi:callback %callback-rgfw--osx-window-move))
+  'rgfw--osx-window-move)
+ (%register-translated-function
+  (cffi:pointer-address
+   (cffi:callback %callback-rgfw--osx-window-miniaturize))
+  'rgfw--osx-window-miniaturize)
+ (%register-translated-function
+  (cffi:pointer-address
+   (cffi:callback %callback-rgfw--osx-window-deminiaturize))
+  'rgfw--osx-window-deminiaturize)
+ (%register-translated-function
+  (cffi:pointer-address
+   (cffi:callback %callback-rgfw--osx-window-became-key))
+  'rgfw--osx-window-became-key)
+ (%register-translated-function
+  (cffi:pointer-address
+   (cffi:callback %callback-rgfw--osx-window-resign-key))
+  'rgfw--osx-window-resign-key)
+ (%register-translated-function
+  (cffi:pointer-address
+   (cffi:callback %callback-rgfw-osx-window-should-close))
+  'rgfw-osx-window-should-close)
+ (%register-translated-function
+  (cffi:pointer-address
+   (cffi:callback %callback-rgfw--osx-can-become-key-window))
+  'rgfw--osx-can-become-key-window)
+ (%register-translated-function
+  (cffi:pointer-address
+   (cffi:callback %callback-rgfw--osx-can-become-main-window))
+  'rgfw--osx-can-become-main-window))
 (%fill rgfw-layouts 0 120)
 (%fill (%offset rgfw-layouts 0) 0 20)
 (setf (%rgfw-color-layout-r (%offset rgfw-layouts 0)) 0)
